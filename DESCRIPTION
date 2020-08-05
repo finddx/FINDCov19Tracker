@@ -27,7 +27,6 @@ Imports:
     plyr,
     purrr,
     RColorBrewer,
-    rdrop2,
     readr,
     readxl,
     reshape2,
