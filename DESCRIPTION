@@ -10,10 +10,11 @@ Authors@R:
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Imports:
-    data.table,
+    checkmate,
     cli,
     countrycode,
     curl,
+    data.table,
     dplyr (>= 1.0.0),
     fuzzyjoin,
     geojsonio,
@@ -21,6 +22,7 @@ Imports:
     ggplot2,
     gh,
     here,
+    janitor,
     leaflet,
     lubridate,
     magrittr,
