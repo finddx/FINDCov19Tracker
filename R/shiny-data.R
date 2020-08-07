@@ -242,7 +242,7 @@ create_shiny_data <- function() {
       pos = sum_ratio(all_new_cases, all_new_tests)
     ) %>%
     ungroup() %>%
-    add_column(set = "region", .before = 1)
+    add_column(set = "income", .before = 1)
 
   shiny_data <-
     bind_rows(data_country, data_region, data_income) %>%
