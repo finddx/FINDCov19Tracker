@@ -188,7 +188,7 @@ create_shiny_data <- function() {
       )
     ) %>%
     # positivity rate
-    mutate(pos = all_new_cases / all_new_tests) %>%
+    mutate(pos = na_if(all_new_cases / all_new_tests, Inf)) %>%
     add_column(set = "country", .before = 1) %>%
     rename(unit = country)
 
