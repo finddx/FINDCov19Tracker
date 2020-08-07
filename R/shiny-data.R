@@ -164,73 +164,92 @@ create_shiny_data <- function() {
     select(-name_not_used) %>%
     filter(!is.na(country))
 
-  # bring data to long structure
-  country <-
+  data_country <-
     data_combined %>%
     select(-name) %>%
-    rename(
-      cum_cases = cases,
-      cum_deaths = deaths,
-      cum_tests = tests,
-      pop = pop_100k,
-      time = date
-    ) %>%
-    select(country, time, pop, everything()) %>%
+    # prefix cummulative vars
+    rename(cum_cases = cases, cum_deaths = deaths, cum_tests = tests, time = date) %>%
+    # rolling averages of 7 for new vars
+    arrange(country, time) %>%
+    group_by(country) %>%
+    mutate(across(starts_with("new"), function(e) data.table::frollmean(e, 7, na.rm = T))) %>%
+    ungroup() %>%
+    # per capita
     mutate(
-      cum_pos = 100 * cum_cases / cum_tests,
-      new_pos = 100 * new_cases / new_tests
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        function(e) e / pop_100k,
+        .names = "cap_{col}"
+      ),
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        function(e) e,
+        .names = "all_{col}"
+      )
     ) %>%
-    tidyr::pivot_longer(
-      cum_cases:new_pos,
-      names_to = c("diff", "var"),
-      names_pattern = "(.+)_(.+)",
-      values_to = c("value_all")
-    )
+    # positivity rate
+    mutate(pos = all_new_cases / all_new_tests) %>%
+    add_column(set = "country", .before = 1) %>%
+    rename(unit = country)
 
-  region <-
-    country %>%
-    left_join(select(country_info, country, region), by = "country") %>%
-    group_by(time, unit = region, diff, var) %>%
-    summarize_at(vars(pop, value_all), sum, na.rm = TRUE) %>%
+  # aggregate to regions, income groups
+
+  # if ratios are aggregated, only use observations that have data for nominator and denominator
+  sum_ratio <- function(nominator, denominator) {
+    in_use <- !is.na(nominator) & !is.na(denominator)
+    sum(nominator[in_use]) / sum(denominator[in_use])
+  }
+
+  sum_basic <- function(x) {
+    sum(x, na.rm = TRUE)
+  }
+
+  data_region <-
+    data_country %>%
+    left_join(select(country_info, unit = country, region, income), by = "unit") %>%
+    group_by(unit = region, time) %>%
+    summarize(
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        function(e) sum_ratio(e, pop_100k),
+        .names = "cap_{col}"
+      ),
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        function(e) sum_basic(e),
+        .names = "all_{col}"
+      ),
+      pos = sum_ratio(all_new_cases, all_new_tests)
+    ) %>%
     ungroup() %>%
     add_column(set = "region", .before = 1)
 
-  income <-
-    country %>%
-    left_join(select(country_info, country, income), by = "country") %>%
-    group_by(time, unit = income, diff, var) %>%
-    summarize_at(vars(pop, value_all), sum, na.rm = TRUE) %>%
-    ungroup() %>%
-    add_column(set = "income", .before = 1)
-
-  all <-
-    country %>%
-    rename(unit = country) %>%
-    add_column(set = "country", .before = 1) %>%
-
-    # add_column(set = "country", .before = 1) %>%
-    bind_rows(region, income) %>%
-    # posivity rate is the same if displyed per capita
-    mutate(value_cap = if_else(var == "pos", value_all, value_all / pop)) %>%
-    select(-pop) %>%
-    tidyr::pivot_longer(
-      value_all:value_cap,
-      names_to = "ref",
-      names_pattern = "value_(.+)",
-      values_to = c("value")
+  data_income <-
+    data_country %>%
+    left_join(select(country_info, unit = country, region, income), by = "unit") %>%
+    group_by(unit = income, time) %>%
+    summarize(
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        function(e) sum_ratio(e, pop_100k),
+        .names = "cap_{col}"
+      ),
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        function(e) sum_basic(e),
+        .names = "all_{col}"
+      ),
+      pos = sum_ratio(all_new_cases, all_new_tests)
     ) %>%
-    filter(!is.na(value)) %>%
-    filter(!is.na(unit))
-
-
-  # 7 day moving averages
-  shiny_data <-
-    all %>%
-    filter(diff == "new") %>%
-    group_by(unit, var, ref) %>%
-    mutate(value = data.table::frollmean(value, 7, na.rm = T)) %>%
     ungroup() %>%
-    bind_rows(filter(all, diff == "cum")) %>%
+    add_column(set = "region", .before = 1)
+
+  shiny_data <-
+    bind_rows(data_country, data_region, data_income) %>%
+    # quadrupple pos series, to have all combinations
+    mutate(cap_cum_pos = pos, all_cum_pos = pos, cap_new_pos = pos, all_new_pos = pos) %>%
+    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests, pop_100k, pos)) %>%
+    pivot_longer(-c(set, unit, time), names_to = c("ref", "diff", "var"), names_sep = "_") %>%
     filter(!is.na(value))
 
   all_latest_wide <-
@@ -250,6 +269,5 @@ create_shiny_data <- function() {
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(shiny_data, "processed/shiny_data.csv")
-
 
 }
