@@ -5,7 +5,7 @@
 \title{Preprocess JHU data
 Processes JHU input data}
 \usage{
-preprocess_jhu_data(input_df, tag)
+preprocess_jhu_data(input_df)
 }
 \description{
 Preprocess JHU data
