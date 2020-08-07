@@ -246,16 +246,20 @@ create_shiny_data <- function() {
 
   shiny_data <-
     bind_rows(data_country, data_region, data_income) %>%
+    filter(!is.na(unit)) %>%
+    mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e}))
+
+  shiny_data_long <-
+    shiny_data %>%
     # quadrupple pos series, to have all combinations
     mutate(pos = 100 * pos) %>%
     mutate(cap_cum_pos = pos, all_cum_pos = pos, cap_new_pos = pos, all_new_pos = pos) %>%
     select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests, pop_100k, pos)) %>%
     pivot_longer(-c(set, unit, time), names_to = c("ref", "diff", "var"), names_sep = "_") %>%
-    filter(!is.na(value)) %>%
-    filter(!is.na(unit))
+    filter(!is.na(value))
 
   all_latest_wide <-
-    shiny_data %>%
+    shiny_data_long %>%
     filter(diff == "new") %>%
     filter(ref == "cap") %>%
     arrange(unit, var, time) %>%
