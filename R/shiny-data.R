@@ -248,8 +248,8 @@ create_shiny_data <- function() {
     all_latest_wide %>%
     left_join(country_info, by = c("unit" = "country"))
 
-  readr::write_csv(unit_info, "../FINDCov19TrackerData/processed/unit_info.csv")
-  readr::write_csv(shiny_data, "../FINDCov19TrackerData/processed/shiny_data.csv")
+  readr::write_csv(unit_info, "processed/unit_info.csv")
+  readr::write_csv(shiny_data, "processed/shiny_data.csv")
 
 
 }
