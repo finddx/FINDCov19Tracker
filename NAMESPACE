@@ -2,6 +2,7 @@
 
 export(create_shiny_data)
 export(preprocess_jhu_data)
+export(preprocess_test_data)
 export(process_jhu_data)
 export(process_test_data)
 import(dplyr)

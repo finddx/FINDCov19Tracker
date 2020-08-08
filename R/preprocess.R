@@ -1,3 +1,9 @@
+#' Scrape test data from all countries
+#'
+#' @description
+#' Rowwise processing of countries test data reports with support for any file
+#' type (csv, pdf, xlsx, etc.)
+#' @export
 preprocess_test_data <- function() {
 
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/coronavirus_tests_countries_urls_CH_v7.xlsx")
