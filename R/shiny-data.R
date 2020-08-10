@@ -252,30 +252,22 @@ create_shiny_data <- function() {
   shiny_data <-
     bind_rows(data_country, data_region, data_income) %>%
     filter(!is.na(unit)) %>%
-    mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e}))
+    mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e})) %>%
+    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests))
 
-  shiny_data_long <-
+  latest <-
     shiny_data %>%
-    # quadrupple pos series, to have all combinations
-    mutate(pos = 100 * pos) %>%
-    mutate(cap_cum_pos = pos, all_cum_pos = pos, cap_new_pos = pos, all_new_pos = pos) %>%
-    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests, pop_100k, pos)) %>%
-    pivot_longer(-c(set, unit, time), names_to = c("ref", "diff", "var"), names_sep = "_") %>%
-    filter(!is.na(value))
-
-  all_latest_wide <-
-    shiny_data_long %>%
-    filter(diff == "new") %>%
-    filter(ref == "cap") %>%
-    arrange(unit, var, time) %>%
-    group_by(set, unit, diff, var, ref) %>%
-    summarize(value = value[n()]) %>%
-    ungroup() %>%
-    select(-diff, -ref) %>%
-    tidyr::pivot_wider(names_from = "var")
+    filter(time == max(shiny_data$time)) %>%
+    select(
+      set, unit,
+      cases = cap_new_cases,
+      deaths = cap_new_deaths,
+      pos = pos,
+      tests = cap_new_tests
+    )
 
   unit_info <-
-    all_latest_wide %>%
+    latest %>%
     left_join(country_info, by = c("unit" = "country"))
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
