@@ -200,6 +200,7 @@ create_shiny_data <- function() {
 
   # if ratios are aggregated, only use observations that have data for nominator and denominator
   sum_ratio <- function(nominator, denominator) {
+    denominator[denominator == 0] <- NA
     in_use <- !is.na(nominator) & !is.na(denominator)
     sum(nominator[in_use]) / sum(denominator[in_use])
   }
