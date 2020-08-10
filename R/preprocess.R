@@ -27,6 +27,7 @@ process_countries_rowwise <- function(...) {
   res = switch(dots$type,
     xlsx = fetch_from_csv_xlsx(dots),
     csv = fetch_from_csv_xlsx(dots),
+    json = fetch_from_json(dots),
     rep(NA, 2) # all other cases
     # more fetch functions here
   )

@@ -164,23 +164,26 @@ fetch_from_csv_xlsx <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-# fetch_from_json <- function(url, cumul, new) {
-#   message(url)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_json <- function(dots) {
 
-#   getData <- GET(url)
-#   getData_text <- content(getData, "text")
-#   getData_json <- fromJSON(getData_text, flatten = TRUE)
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   if (!is.na(cumul)) {
-#     tests_cumulative <- as.numeric(eval(parse(text = cumul)))
-#   }
-#   if (!is.na(new)) {
-#     new_tests <- as.numeric(eval(parse(text = new)))
-#   }
-#   return(c(new_tests, tests_cumulative))
-# }
+  getData <- httr::GET(dots$data_url)
+  getData_text <- httr::content(getData, "text", encoding = "UTF-8")
+  getData_json <- jsonlite::fromJSON(getData_text, flatten = TRUE)
+
+  if (!is.na(dots$xpath_cumul)) {
+    # FIXME: prefix namespace of last so we do not need to import all of dplyr
+    # because of "dplyr::last()" embedded in xpath_cumul
+    library(dplyr)
+    tests_cumulative <- as.numeric(eval(parse(text = dots$xpath_cumul)))
+  }
+  if (!is.na(dots$xpath_new)) {
+    new_tests <- as.numeric(eval(parse(text = dots$xpath_new)))
+  }
+  return(c(new_tests, tests_cumulative))
+}
 
 
 # is.error <- function(x) inherits(x, "try-error")
