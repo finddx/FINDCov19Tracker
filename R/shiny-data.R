@@ -6,6 +6,8 @@
 #' @import dplyr tibble
 create_shiny_data <- function() {
 
+  # library(tidyverse)
+
   # read and cobine data -------------------------------------------------------
 
   cv_cases <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/processed/coronavirus_cases.csv",
@@ -169,10 +171,12 @@ create_shiny_data <- function() {
     select(-name) %>%
     # prefix cummulative vars
     rename(cum_cases = cases, cum_deaths = deaths, cum_tests = tests, time = date) %>%
+    # keep orginal data in separate columns
+    mutate(across(starts_with("new"), function(e) e, .names = "{col}_orig")) %>%
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
-    mutate(across(starts_with("new"), function(e) data.table::frollmean(e, 7, na.rm = T))) %>%
+    mutate(across(starts_with("new"), function(e) data.table::frollmean(e, 7, na.rm = TRUE))) %>%
     ungroup() %>%
     # per capita
     mutate(
