@@ -28,6 +28,8 @@ process_countries_rowwise <- function(...) {
     xlsx = fetch_from_csv_xlsx(dots),
     csv = fetch_from_csv_xlsx(dots),
     json = fetch_from_json(dots),
+    html = fetch_from_html(dots),
+    zip = fetch_from_zip(dots),
     rep(NA, 2) # all other cases
     # more fetch functions here
   )

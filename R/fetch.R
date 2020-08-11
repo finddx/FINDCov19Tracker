@@ -94,18 +94,11 @@ fetch_from_csv_xlsx <- function(dots) {
       yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
       dots$data_url <- gsub("DATE", yesterday_char, dots$data_url)
     }
-    #cli::cli_alert_info("URL: {dots$data_url}.")
-    # seps <- c(stringr::str_extract(dots$xpath_cumul, "[,;]"), stringr::str_extract(dots$xpath_new, "[,;]"))
-    # sep <- seps[which(!is.na(seps))]
-    # data <- readr::read_csv2(file = dots$data_url)
-    # data = readr::read_table(dots$data_url)
     data <- rio::import(dots$data_url, format = "csv")
     # remove missing data
     # this removes rows which only have NA or "" in all columns
     data <- data %>%
       janitor::remove_empty(which = c("rows", "cols"))
-    # data = data[rowSums(is.na(data)|data=='') != ncol(data),]
-    # data = data[complete.cases(data), ]
 
   } else {
     return(c(new_tests, tests_cumulative))
@@ -122,8 +115,8 @@ fetch_from_csv_xlsx <- function(dots) {
     # account for some special cases
     # - totalTestResultsIncrease is dropped in favor of totalTestResults, which
     # would lead to clashes down the road
-    data = data %>%
-      dplyr::select_if(!(names(.) %in% c('totalTestResultsIncrease')))
+    data <- data %>%
+      dplyr::select_if(!(names(.) %in% c("totalTestResultsIncrease")))
 
     cols <- grep(idx[[2]], names(data))
     data[, cols] <- sapply(data[, cols], as.numeric)
@@ -188,32 +181,31 @@ fetch_from_json <- function(dots) {
 
 # is.error <- function(x) inherits(x, "try-error")
 
-# fetch_from_html <- function(url, cumul, new) {
-#   message(url)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_html <- function(dots) {
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   page <- try(read_html(url), silent = TRUE)
-#   if (is.error(page)) {
-#     page <- try(read_html(url(url)), silent = TRUE)
-#     if (is.error(page)) {
-#       return(c(new_tests, tests_cumulative))
-#     }
-#   }
-#   if (!is.na(cumul)) {
-#     text <- page %>%
-#       html_node(xpath = cumul) %>%
-#       html_text()
-#     tests_cumulative <- as.numeric(gsub("[^0-9]", "", text))
-#   }
-#   if (!is.na(new)) {
-#     text <- page %>%
-#       html_node(xpath = new) %>%
-#       html_text()
-#     new_tests <- as.numeric(gsub("[^0-9]", "", text))
-#   }
-#   return(c(new_tests, tests_cumulative))
-# }
+  page <- try(xml2::read_html(dots$data_url), silent = TRUE)
+  if (is.error(page)) {
+    page <- try(xml2::read_html(url(dots$data_url)), silent = TRUE)
+    if (is.error(page)) {
+      return(c(new_tests, tests_cumulative))
+    }
+  }
+  if (!is.na(dots$xpath_cumul)) {
+    text <- page %>%
+      xml2::html_node(xpath = dots$xpath_cumul) %>%
+      xml2::html_text()
+    tests_cumulative <- as.numeric(gsub("[^0-9]", "", text))
+  }
+  if (!is.na(dots$xpath_new)) {
+    text <- page %>%
+      xml2::html_node(xpath = dots$xpath_new) %>%
+      xml2::html_text()
+    new_tests <- as.numeric(gsub("[^0-9]", "", text))
+  }
+  return(c(new_tests, tests_cumulative))
+}
 
 # fetch_from_pdf <- function(country, url, date_format, pattern) {
 #   message(url)
@@ -345,35 +337,34 @@ fetch_from_json <- function(dots) {
 #   return(c(new_tests, tests_cumulative))
 # }
 
-# fetch_from_zip <- function(url, cumul) {
-#   message(url)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_zip <- function(dots) {
 
-#   tmpfile <- tempfile("country_data", fileext = ".zip")
-#   tryCatch(
-#     {
-#       download.file(url,
-#         destfile = tmpfile, quiet = FALSE, mode =
-#           "wb"
-#       )
-#     },
-#     silent = FALSE,
-#     condition = function(err) { }
-#   )
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   if (file.size(tmpfile) > 0) {
-#     file <- unzip(tmpfile)
-#     data <- read.csv(file)
-#     unlink(file)
+  tmpfile <- tempfile("country_data", fileext = ".zip")
+  tryCatch(
+    {
+      download.file(dots$data_url,
+        destfile = tmpfile, quiet = TRUE,
+      )
+    },
+    silent = FALSE,
+    condition = function(err) { }
+  )
 
-#     if (cumul == "nrow") {
-#       tests_cumulative <- nrow(data)
-#     }
-#   }
+  if (file.size(tmpfile) > 0) {
+    file <- unzip(tmpfile)
+    data <- rio::import(file)
+    unlink(file)
 
-#   return(c(new_tests, tests_cumulative))
-# }
+    if (dots$xpath_cumul == "nrow") {
+      tests_cumulative <- nrow(data)
+    }
+  }
+
+  return(c(new_tests, tests_cumulative))
+}
 
 # fetch_from_selenium <- function(country, pattern) {
 #   tests_cumulative <- NA
