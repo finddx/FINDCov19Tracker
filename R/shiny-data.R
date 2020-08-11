@@ -164,7 +164,7 @@ create_shiny_data <- function() {
   country_info <-
     readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/country_info.csv", col_types = readr::cols()) %>%
     select(-name_not_used) %>%
-    filter(!is.na(country))
+    filter(!is.na(country_iso))
 
   data_country <-
     data_combined %>%
@@ -211,7 +211,7 @@ create_shiny_data <- function() {
 
   data_region <-
     data_country %>%
-    left_join(select(country_info, unit = country, region, income), by = "unit") %>%
+    left_join(select(country_info, unit = country_iso, region, income), by = "unit") %>%
     group_by(unit = region, time) %>%
     summarize(
       across(
@@ -231,7 +231,7 @@ create_shiny_data <- function() {
 
   data_income <-
     data_country %>%
-    left_join(select(country_info, unit = country, region, income), by = "unit") %>%
+    left_join(select(country_info, unit = country_iso, region, income), by = "unit") %>%
     group_by(unit = income, time) %>%
     summarize(
       across(
@@ -268,7 +268,7 @@ create_shiny_data <- function() {
 
   unit_info <-
     latest %>%
-    left_join(country_info, by = c("unit" = "country"))
+    left_join(country_info, by = c("unit" = "country_iso"))
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(shiny_data, "processed/shiny_data.csv")
