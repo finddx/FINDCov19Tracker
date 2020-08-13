@@ -30,6 +30,7 @@ process_countries_rowwise <- function(...) {
     json = fetch_from_json(dots),
     html = fetch_from_html(dots),
     zip = fetch_from_zip(dots),
+    pdf = fetch_from_pdf(dots),
     rep(NA, 2) # all other cases
     # more fetch functions here
   )

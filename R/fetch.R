@@ -178,7 +178,6 @@ fetch_from_json <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-
 # is.error <- function(x) inherits(x, "try-error")
 
 fetch_from_html <- function(dots) {
@@ -207,67 +206,87 @@ fetch_from_html <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-# fetch_from_pdf <- function(country, url, date_format, pattern) {
-#   message(url)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_pdf <- function(dots) {
 
-#   tmpfile <- tempfile("country_data", fileext = ".pdf")
+  if (!dots$country == "Switzerland") {
+    stop(sprintf(
+      "Country %s is not supported yet for PDF extraction.",
+      dots$country
+    ))
+  }
 
-#   if (is.na(date_format)) {
-#     tryCatch(
-#       {
-#         download.file(url,
-#           destfile = tmpfile, quiet = FALSE, mode =
-#             "wb"
-#         )
-#       },
-#       silent = FALSE,
-#       condition = function(err) { }
-#     )
-#     if (file.size(tmpfile) == 0) {
-#       return(c(new_tests, tests_cumulative))
-#     }
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   } else {
-#     today_char <- ifelse(grepl("%B", date_format) & country == "Afghanistan", str_to_lower(as.character(Sys.Date(), date_format)),
-#       as.character(Sys.Date(), date_format)
-#     )
-#     yesterday_char <- ifelse(grepl("%B", date_format) & country == "Afghanistan", str_to_lower(as.character(Sys.Date() - 1, date_format)),
-#       as.character(Sys.Date() - 1, date_format)
-#     )
+  tmpfile <- tempfile("country_data", fileext = ".pdf")
 
-#     tryCatch(
-#       {
-#         download.file(gsub("DATE", today_char, url),
-#           destfile = tmpfile, quiet = FALSE, mode =
-#             "wb"
-#         )
-#       },
-#       silent = FALSE,
-#       condition = function(err) { }
-#     )
-#     if (file.size(tmpfile) == 0) {
-#       tryCatch(
-#         {
-#           download.file(gsub("DATE", yesterday_char, url),
-#             destfile = tmpfile, quiet = FALSE, mode =
-#               "wb"
-#           )
-#         },
-#         silent = FALSE,
-#         condition = function(err) { }
-#       )
-#       if (file.size(tmpfile) == 0) {
-#         return(c(new_tests, tests_cumulative))
-#       }
-#     }
-#   }
-#   content <- pdf_text(tmpfile)
-#   tests_cumulative <- as.numeric(gsub("[, .]", "", unique(gsub(pattern, "\\1", na.omit(str_extract(content, pattern))))))
+  if (is.na(dots$date_format)) {
+    tryCatch(
+      {
+        download.file(dots$data_url,
+          destfile = tmpfile, quiet = TRUE,
+        )
+      },
+      silent = FALSE,
+      condition = function(err) { }
+    )
+    if (file.size(tmpfile) == 0) {
+      return(c(new_tests, tests_cumulative))
+    }
+  } else {
+    today_char <- ifelse(grepl("%B", dots$date_format) &&
+      country == "Afghanistan",
+    stringr::str_to_lower(as.character(Sys.Date(), dots$date_format)),
+    as.character(Sys.Date(), dots$date_format)
+    )
+    yesterday_char <- ifelse(grepl("%B", dots$date_format) &&
+      country == "Afghanistan",
+    stringr::str_to_lower(as.character(Sys.Date() - 1, dots$date_format)),
+    as.character(Sys.Date() - 1, dots$date_format)
+    )
 
-#   return(c(new_tests, tests_cumulative))
-# }
+    tryCatch(
+      {
+        download.file(gsub("DATE", today_char, url),
+          destfile = tmpfile, quiet = FALSE, mode =
+            "wb"
+        )
+      },
+      silent = FALSE,
+      condition = function(err) { }
+    )
+    if (file.size(tmpfile) == 0) {
+      tryCatch(
+        {
+          download.file(gsub("DATE", yesterday_char, url),
+            destfile = tmpfile, quiet = FALSE, mode =
+              "wb"
+          )
+        },
+        silent = FALSE,
+        condition = function(err) { }
+      )
+      if (file.size(tmpfile) == 0) {
+        return(c(new_tests, tests_cumulative))
+      }
+    }
+  }
+  if (dots$country == "Switzerland") {
+    table <- tabulizer::extract_tables(tmpfile,
+      guess = FALSE,
+      area = list(c(379, 201, 389, 326)),
+      output = "character"
+    )[[1]] %>%
+      stringr::str_split(., pattern = "\t") %>%
+      magrittr::extract2(1) %>%
+      stringr::str_replace(., pattern = " ", replacement = "") %>%
+      stringr::str_remove(., pattern = "\\+")
+
+    new_tests <- table[2]
+    tests_cumulative <- table[1]
+  }
+  return(c(new_tests, tests_cumulative))
+}
 
 # fetch_from_pdf_list <- function(url, pattern_url, pattern_content) {
 #   message(url)
