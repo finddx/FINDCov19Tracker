@@ -1,4 +1,4 @@
-# FIND_Cov_19_Tracker
+# FINDCov19Tracker
 
 Our interactive map uses publicly available data to show the number of SARS-CoV-2 tests that have been performed in each country, and the number of positive cases.
 The map was developed using [open-source code](https://github.com/eparker12/nCoV_tracker) initially developed by the [London School of Hygiene & Tropical Medicine](https://www.lshtm.ac.uk/)
@@ -18,7 +18,7 @@ Although there is currently no centralized database and many countries do not pu
 ### R Package Workflow Description
 
 We make use of an R package structure to process the downloaded data.
-The workflow is automated via GitHub Actions in [dsbbfinddx/data](https://github.com/dsbbfinddx/data).
+The workflow is automated via GitHub Actions in [dsbbfinddx/FindCov19TrackerData](https://github.com/dsbbfinddx/FindCov19TrackerData).
 
 - `process_jhu_data()`: Main function which starts all JHU data processing.
   Calls `download_jhu_data()`, `preprocess_jhu_data()` and `check_jhu_data()`.
