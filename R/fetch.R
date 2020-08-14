@@ -300,14 +300,13 @@ fetch_from_pdf <- function(dots) {
 }
 
 fetch_from_pdf_list <- function(dots) {
-  browser()
   tests_cumulative <- NA
   new_tests <- NA
 
   page <- xml2::read_html(dots$source)
   hrefs <- rvest::html_attr(rvest::html_nodes(page, "a"), "href")
 
-  pdfs <- grep(dots$data_url, hrefs, ignore.case = T, value = T)
+  pdfs <- grep(dots$data_url, hrefs, ignore.case = TRUE, value = TRUE)
 
   pdf <- pdfs[1]
 
@@ -316,6 +315,8 @@ fetch_from_pdf_list <- function(dots) {
     "[, .]", "",
     unique(gsub(dots$xpath_cumul, "\\1", na.omit(stringr::str_extract(content, dots$xpath_cumul))))
   ))
+
+  check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative)
 
   return(c(new_tests, tests_cumulative))
 }
