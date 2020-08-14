@@ -14,8 +14,8 @@ process_test_data <- function() {
     access_token = gh::gh_token()
   )
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
-    stringr::str_subset("coronavirus_tests_[0-9]{8}_sources_SO.csv") %>%
-    stringr::str_remove("data/")
+    stringr::str_subset(., "coronavirus_tests_[0-9]{8}_sources_SO.csv") %>%
+    stringr::str_remove(., "data/")
 
   # # suppressed warning: some observations have inconsistent entries
   last_upd_coronavirus_test <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FIND_Cov_19_Tracker/master/input_data/coronavirus_tests.csv",
@@ -32,6 +32,9 @@ process_test_data <- function() {
     ), col_types = readr::cols(),
     delim = ",")
   )
+  # remove empty "ind" and "X" columns
+  cv_tests %<>%
+    dplyr::select(-ind, -X)
 
   # tests file is ok, go on with the update
   cv_tests$date <- as.Date(cv_tests$date,
