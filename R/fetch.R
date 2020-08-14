@@ -178,9 +178,10 @@ fetch_from_json <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-# is.error <- function(x) inherits(x, "try-error")
+is.error <- function(x) inherits(x, "try-error")
 
 fetch_from_html <- function(dots) {
+
   tests_cumulative <- NA
   new_tests <- NA
 
@@ -193,15 +194,25 @@ fetch_from_html <- function(dots) {
   }
   if (!is.na(dots$xpath_cumul)) {
     text <- page %>%
-      xml2::html_node(xpath = dots$xpath_cumul) %>%
-      xml2::html_text()
-    tests_cumulative <- as.numeric(gsub("[^0-9]", "", text))
+      rvest::html_node(xpath = dots$xpath_cumul) %>%
+      rvest::html_text()
+    tests_cumulative <- stringr::str_extract(text, dots$pattern_cumul)
+
+    if (dots$country == "Afghanistan") {
+      tests_cumulative <- as.numeric(
+        gsub(",",
+          replacement = "",
+          stringr::str_extract(tests_cumulative, "[0-9].*,.*")
+        )
+      )
+      checkmate::assert_int(tests_cumulative)
+    }
   }
   if (!is.na(dots$xpath_new)) {
     text <- page %>%
-      xml2::html_node(xpath = dots$xpath_new) %>%
-      xml2::html_text()
-    new_tests <- as.numeric(gsub("[^0-9]", "", text))
+      rvest::html_node(xpath = dots$xpath_new) %>%
+      rvest::html_text()
+    new_tests <- as.numeric(gsub("[^0-9]", "", dots$pattern_new))
   }
   return(c(new_tests, tests_cumulative))
 }
@@ -288,23 +299,26 @@ fetch_from_pdf <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-# fetch_from_pdf_list <- function(url, pattern_url, pattern_content) {
-#   message(url)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_pdf_list <- function(dots) {
+  browser()
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   page <- read_html(url)
-#   hrefs <- html_attr(html_nodes(page, "a"), "href")
+  page <- xml2::read_html(dots$source)
+  hrefs <- rvest::html_attr(rvest::html_nodes(page, "a"), "href")
 
-#   pdfs <- grep(pattern_url, hrefs, ignore.case = T, value = T)
+  pdfs <- grep(dots$data_url, hrefs, ignore.case = T, value = T)
 
-#   pdf <- pdfs[1]
+  pdf <- pdfs[1]
 
-#   content <- pdf_text(pdf)
-#   tests_cumulative <- as.numeric(gsub("[, .]", "", unique(gsub(pattern_content, "\\1", na.omit(str_extract(content, pattern_content))))))
+  content <- pdftools::pdf_text(pdf)
+  tests_cumulative <- as.numeric(gsub(
+    "[, .]", "",
+    unique(gsub(dots$xpath_cumul, "\\1", na.omit(stringr::str_extract(content, dots$xpath_cumul))))
+  ))
 
-#   return(c(new_tests, tests_cumulative))
-# }
+  return(c(new_tests, tests_cumulative))
+}
 
 # fetch_from_html_list <- function(url_list, pattern_url, pattern_content) {
 #   message(url_list)
