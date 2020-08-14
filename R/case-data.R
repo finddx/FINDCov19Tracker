@@ -35,6 +35,7 @@ process_jhu_data <- function() {
     dplyr::arrange(date)
 
   # remove Timor Leste as this duplicates East Timor data
+  fs::dir_create("processed")
   readr::write_csv(jhu_merge, "processed/jhu_data.csv")
 
   # load country data
