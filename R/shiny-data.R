@@ -211,7 +211,7 @@ create_shiny_data <- function() {
 
   data_region <-
     data_country %>%
-    left_join(select(country_info, unit = country_iso, region, income), by = "unit") %>%
+    left_join(select(country_info, unit = country_iso, region = continent, income), by = "unit") %>%
     group_by(unit = region, time) %>%
     summarize(
       across(
@@ -231,7 +231,7 @@ create_shiny_data <- function() {
 
   data_income <-
     data_country %>%
-    left_join(select(country_info, unit = country_iso, region, income), by = "unit") %>%
+    left_join(select(country_info, unit = country_iso, region = continent, income), by = "unit") %>%
     group_by(unit = income, time) %>%
     summarize(
       across(
