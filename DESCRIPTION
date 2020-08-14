@@ -10,10 +10,11 @@ Authors@R:
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Imports:
-    data.table,
     cli,
     countrycode,
+    data.table,
     dplyr (>= 1.0.0),
+    fs,
     fuzzyjoin,
     geojsonio,
     ggiraph,
