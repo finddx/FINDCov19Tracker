@@ -26,10 +26,11 @@ process_test_data <- function() {
     dplyr::pull(date)
   timestamp_last_upd <- stringr::str_replace_all(last_upd_coronavirus_test, "-", "")
   cv_tests <- suppressWarnings(
-    readr::read_csv2(sprintf(
+    readr::read_delim(sprintf(
       "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/coronavirus_tests_%s_sources_SO.csv",
       timestamp_last_upd
-    ), col_types = readr::cols())
+    ), col_types = readr::cols(),
+    delim = ",")
   )
 
   # tests file is ok, go on with the update
