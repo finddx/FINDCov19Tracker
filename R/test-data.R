@@ -30,7 +30,7 @@ process_test_data <- function() {
       "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/coronavirus_tests_%s_sources_SO.csv",
       timestamp_last_upd
     ), col_types = readr::cols(),
-    delim = ",")
+    delim = ";")
   )
   # remove empty "ind" and "X" columns
   cv_tests %<>%
