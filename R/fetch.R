@@ -321,23 +321,41 @@ fetch_from_pdf_list <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-# fetch_from_html_list <- function(url_list, pattern_url, pattern_content) {
-#   message(url_list)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_html_list <- function(dots) {
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   page <- read_html(url_list)
-#   hrefs <- html_attr(html_nodes(page, "a"), "href")
+  # FIXME
+  if (dots$country == "Greece") {
+    return(c(new_tests, tests_cumulative))
+  }
 
-#   urls <- grep(pattern_url, hrefs, ignore.case = T, value = T)
+  if (dots$country == "Uruguay") {
+    browser()
+  }
 
-#   url <- urls[1]
+  page <- xml2::read_html(dots$source)
+  hrefs <- rvest::html_attr(rvest::html_nodes(page, "a"), "href")
 
-#   content <- read_html(url) %>% html_text()
-#   tests_cumulative <- as.numeric(gsub("[, .]", "", unique(gsub(pattern_content, "\\1", na.omit(str_extract(content, pattern_content))))))
+  urls <- grep(dots$data_url, hrefs, ignore.case = TRUE, value = TRUE)
 
-#   return(c(new_tests, tests_cumulative))
-# }
+  url <- urls[1]
+
+  content <- xml2::read_html(url) %>%
+    rvest::html_text()
+  stringr::str_extract(content, dots$xpath_cumul)
+  tests_cumulative <- as.numeric(
+    stringr::str_squish(na.omit(stringr::str_extract(content, dots$xpath_cumul)))
+  )
+
+  new_tests <- as.numeric(
+    stringr::str_squish(na.omit(stringr::str_extract(content, dots$xpath_new)))
+  )
+
+  check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
+
+  return(c(new_tests, tests_cumulative))
+}
 
 # fetch_from_html2 <- function(url, date_format, pattern) {
 #   message(url)
