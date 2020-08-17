@@ -252,28 +252,29 @@ create_shiny_data <- function() {
     ungroup() %>%
     add_column(set = "income", .before = 1)
 
-  shiny_data <-
+  data_all <-
     bind_rows(data_country, data_region, data_income) %>%
     filter(!is.na(unit)) %>%
     mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e})) %>%
-    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests))
+    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests)) %>%
+    arrange(time, set, unit)
 
-  latest <-
-    shiny_data %>%
-    filter(time == max(shiny_data$time)) %>%
+  unit_info <-
+    data_all %>%
+    filter(time == max(data_all$time)) %>%
     select(
       set, unit,
       cases = cap_new_cases,
       deaths = cap_new_deaths,
       pos = pos,
       tests = cap_new_tests
-    )
-
-  unit_info <-
-    latest %>%
+    ) %>%
     left_join(country_info, by = c("unit" = "country_iso"))
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
-  readr::write_csv(shiny_data, "processed/shiny_data.csv")
+  readr::write_csv(data_all, "processed/data_all.csv")
+
+  writeLines(jsonlite::toJSON(data_all), "processed/data_all.json")
+
 
 }
