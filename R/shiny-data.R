@@ -125,9 +125,12 @@ create_shiny_data <- function() {
       name == "DominicanRepublic" ~ "DO",
       name == "SaintLucia" ~ "LC",
       name == "WesternSahara" ~ "EH",
+      name == "UnitedRepublicofTanzania" ~ "TZ",
+      name == "RepublicofKorea" ~ "KR",
       TRUE ~ country
     )) %>%
-    # drop
+    # drop ships
+    filter(!(name %in% c("DiamondPrincessCruiseShip", "MSZaandam"))) %>%
     # 1 Diamond Princess Cruise Ship
     # 2 MS Zaandam
     select(-regex) %>%
