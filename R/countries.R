@@ -2,9 +2,8 @@
 #'
 #' This function ensures that valid values are returned for countries.
 check_country <- function(dots, ...) {
+  ellip <- list(...)
   if (dots$country == "Argentina") {
-
-    ellip <- list(...)
     # check the previous report and calculate new tests
     pdf_prev <- ellip$pdfs[2]
 
@@ -21,5 +20,8 @@ check_country <- function(dots, ...) {
 
     checkmate::assert_int(new_tests)
     checkmate::assert_int(ellip$tests_cumulative)
+  } else if (dots$country == "Romania") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
   }
 }
