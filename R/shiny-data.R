@@ -259,6 +259,17 @@ create_shiny_data <- function() {
     select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests)) %>%
     arrange(time, set, unit)
 
+  latest_test_date <-
+    data_all %>%
+    filter(set == "country") %>%
+    select(unit, time, value = new_tests_orig) %>%
+    filter(!is.na(value)) %>%
+    filter(value > 0) %>%
+    arrange(desc(time)) %>%
+    group_by(unit) %>%
+    summarize(latest_test_date = time[1]) %>%
+    ungroup()
+
   unit_info <-
     data_all %>%
     filter(time == max(data_all$time)) %>%
@@ -269,7 +280,8 @@ create_shiny_data <- function() {
       pos = pos,
       tests = cap_new_tests
     ) %>%
-    left_join(country_info, by = c("unit" = "country_iso"))
+    left_join(country_info, by = c("unit" = "country_iso")) %>%
+    left_join(latest_test_date, by = "unit")
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(data_all, "processed/data_all.csv")
