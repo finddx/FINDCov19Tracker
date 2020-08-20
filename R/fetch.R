@@ -343,7 +343,6 @@ fetch_from_html_list <- function(dots) {
 
   content <- xml2::read_html(url) %>%
     rvest::html_text()
-  stringr::str_extract(content, dots$xpath_cumul)
   tests_cumulative <- as.numeric(
     stringr::str_squish(na.omit(stringr::str_extract(content, dots$xpath_cumul)))
   )
@@ -357,37 +356,82 @@ fetch_from_html_list <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
-# fetch_from_html2 <- function(url, date_format, pattern) {
-#   message(url)
-#   tests_cumulative <- NA
-#   new_tests <- NA
+fetch_from_html2 <- function(dots) {
 
-#   if (!is.na(date_format)) {
-#     today_char <- as.character(Sys.Date(), date_format)
-#     yesterday_char <- as.character(Sys.Date() - 1, date_format)
+  if (dots$country == "Scotland") {
+    browser()
 
-#     page <- try(read_html(gsub("DATE", today_char, url)), silent = TRUE)
-#     if (is.error(page)) {
-#       page <- try(read_html(gsub("DATE", yesterday_char, url)), silent = TRUE)
-#       if (is.error(page)) {
-#         return(c(new_tests, tests_cumulative))
-#       }
-#     }
+  }
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   } else {
-#     page <- try(read_html(url), silent = TRUE)
-#     if (is.error(page)) {
-#       page <- try(read_html(url(url)), silent = TRUE)
-#       if (is.error(page)) {
-#         return(c(new_tests, tests_cumulative))
-#       }
-#     }
-#   }
-#   content <- page %>% html_text()
-#   tests_cumulative <- as.numeric(gsub("[, .]", "", unique(gsub(pattern, "\\1", na.omit(str_extract(content, pattern))))))
+  if (!is.na(dots$date_format)) {
+    today_char <- as.character(Sys.Date(), dots$date_format)
+    yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
 
-#   return(c(new_tests, tests_cumulative))
-# }
+    page <- try(xml2::read_html(gsub("DATE", today_char, dots$data_url)), silent = TRUE)
+    if (is.error(page)) {
+      page <- try(xml2::read_html(gsub("DATE", yesterday_char, dots$data_url)), silent = TRUE)
+      if (is.error(page)) {
+        return(c(new_tests, tests_cumulative))
+      }
+    }
+
+  } else {
+    page <- try(xml2::read_html(dots$data_url), silent = TRUE)
+    if (is.error(page)) {
+      page <- try(xml2::read_html(url(dots$data_url)), silent = TRUE)
+      if (is.error(page)) {
+        return(c(new_tests, tests_cumulative))
+      }
+    }
+  }
+  content <- page %>%
+    rvest::html_text()
+  tests_cumulative <- as.numeric(
+    stringr::str_replace_all(
+      stringr::str_extract(stringr::str_squish(
+        content
+      ), dots$xpath_cumul),
+      "[.]|[,]", ""
+    )
+  )
+  new_tests <- as.numeric(
+    stringr::str_replace_all(
+      stringr::str_extract(stringr::str_squish(
+        content
+      ), dots$xpath_new),
+      "[.]|[,]", ""
+    )
+  )
+
+  if (is.na(dots$xpath_new)) {
+    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
+    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+      col_types = list(
+        country = readr::col_character(),
+        date = readr::col_date(format = ""),
+        new_tests = readr::col_double(),
+        tests_cumulative = readr::col_double(),
+        jhu_ID = readr::col_character(),
+        source = readr::col_character()
+      ),
+      progress = FALSE
+    ) %>%
+      dplyr::filter(country == dots$country) %>%
+      dplyr::filter(date == lubridate::today() - 1)
+
+    tests_yesterday <- tbl$tests_cumulative
+    # to ensure we do not get a negative number
+    new_tests <- tests_cumulative - tests_yesterday
+
+    if (new_tests < 0) new_tests <- 0
+  }
+
+  check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
+
+  return(c(new_tests, tests_cumulative))
+}
 
 fetch_from_zip <- function(dots) {
 

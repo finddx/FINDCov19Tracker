@@ -23,6 +23,26 @@ preprocess_test_data <- function() {
     dplyr::mutate(xpath_new = dplyr::case_when(
       country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
       TRUE ~ xpath_new
+    )) %>%
+    dplyr::mutate(xpath_cumul = dplyr::case_when(
+      country == "Armenia" ~ '(?<=Ընդհանուր թեստեր - )(.*?)(?=\\\")',
+      TRUE ~ xpath_cumul
+    )) %>%
+    dplyr::mutate(xpath_cumul = dplyr::case_when(
+      country == "Croatia" ~ "(?<=ukupno testirana)(.*)(?=osoba)",
+      TRUE ~ xpath_cumul
+    )) %>%
+    dplyr::mutate(xpath_new = dplyr::case_when(
+      country == "Croatia" ~ "(?<=osoba, od toga)(.*)(?=u protekla 24 sata)",
+      TRUE ~ xpath_new
+    )) %>%
+    dplyr::mutate(xpath_cumul = dplyr::case_when(
+      country == "Scotland" ~ "(?<=A total of )(.*)(?= people in Scotland)",
+      TRUE ~ xpath_cumul
+    )) %>%
+    dplyr::mutate(xpath_new = dplyr::case_when(
+      country == "Scotland" ~ "(?<=hospital with confirmed COVID-19\\. )(.*)(?= new tests)",
+      TRUE ~ xpath_new
     ))
   #   dplyr::filter(country == "Afghanistan") %>%
   #   dplyr::mutate(type = "html") %>%
@@ -54,7 +74,8 @@ process_countries_rowwise <- function(...) {
     # zip = fetch_from_zip(dots),
     # pdf = fetch_from_pdf(dots),
     # pdf_list = fetch_from_pdf_list(dots),
-    html_list = fetch_from_html_list(dots),
+    #html_list = fetch_from_html_list(dots),
+    html2 = fetch_from_html2(dots),
     rep(NA, 2) # all other cases
     # more fetch functions here
   )
