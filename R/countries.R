@@ -20,7 +20,16 @@ check_country <- function(dots, ...) {
 
     checkmate::assert_int(new_tests)
     checkmate::assert_int(ellip$tests_cumulative)
+  } else if (dots$country == "Afghanistan") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
   } else if (dots$country == "Armenia") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Albania") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  }  else if (dots$country == "Argentina") {
     checkmate::assert_number(ellip$new_tests)
     checkmate::assert_number(ellip$tests_cumulative)
   } else if (dots$country == "Croatia") {

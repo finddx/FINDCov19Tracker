@@ -175,6 +175,31 @@ fetch_from_json <- function(dots) {
   if (!is.na(dots$xpath_new)) {
     new_tests <- as.numeric(eval(parse(text = dots$xpath_new)))
   }
+
+  if (is.na(dots$xpath_new)) {
+    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
+    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+      col_types = list(
+        country = readr::col_character(),
+        date = readr::col_date(format = ""),
+        new_tests = readr::col_double(),
+        tests_cumulative = readr::col_double(),
+        jhu_ID = readr::col_character(),
+        source = readr::col_character()
+      ),
+      progress = FALSE
+    ) %>%
+      dplyr::filter(country == dots$country) %>%
+      dplyr::filter(date == lubridate::today() - 1)
+
+    tests_yesterday <- tbl$tests_cumulative
+    # to ensure we do not get a negative number
+    new_tests <- tests_cumulative - tests_yesterday
+
+    if (new_tests < 0) new_tests <- 0
+  }
+
+  check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
   return(c(new_tests, tests_cumulative))
 }
 
@@ -219,12 +244,12 @@ fetch_from_html <- function(dots) {
 
 fetch_from_pdf <- function(dots) {
 
-  if (!dots$country == "Switzerland") {
-    stop(sprintf(
-      "Country %s is not supported yet for PDF extraction.",
-      dots$country
-    ))
-  }
+  # if (!dots$country == "Switzerland") {
+  #   stop(sprintf(
+  #     "Country %s is not supported yet for PDF extraction.",
+  #     dots$country
+  #   ))
+  # }
 
   tests_cumulative <- NA
   new_tests <- NA
@@ -245,57 +270,99 @@ fetch_from_pdf <- function(dots) {
       return(c(new_tests, tests_cumulative))
     }
   } else {
-    today_char <- ifelse(grepl("%B", dots$date_format) &&
-      country == "Afghanistan",
-    stringr::str_to_lower(as.character(Sys.Date(), dots$date_format)),
-    as.character(Sys.Date(), dots$date_format)
-    )
-    yesterday_char <- ifelse(grepl("%B", dots$date_format) &&
-      country == "Afghanistan",
-    stringr::str_to_lower(as.character(Sys.Date() - 1, dots$date_format)),
-    as.character(Sys.Date() - 1, dots$date_format)
-    )
+    # today_char <-  as.character(Sys.Date(), dots$date_format)
+    yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
 
-    tryCatch(
-      {
-        download.file(gsub("DATE", today_char, url),
-          destfile = tmpfile, quiet = FALSE, mode =
-            "wb"
-        )
-      },
-      silent = FALSE,
-      condition = function(err) { }
-    )
-    if (file.size(tmpfile) == 0) {
-      tryCatch(
-        {
-          download.file(gsub("DATE", yesterday_char, url),
-            destfile = tmpfile, quiet = FALSE, mode =
-              "wb"
-          )
-        },
-        silent = FALSE,
-        condition = function(err) { }
+    # FIXME: only use pdf_text() instead of tabulizer?
+    # tryCatch(
+    #   {
+    #     download.file(gsub("DATE", today_char, dots$data_url),
+    #       destfile = tmpfile, quiet = TRUE
+    #     )
+    #   },
+    #   silent = FALSE,
+    #   condition = function(err) { }
+    # )
+    # if (file.size(tmpfile) == 0) {
+    #   tryCatch(
+    #     {
+    #       download.file(gsub("DATE", yesterday_char, dots$data_url),
+    #         destfile = tmpfile, quiet = FALSE, mode =
+    #           "wb"
+    #       )
+    #     },
+    #     silent = FALSE,
+    #     condition = function(err) { }
+    #   )
+    #   if (file.size(tmpfile) == 0) {
+    #     return(c(new_tests, tests_cumulative))
+    #   }
+    # }
+  }
+  # if (dots$country == "Switzerland") {
+  #   table <- tabulizer::extract_tables(tmpfile,
+  #     guess = FALSE,
+  #     area = list(c(379, 201, 389, 326)),
+  #     output = "character"
+  #   )[[1]] %>%
+  #     stringr::str_split(., pattern = "\t") %>%
+  #     magrittr::extract2(1) %>%
+  #     stringr::str_replace(., pattern = " ", replacement = "") %>%
+  #     stringr::str_remove(., pattern = "\\+")
+  #
+  #   new_tests <- table[2]
+  #   tests_cumulative <- table[1]
+  # }
+
+  content <- pdftools::pdf_text(gsub("DATE", yesterday_char, dots$data_url))
+
+  tests_cumulative <- na.omit(
+    as.numeric(
+      stringr::str_replace_all(
+        stringr::str_extract(stringr::str_squish(
+          content
+        ), dots$xpath_cumul),
+        "[.]|[,]", ""
       )
-      if (file.size(tmpfile) == 0) {
-        return(c(new_tests, tests_cumulative))
-      }
-    }
-  }
-  if (dots$country == "Switzerland") {
-    table <- tabulizer::extract_tables(tmpfile,
-      guess = FALSE,
-      area = list(c(379, 201, 389, 326)),
-      output = "character"
-    )[[1]] %>%
-      stringr::str_split(., pattern = "\t") %>%
-      magrittr::extract2(1) %>%
-      stringr::str_replace(., pattern = " ", replacement = "") %>%
-      stringr::str_remove(., pattern = "\\+")
+    )
+  )
 
-    new_tests <- table[2]
-    tests_cumulative <- table[1]
+  new_tests <- na.omit(
+    as.numeric(
+      stringr::str_replace_all(
+        stringr::str_extract(stringr::str_squish(
+          content
+        ), dots$xpath_new),
+        "[.]|[,]", ""
+      )
+    )
+  )
+
+  if (is.na(dots$xpath_new)) {
+    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
+    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+      col_types = list(
+        country = readr::col_character(),
+        date = readr::col_date(format = ""),
+        new_tests = readr::col_double(),
+        tests_cumulative = readr::col_double(),
+        jhu_ID = readr::col_character(),
+        source = readr::col_character()
+      ),
+      progress = FALSE
+    ) %>%
+      dplyr::filter(country == dots$country) %>%
+      dplyr::filter(date == lubridate::today() - 1)
+
+    tests_yesterday <- tbl$tests_cumulative
+    # to ensure we do not get a negative number
+    new_tests <- tests_cumulative - tests_yesterday
+
+    if (new_tests < 0) new_tests <- 0
   }
+
+  check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative)
+
   return(c(new_tests, tests_cumulative))
 }
 
@@ -311,10 +378,51 @@ fetch_from_pdf_list <- function(dots) {
   pdf <- pdfs[1]
 
   content <- pdftools::pdf_text(pdf)
-  tests_cumulative <- as.numeric(gsub(
-    "[, .]", "",
-    unique(gsub(dots$xpath_cumul, "\\1", na.omit(stringr::str_extract(content, dots$xpath_cumul))))
-  ))
+
+  tests_cumulative <- na.omit(
+    as.numeric(
+      stringr::str_replace_all(
+        stringr::str_extract(stringr::str_squish(
+          content
+        ), dots$xpath_cumul),
+        "[.]|[,]", ""
+      )
+    )
+  )
+
+  new_tests <- na.omit(
+    as.numeric(
+      stringr::str_replace_all(
+        stringr::str_extract(stringr::str_squish(
+          content
+        ), dots$xpath_new),
+        "[.]|[,]", ""
+      )
+    )
+  )
+
+  if (is.na(dots$xpath_new)) {
+    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
+    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+      col_types = list(
+        country = readr::col_character(),
+        date = readr::col_date(format = ""),
+        new_tests = readr::col_double(),
+        tests_cumulative = readr::col_double(),
+        jhu_ID = readr::col_character(),
+        source = readr::col_character()
+      ),
+      progress = FALSE
+    ) %>%
+      dplyr::filter(country == dots$country) %>%
+      dplyr::filter(date == lubridate::today() - 1)
+
+    tests_yesterday <- tbl$tests_cumulative
+    # to ensure we do not get a negative number
+    new_tests <- tests_cumulative - tests_yesterday
+
+    if (new_tests < 0) new_tests <- 0
+  }
 
   check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative)
 
@@ -358,10 +466,6 @@ fetch_from_html_list <- function(dots) {
 
 fetch_from_html2 <- function(dots) {
 
-  if (dots$country == "Scotland") {
-    browser()
-
-  }
   tests_cumulative <- NA
   new_tests <- NA
 
@@ -396,6 +500,7 @@ fetch_from_html2 <- function(dots) {
       "[.]|[,]", ""
     )
   )
+
   new_tests <- as.numeric(
     stringr::str_replace_all(
       stringr::str_extract(stringr::str_squish(

@@ -7,11 +7,46 @@
 preprocess_test_data <- function() {
 
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/coronavirus_tests_countries_urls_CH_v7.xlsx")
+
+  info = info[3:nrow(info), ]
+
   info %<>%
     dplyr::mutate(type = dplyr::case_when(
-      country == "Afghanistan" ~ "html",
+      country == "Afghanistan" ~ "pdf_list",
       TRUE ~ type
     )) %>%
+    dplyr::mutate(data_url = dplyr::case_when(
+      country == "Afghanistan" ~ "https://www.humanitarianresponse.info/sites/www.humanitarianresponse.info/files/documents/files/",
+      TRUE ~ data_url
+    )) %>%
+    dplyr::mutate(xpath_cumul = dplyr::case_when(
+      country ==  "Afghanistan" ~ "(?<=tested: )(.*)(?= Key concerns)",
+      TRUE ~ xpath_cumul
+    )) %>%
+    # dplyr::mutate(xpath_new = dplyr::case_when(
+    #   country == "Albania" ~ "getData_json[['tabs']][['teste_gjithesej_dje']]",
+    #   TRUE ~ xpath_new
+    # )) %>%
+    dplyr::mutate(type = dplyr::case_when(
+      country == "Argentina" ~ "pdf",
+      TRUE ~ type
+    )) %>%
+    dplyr::mutate(data_url = dplyr::case_when(
+      country == "Argentina" ~ "https://www.argentina.gob.ar/sites/default/files/DATE-reporte-matutino-covid-19.pdf",
+      TRUE ~ data_url
+    )) %>%
+    dplyr::mutate(xpath_cumul = dplyr::case_when(
+      country == "Argentina" ~ "(?<=se realizaron)(.*)(?=pruebas diagn)",
+      TRUE ~ xpath_cumul
+    )) %>%
+    dplyr::mutate(xpath_new = dplyr::case_when(
+      country == "Argentina" ~ "(?<=fueron realizadas)(.*)(?=nuevas muestras)",
+      TRUE ~ xpath_new
+    )) %>%
+    # dplyr::mutate(date_format = dplyr::case_when(
+    #   country == "Argentina" ~ "%d-%m-%Y",
+    #   TRUE ~ date_format
+    # )) %>%
     dplyr::mutate(xpath_new = dplyr::case_when(
       country == "Romania" ~ "acestea ([.0-9]+) au fost",
       TRUE ~ xpath_new
@@ -44,12 +79,6 @@ preprocess_test_data <- function() {
       country == "Scotland" ~ "(?<=hospital with confirmed COVID-19\\. )(.*)(?= new tests)",
       TRUE ~ xpath_new
     ))
-  #   dplyr::filter(country == "Afghanistan") %>%
-  #   dplyr::mutate(type = "html") %>%
-  #   dplyr::mutate(data_url = "https://www.humanitarianresponse.info/en/operations/afghanistan/document/afghanistan-flash-update-covid-19-strategic-situation-report-no-67") %>%
-  #   dplyr::mutate(xpath_cumul = "/html/body/div[1]/div[4]/div/div[2]/div/div/div/div/div/div/div/div[1]/div/div[5]/div/div/div/div/p[2]/strong") %>%
-  #   dplyr::mutate(pattern_cumul = "tested. \\d{1,4}[\\,\\.]{1}\\d{1,3}")
-
   res <- purrr::pmap(info, process_countries_rowwise)
   return(res)
 }
@@ -66,15 +95,17 @@ process_countries_rowwise <- function(...) {
     return(res)
   }
 
+  browser()
+
   res <- switch(dots$type,
-    # xlsx = fetch_from_csv_xlsx(dots),
-    # csv = fetch_from_csv_xlsx(dots),
-    # json = fetch_from_json(dots),
-    # html = fetch_from_html(dots),
-    # zip = fetch_from_zip(dots),
-    # pdf = fetch_from_pdf(dots),
-    # pdf_list = fetch_from_pdf_list(dots),
-    #html_list = fetch_from_html_list(dots),
+    xlsx = fetch_from_csv_xlsx(dots),
+    csv = fetch_from_csv_xlsx(dots),
+    json = fetch_from_json(dots),
+    html = fetch_from_html(dots),
+    zip = fetch_from_zip(dots),
+    pdf = fetch_from_pdf(dots),
+    pdf_list = fetch_from_pdf_list(dots),
+    html_list = fetch_from_html_list(dots),
     html2 = fetch_from_html2(dots),
     rep(NA, 2) # all other cases
     # more fetch functions here
