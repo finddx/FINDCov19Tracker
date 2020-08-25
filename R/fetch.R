@@ -196,7 +196,7 @@ fetch_from_json <- function(dots) {
     # to ensure we do not get a negative number
     new_tests <- tests_cumulative - tests_yesterday
 
-    if (new_tests < 0) new_tests <- 0
+    if (new_tests < 0) new_tests <- NA
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
@@ -338,8 +338,13 @@ fetch_from_pdf <- function(dots) {
     )
   )
 
+  # in case something goes wrong, we fall back to the manual calculation of new_tests
+  if (length(new_tests) == 0) {
+    dots$xpath_new = NA
+  }
+
   if (is.na(dots$xpath_new)) {
-    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
+    cli::cli_alert_info("Generating {.strong new_tests} for {.emph {dots$country}} manually from yesterday's data.")
     tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
       col_types = list(
         country = readr::col_character(),
@@ -358,10 +363,10 @@ fetch_from_pdf <- function(dots) {
     # to ensure we do not get a negative number
     new_tests <- tests_cumulative - tests_yesterday
 
-    if (new_tests < 0) new_tests <- 0
+    if (new_tests < 0) new_tests <- NA
   }
 
-  check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative)
+  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
 
   return(c(new_tests, tests_cumulative))
 }
@@ -421,10 +426,10 @@ fetch_from_pdf_list <- function(dots) {
     # to ensure we do not get a negative number
     new_tests <- tests_cumulative - tests_yesterday
 
-    if (new_tests < 0) new_tests <- 0
+    if (new_tests < 0) new_tests <- NA
   }
 
-  check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative)
+  check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative, new_tests = new_tests)
 
   return(c(new_tests, tests_cumulative))
 }
@@ -530,7 +535,7 @@ fetch_from_html2 <- function(dots) {
     # to ensure we do not get a negative number
     new_tests <- tests_cumulative - tests_yesterday
 
-    if (new_tests < 0) new_tests <- 0
+    if (new_tests < 0) new_tests <- NA
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
