@@ -1,34 +1,3 @@
-# collect_all <- function(r) {
-#   type <- info[[r, "type"]]
-#   if (!is.na(type)) {
-#     country <- info[[r, "country"]]
-#     message(country)
-#     if (type %in% c("csv", "xlsx")) {
-#       data <- fetch_from_csv_xlsx(type, info[[r, "data_url"]], info[[r, "date_format"]], info[[r, "xpath_cumul"]], info[[r, "xpath_new"]], info[[r, "backlog"]])
-#     } else if (type == "html") {
-#       data <- fetch_from_html(info[[r, "source"]], info[[r, "xpath_cumul"]], info[[r, "xpath_new"]])
-#     } else if (type == "json") {
-#       data <- fetch_from_json(info[[r, "data_url"]], info[[r, "xpath_cumul"]], info[[r, "xpath_new"]])
-#     } else if (type == "jsonstat") {
-#       data <- fetch_from_jsonstat(info[[r, "data_url"]], info[[r, "xpath_cumul"]], info[[r, "xpath_new"]])
-#     } else if (type == "pdf") {
-#       data <- fetch_from_pdf(country, info[[r, "data_url"]], info[[r, "date_format"]], info[[r, "xpath_cumul"]])
-#     } else if (type == "pdf_list") {
-#       data <- fetch_from_pdf_list(info[[r, "source"]], info[[r, "data_url"]], info[[r, "xpath_cumul"]])
-#     } else if (type == "html2") {
-#       data <- fetch_from_html2(info[[r, "data_url"]], info[[r, "date_format"]], info[[r, "xpath_cumul"]])
-#     } else if (type == "html_list") {
-#       data <- fetch_from_html_list(info[[r, "source"]], info[[r, "data_url"]], info[[r, "xpath_cumul"]])
-#     } else if (type == "zip") {
-#       data <- fetch_from_zip(info[[r, "data_url"]], info[[r, "xpath_cumul"]])
-#     } else if (type == "Selenium") {
-#       data <- fetch_from_selenium(info[[r, "country"]], info[[r, "xpath_cumul"]])
-#     }
-#     return(data)
-#   }
-#   return(NA)
-# }
-#
 fetch_from_csv <- function(dots) {
   if (dots$country == "USA") {
   }
