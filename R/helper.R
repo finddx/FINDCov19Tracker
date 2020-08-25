@@ -10,8 +10,8 @@ read_urls <- function(path) {
   return(file)
 }
 
-calculate_new_tests <- function(dots) {
-  cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
+calculate_new_tests <- function(dots, tests_cumulative) {
+  cli::cli_alert_info("Generating {.strong new_tests} for {.emph {dots$country}} manually from yesterday's data.")
   tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
     col_types = list(
       country = readr::col_character(),
@@ -25,6 +25,8 @@ calculate_new_tests <- function(dots) {
   ) %>%
     dplyr::filter(country == dots$country) %>%
     dplyr::filter(date == lubridate::today() - 1)
+
+  browser()
 
   tests_yesterday <- tbl$tests_cumulative
   # to ensure we do not get a negative number

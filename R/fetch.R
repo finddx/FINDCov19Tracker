@@ -177,7 +177,7 @@ fetch_from_json <- function(dots) {
   }
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots)
+    new_tests = calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
@@ -325,7 +325,7 @@ fetch_from_pdf <- function(dots) {
   }
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots)
+    new_tests = calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
@@ -369,7 +369,7 @@ fetch_from_pdf_list <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots)
+    new_tests = calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative, new_tests = new_tests)
@@ -461,7 +461,7 @@ fetch_from_html2 <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots)
+    new_tests = calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
