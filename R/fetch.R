@@ -177,26 +177,7 @@ fetch_from_json <- function(dots) {
   }
 
   if (is.na(dots$xpath_new)) {
-    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
-    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-      col_types = list(
-        country = readr::col_character(),
-        date = readr::col_date(format = ""),
-        new_tests = readr::col_double(),
-        tests_cumulative = readr::col_double(),
-        jhu_ID = readr::col_character(),
-        source = readr::col_character()
-      ),
-      progress = FALSE
-    ) %>%
-      dplyr::filter(country == dots$country) %>%
-      dplyr::filter(date == lubridate::today() - 1)
-
-    tests_yesterday <- tbl$tests_cumulative
-    # to ensure we do not get a negative number
-    new_tests <- tests_cumulative - tests_yesterday
-
-    if (new_tests < 0) new_tests <- NA
+    new_tests = calculate_new_tests(dots)
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
@@ -344,26 +325,7 @@ fetch_from_pdf <- function(dots) {
   }
 
   if (is.na(dots$xpath_new)) {
-    cli::cli_alert_info("Generating {.strong new_tests} for {.emph {dots$country}} manually from yesterday's data.")
-    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-      col_types = list(
-        country = readr::col_character(),
-        date = readr::col_date(format = ""),
-        new_tests = readr::col_double(),
-        tests_cumulative = readr::col_double(),
-        jhu_ID = readr::col_character(),
-        source = readr::col_character()
-      ),
-      progress = FALSE
-    ) %>%
-      dplyr::filter(country == dots$country) %>%
-      dplyr::filter(date == lubridate::today() - 1)
-
-    tests_yesterday <- tbl$tests_cumulative
-    # to ensure we do not get a negative number
-    new_tests <- tests_cumulative - tests_yesterday
-
-    if (new_tests < 0) new_tests <- NA
+    new_tests = calculate_new_tests(dots)
   }
 
   check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
@@ -407,26 +369,7 @@ fetch_from_pdf_list <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
-    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-      col_types = list(
-        country = readr::col_character(),
-        date = readr::col_date(format = ""),
-        new_tests = readr::col_double(),
-        tests_cumulative = readr::col_double(),
-        jhu_ID = readr::col_character(),
-        source = readr::col_character()
-      ),
-      progress = FALSE
-    ) %>%
-      dplyr::filter(country == dots$country) %>%
-      dplyr::filter(date == lubridate::today() - 1)
-
-    tests_yesterday <- tbl$tests_cumulative
-    # to ensure we do not get a negative number
-    new_tests <- tests_cumulative - tests_yesterday
-
-    if (new_tests < 0) new_tests <- NA
+    new_tests = calculate_new_tests(dots)
   }
 
   check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative, new_tests = new_tests)
@@ -474,6 +417,8 @@ fetch_from_html2 <- function(dots) {
   tests_cumulative <- NA
   new_tests <- NA
 
+  browser()
+
   if (!is.na(dots$date_format)) {
     today_char <- as.character(Sys.Date(), dots$date_format)
     yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
@@ -516,26 +461,7 @@ fetch_from_html2 <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    cli::cli_alert_info("Generating {.strong new_tests} for {.emph dots$country} manually from yesterday's data.")
-    tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-      col_types = list(
-        country = readr::col_character(),
-        date = readr::col_date(format = ""),
-        new_tests = readr::col_double(),
-        tests_cumulative = readr::col_double(),
-        jhu_ID = readr::col_character(),
-        source = readr::col_character()
-      ),
-      progress = FALSE
-    ) %>%
-      dplyr::filter(country == dots$country) %>%
-      dplyr::filter(date == lubridate::today() - 1)
-
-    tests_yesterday <- tbl$tests_cumulative
-    # to ensure we do not get a negative number
-    new_tests <- tests_cumulative - tests_yesterday
-
-    if (new_tests < 0) new_tests <- NA
+    new_tests = calculate_new_tests(dots)
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
