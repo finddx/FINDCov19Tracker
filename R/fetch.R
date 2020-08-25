@@ -28,81 +28,19 @@
 #   }
 #   return(NA)
 # }
-
-fetch_from_csv_xlsx <- function(dots) {
-
-  tests_cumulative <- NA
-  new_tests <- NA
-  proc_backlog <- ifelse(is.na(dots$backlog), 0, as.numeric(dots$backlog))
-
-  if (dots$type == "xlsx") {
-
-    tmpfile <- tempfile("country_data", fileext = ".xlsx")
-
-    if (!is.na(dots$date_format)) {
-      today_char <- as.character(Sys.Date(), dots$date_format)
-      yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
-
-      tryCatch(
-        {
-          download.file(gsub("DATE", today_char, dots$data_url),
-            destfile = tmpfile, quiet = TRUE, mode =
-              "wb"
-          )
-        },
-        silent = FALSE,
-        condition = function(err) { }
-      )
-      if (file.size(tmpfile) == 0) {
-        tryCatch(
-          {
-            download.file(gsub("DATE", yesterday_char, dots$data_url),
-              destfile = tmpfile, quiet = FALSE, mode =
-                "wb"
-            )
-          },
-          silent = FALSE,
-          condition = function(err) { }
-        )
-        if (file.size(tmpfile) == 0) {
-          return(c(new_tests, tests_cumulative))
-        }
-      }
-    } else {
-      tryCatch(
-        {
-          download.file(url,
-            destfile = tmpfile, quiet = FALSE, mode =
-              "wb"
-          )
-        },
-        silent = FALSE,
-        condition = function(err) { }
-      )
-      if (file.size(tmpfile) == 0) {
-        return(c(new_tests, tests_cumulative))
-      }
-    }
-
-    data <- readxl::read_excel(tmpfile, sheet = 1, progress = FALSE)
-    sep <- ","
-
-  } else if (dots$type == "csv") {
-    if (dots$country == "USA") {
-    }
-    if (!is.na(dots$date_format)) { # for now only Costa Rica, updated day before
-      yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
-      dots$data_url <- gsub("DATE", yesterday_char, dots$data_url)
-    }
-    data <- rio::import(dots$data_url, format = "csv")
-    # remove missing data
-    # this removes rows which only have NA or "" in all columns
-    data <- data %>%
-      janitor::remove_empty(which = c("rows", "cols"))
-
-  } else {
-    return(c(new_tests, tests_cumulative))
+#
+fetch_from_csv <- function(dots) {
+  if (dots$country == "USA") {
   }
+  if (!is.na(dots$date_format)) { # for now only Costa Rica, updated day before
+    yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
+    dots$data_url <- gsub("DATE", yesterday_char, dots$data_url)
+  }
+  data <- rio::import(dots$data_url, format = "csv")
+  # remove missing data
+  # this removes rows which only have NA or "" in all columns
+  data <- data %>%
+    janitor::remove_empty(which = c("rows", "cols"))
 
   if (!is.na(dots$xpath_cumul)) {
     seps <- c(
@@ -154,6 +92,127 @@ fetch_from_csv_xlsx <- function(dots) {
     checkmate::assert_numeric(new_tests, max.len = 1)
   }
 
+  if (is.na(dots$xpath_new)) {
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
+  }
+
+  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
+
+  return(c(new_tests, tests_cumulative))
+}
+
+fetch_from_xlsx <- function(dots) {
+
+  tests_cumulative <- NA
+  new_tests <- NA
+  proc_backlog <- ifelse(is.na(dots$backlog), 0, as.numeric(dots$backlog))
+
+  tmpfile <- tempfile("country_data", fileext = ".xlsx")
+
+  if (!is.na(dots$date_format)) {
+    today_char <- as.character(Sys.Date(), dots$date_format)
+    yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
+
+    tryCatch(
+      {
+        download.file(gsub("DATE", today_char, dots$data_url),
+          destfile = tmpfile, quiet = TRUE, mode =
+            "wb"
+        )
+      },
+      silent = FALSE,
+      condition = function(err) { }
+    )
+    if (file.size(tmpfile) == 0) {
+      tryCatch(
+        {
+          download.file(gsub("DATE", yesterday_char, dots$data_url),
+            destfile = tmpfile, quiet = FALSE, mode =
+              "wb"
+          )
+        },
+        silent = FALSE,
+        condition = function(err) { }
+      )
+      if (file.size(tmpfile) == 0) {
+        return(c(new_tests, tests_cumulative))
+      }
+    }
+  } else {
+    tryCatch(
+      {
+        download.file(url,
+          destfile = tmpfile, quiet = FALSE, mode =
+            "wb"
+        )
+      },
+      silent = FALSE,
+      condition = function(err) { }
+    )
+    if (file.size(tmpfile) == 0) {
+      return(c(new_tests, tests_cumulative))
+    }
+  }
+
+  data <- readxl::read_excel(tmpfile, sheet = 1, progress = FALSE)
+  sep <- ","
+
+  if (!is.na(dots$xpath_cumul)) {
+    seps <- c(
+      stringr::str_extract(dots$xpath_cumul, "[,;]"),
+      stringr::str_extract(dots$xpath_new, "[,;]")
+    )
+    sep <- seps[which(!is.na(seps))]
+    idx <- unlist(stringr::str_split(dots$xpath_cumul, sep))
+
+    # account for some special cases
+    # - totalTestResultsIncrease is dropped in favor of totalTestResults, which
+    # would lead to clashes down the road
+    data <- data %>%
+      dplyr::select_if(!(names(.) %in% c("totalTestResultsIncrease")))
+
+    cols <- grep(idx[[2]], names(data))
+    data[, cols] <- sapply(data[, cols], as.numeric)
+    type <- idx[[1]]
+    if (type == "last") {
+      tests_cumulative <- data[nrow(data), cols]
+    } else if (type == "sum") {
+      tests_cumulative <- sum(na.omit(data[, cols]))
+    } else {
+      tests_cumulative <- data[as.integer(type), cols]
+    }
+    tests_cumulative <- as.numeric(tests_cumulative)
+    tests_cumulative <- tests_cumulative + proc_backlog
+    checkmate::assert_numeric(tests_cumulative, max.len = 1)
+  }
+
+  if (!is.na(dots$xpath_new)) {
+    seps <- c(
+      stringr::str_extract(dots$xpath_cumul, "[,;]"),
+      stringr::str_extract(dots$xpath_new, "[,;]")
+    )
+    sep <- seps[which(!is.na(seps))]
+    idx <- unlist(stringr::str_split(dots$xpath_new, sep))
+    cols <- grep(idx[[2]], names(data))
+    data[, cols] <- sapply(data[, cols], as.numeric)
+    type <- idx[[1]]
+    if (type == "last") {
+      new_tests <- data[nrow(data), cols]
+    } else if (type == "sum") {
+      new_tests <- sum(na.omit(data[, cols]))
+    } else {
+      new_tests <- data[as.integer(type), cols]
+    }
+    new_tests <- as.numeric(new_tests)
+    checkmate::assert_numeric(new_tests, max.len = 1)
+  }
+
+  if (is.na(dots$xpath_new)) {
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
+  }
+
+  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
+
   return(c(new_tests, tests_cumulative))
 }
 
@@ -177,7 +236,7 @@ fetch_from_json <- function(dots) {
   }
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots, tests_cumulative)
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
@@ -321,11 +380,11 @@ fetch_from_pdf <- function(dots) {
 
   # in case something goes wrong, we fall back to the manual calculation of new_tests
   if (length(new_tests) == 0) {
-    dots$xpath_new = NA
+    dots$xpath_new <- NA
   }
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots, tests_cumulative)
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
@@ -369,7 +428,7 @@ fetch_from_pdf_list <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots, tests_cumulative)
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative, new_tests = new_tests)
@@ -461,7 +520,7 @@ fetch_from_html2 <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    new_tests = calculate_new_tests(dots, tests_cumulative)
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
   check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
