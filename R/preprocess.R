@@ -4,7 +4,7 @@
 #' Rowwise processing of countries test data reports with support for any file
 #' type (csv, pdf, xlsx, etc.)
 #' @export
-preprocess_test_data <- function() {
+fetch_test_data <- function() {
 
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
 
@@ -12,58 +12,6 @@ preprocess_test_data <- function() {
   info = info[7, ]
 
   info %<>%
-    # dplyr::mutate(type = dplyr::case_when(
-    #   country == "Afghanistan" ~ "pdf_list",
-    #   TRUE ~ type
-    # )) %>%
-    # dplyr::mutate(data_url = dplyr::case_when(
-    #   country == "Afghanistan" ~ "https://www.humanitarianresponse.info/sites/www.humanitarianresponse.info/files/documents/files/",
-    #   TRUE ~ data_url
-    # )) %>%
-    # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country ==  "Afghanistan" ~ "(?<=tested: )(.*)(?= Key concerns)",
-    #   TRUE ~ xpath_cumul
-    # )) %>%
-    # # dplyr::mutate(xpath_new = dplyr::case_when(
-    # #   country == "Albania" ~ "getData_json[['tabs']][['teste_gjithesej_dje']]",
-    # #   TRUE ~ xpath_new
-    # # )) %>%
-    # dplyr::mutate(type = dplyr::case_when(
-    #   country == "Albania" ~ "html_list",
-    #   TRUE ~ type
-    # )) %>%
-    # dplyr::mutate(data_url = dplyr::case_when(
-    #   country == "Albania" ~ "https://new.shendetesia.gov.al/covid-19",
-    #   TRUE ~ data_url
-    # )) %>%
-    # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country == "Albania" ~ "(?<=Testime totale)(.*)(?=Raste pozitive)",
-    #   TRUE ~ xpath_cumul
-    # )) %>%
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Albania" ~ "(?<=janë kryer)(.*)(?=testime\\.)",
-    #   TRUE ~ xpath_new
-    # )) #%>%
-    # dplyr::mutate(type = dplyr::case_when(
-    #   country == "Argentina" ~ "pdf",
-    #   TRUE ~ type
-    # )) %>%
-    # dplyr::mutate(data_url = dplyr::case_when(
-    #   country == "Argentina" ~ "https://www.argentina.gob.ar/sites/default/files/DATE-reporte-matutino-covid-19.pdf",
-    #   TRUE ~ data_url
-    # )) %>%
-    # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country == "Argentina" ~ "(?<=se realizaron)(.*)(?=pruebas diagn)",
-    #   TRUE ~ xpath_cumul
-    # )) %>%
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Argentina" ~ "(?<=fueron realizadas)(.*)(?=nuevas muestras)",
-    #   TRUE ~ xpath_new
-    # ))
-    # dplyr::mutate(date_format = dplyr::case_when(
-    #   country == "Argentina" ~ "%d-%m-%Y",
-    #   TRUE ~ date_format
-    # )) %>%
     # dplyr::mutate(xpath_new = dplyr::case_when(
     #   country == "Romania" ~ "acestea ([.0-9]+) au fost",
     #   TRUE ~ xpath_new
@@ -115,8 +63,6 @@ process_countries_rowwise <- function(...) {
     return(res)
   }
 
-  browser()
-
   res <- switch(dots$type,
     xlsx = fetch_from_csv_xlsx(dots),
     csv = fetch_from_csv_xlsx(dots),
@@ -130,10 +76,6 @@ process_countries_rowwise <- function(...) {
     rep(NA, 2) # all other cases
     # more fetch functions here
   )
-
-  if (length(res) != 2) {
-    browser()
-  }
 
   purrr::set_names(res, c("new_tests", "tests_cumulative"))
   return(res)
