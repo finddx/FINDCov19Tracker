@@ -15,10 +15,33 @@ check_country <- function(dots, ...) {
   } else if (dots$country == "Albania") {
     checkmate::assert_number(ellip$new_tests)
     checkmate::assert_number(ellip$tests_cumulative)
-  }  else if (dots$country == "Argentina") {
+  } else if (dots$country == "Argentina") {
     checkmate::assert_number(ellip$new_tests)
     checkmate::assert_number(ellip$tests_cumulative)
-  } else if (dots$country == "Croatia") {
+  } else if (dots$country == "Austria") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Azerbaijan") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Bahrain") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Belgium") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Bermuda") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Bulgaria") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  }
+
+
+
+
+  else if (dots$country == "Croatia") {
     checkmate::assert_number(ellip$new_tests)
     checkmate::assert_number(ellip$tests_cumulative)
   } else if (dots$country == "Romania") {

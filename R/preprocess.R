@@ -9,24 +9,24 @@ fetch_test_data <- function() {
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
 
   #info = info[3:nrow(info), ]
-  info = info[7, ]
+  info = info[25, ]
 
   info %<>%
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Romania" ~ "acestea ([.0-9]+) au fost",
-    #   TRUE ~ xpath_new
-    # )) %>%
+  # dplyr::mutate(xpath_new = dplyr::case_when(
+  #   country == "Romania" ~ "acestea ([.0-9]+) au fost",
+  #   TRUE ~ xpath_new
+  # )) %>%
     # dplyr::mutate(xpath_cumul = dplyr::case_when(
     #   country == "Uruguay" ~ "(?<=procesado)(.*)(?=tests)",
     #   TRUE ~ xpath_cumul
     # )) %>%
+  dplyr::mutate(data_url = dplyr::case_when(
+    country == "Bulgaria" ~ "https://coronavirus.bg/",
+    TRUE ~ data_url
+  ))
     # dplyr::mutate(xpath_new = dplyr::case_when(
     #   country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
     #   TRUE ~ xpath_new
-    # )) %>%
-    # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country == "Armenia" ~ '(?<=Ընդհանուր թեստեր - )(.*?)(?=\\\")',
-    #   TRUE ~ xpath_cumul
     # )) %>%
     # dplyr::mutate(xpath_cumul = dplyr::case_when(
     #   country == "Croatia" ~ "(?<=ukupno testirana)(.*)(?=osoba)",
@@ -45,8 +45,8 @@ fetch_test_data <- function() {
     #   TRUE ~ xpath_new
     # ))
 
-  # xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
-  #                  row.names = FALSE)
+  xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
+                   row.names = FALSE)
   res <- purrr::pmap(info, process_countries_rowwise)
   return(res)
 }
@@ -64,8 +64,8 @@ process_countries_rowwise <- function(...) {
   }
 
   res <- switch(dots$type,
-    xlsx = fetch_from_csv_xlsx(dots),
-    csv = fetch_from_csv_xlsx(dots),
+    xlsx = fetch_from_xlsx(dots),
+    csv = fetch_from_csv(dots),
     json = fetch_from_json(dots),
     html = fetch_from_html(dots),
     zip = fetch_from_zip(dots),

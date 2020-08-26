@@ -1,4 +1,10 @@
 fetch_from_csv <- function(dots) {
+
+  tests_cumulative <- NA
+  new_tests <- NA
+  proc_backlog <- ifelse(is.na(dots$backlog), 0, as.numeric(dots$backlog))
+
+  browser()
   if (dots$country == "USA") {
   }
   if (!is.na(dots$date_format)) { # for now only Costa Rica, updated day before
@@ -219,6 +225,7 @@ fetch_from_html <- function(dots) {
   tests_cumulative <- NA
   new_tests <- NA
 
+  browser()
   page <- try(xml2::read_html(dots$data_url), silent = TRUE)
   if (is.error(page)) {
     page <- try(xml2::read_html(url(dots$data_url)), silent = TRUE)
@@ -230,24 +237,41 @@ fetch_from_html <- function(dots) {
     text <- page %>%
       rvest::html_node(xpath = dots$xpath_cumul) %>%
       rvest::html_text()
-    tests_cumulative <- stringr::str_extract(text, dots$pattern_cumul)
 
-    if (dots$country == "Afghanistan") {
+    if (!grepl(",|\\.", text)) {
+      tests_cumulative <- as.numeric(text)
+    } else {
       tests_cumulative <- as.numeric(
         gsub(",",
           replacement = "",
-          stringr::str_extract(tests_cumulative, "[0-9].*,.*")
+          stringr::str_extract(text, "[0-9].*,.*")
         )
       )
-      checkmate::assert_int(tests_cumulative)
     }
   }
   if (!is.na(dots$xpath_new)) {
     text <- page %>%
       rvest::html_node(xpath = dots$xpath_new) %>%
       rvest::html_text()
-    new_tests <- as.numeric(gsub("[^0-9]", "", dots$pattern_new))
+
+    if (!grepl(",|\\.", text)) {
+      new_tests <- as.numeric(text)
+    } else {
+      new_tests <- as.numeric(
+        gsub(",",
+          replacement = "",
+          stringr::str_extract(text, "[0-9].*,.*")
+        )
+      )
+    }
   }
+
+  if (is.na(dots$xpath_new)) {
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
+  }
+
+  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
+
   return(c(new_tests, tests_cumulative))
 }
 
@@ -406,6 +430,8 @@ fetch_from_pdf_list <- function(dots) {
 }
 
 fetch_from_html_list <- function(dots) {
+
+  browser()
   tests_cumulative <- NA
   new_tests <- NA
 

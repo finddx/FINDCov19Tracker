@@ -26,8 +26,6 @@ calculate_new_tests <- function(dots, tests_cumulative) {
     dplyr::filter(country == dots$country) %>%
     dplyr::filter(date == lubridate::today() - 1)
 
-  browser()
-
   tests_yesterday <- tbl$tests_cumulative
   # to ensure we do not get a negative number
   new_tests <- tests_cumulative - tests_yesterday
