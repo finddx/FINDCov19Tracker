@@ -9,7 +9,7 @@ fetch_test_data <- function() {
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
 
   #info = info[3:nrow(info), ]
-  info = info[30, ]
+  info = info[39, ]
 
   info %<>%
   # dplyr::mutate(xpath_new = dplyr::case_when(
@@ -20,22 +20,22 @@ fetch_test_data <- function() {
     #   country == "Uruguay" ~ "(?<=procesado)(.*)(?=tests)",
     #   TRUE ~ xpath_cumul
     # )) %>%
-  dplyr::mutate(data_url = dplyr::case_when(
-    country == "Canada" ~ "https://www.canada.ca/en/public-health/services/diseases/2019-novel-coronavirus-infection.html?topic=tilelink",
-    TRUE ~ data_url
-  ))
+  # dplyr::mutate(data_url = dplyr::case_when(
+  #   country == "Canada" ~ "https://www.canada.ca/en/public-health/services/diseases/2019-novel-coronavirus-infection.html?topic=tilelink",
+  #   TRUE ~ data_url
+  # ))
     # dplyr::mutate(xpath_new = dplyr::case_when(
     #   country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
     #   TRUE ~ xpath_new
     # )) %>%
     # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country == "Croatia" ~ "(?<=ukupno testirana)(.*)(?=osoba)",
+    #   country == "Croatia" ~ "(?<=ukupno testirano)(.*)(?=osoba, od)",
     #   TRUE ~ xpath_cumul
     # )) %>%
     # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Croatia" ~ "(?<=osoba, od toga)(.*)(?=u protekla 24 sata)",
+    #   country == "Croatia" ~ "(?<=osoba, od toga)(.*)(?=u (protekla|posljednja) 24 sata)",
     #   TRUE ~ xpath_new
-    # )) %>%
+    # ))
     # dplyr::mutate(xpath_cumul = dplyr::case_when(
     #   country == "Scotland" ~ "(?<=A total of )(.*)(?= people in Scotland)",
     #   TRUE ~ xpath_cumul
@@ -45,8 +45,8 @@ fetch_test_data <- function() {
     #   TRUE ~ xpath_new
     # ))
 
-  xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
-                   row.names = FALSE)
+  # xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
+  #                  row.names = FALSE)
   res <- purrr::pmap(info, process_countries_rowwise)
   return(res)
 }

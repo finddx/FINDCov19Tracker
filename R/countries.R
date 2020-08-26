@@ -39,6 +39,15 @@ check_country <- function(dots, ...) {
   } else if (dots$country == "Canada") {
     checkmate::assert_number(ellip$new_tests)
     checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Chile") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Colombia") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Croatia") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
   }
 
 
