@@ -238,11 +238,11 @@ fetch_from_html <- function(dots) {
       rvest::html_node(xpath = dots$xpath_cumul) %>%
       rvest::html_text()
 
-    if (!grepl(",|\\.", text)) {
+    if (!grepl(",|\\.|+|\\(|\\)|[[:blank:]]", text)) {
       tests_cumulative <- as.numeric(gsub("[[:blank:]]", "", text))
     } else {
       tests_cumulative <- as.numeric(
-        gsub(",|\\.",
+        gsub(",|\\.|+|\\(|\\)|[[:blank:]]",
           replacement = "",
           stringr::str_extract(text, "[0-9].*.*")
         )
@@ -254,11 +254,11 @@ fetch_from_html <- function(dots) {
       rvest::html_node(xpath = dots$xpath_new) %>%
       rvest::html_text()
 
-    if (!grepl(",|\\.", text)) {
+    if (!grepl(",|\\.|+|\\(|\\)|[[:blank:]]", text)) {
       new_tests <- as.numeric(gsub("[[:blank:]]", "", text))
     } else {
       new_tests <- as.numeric(
-        gsub(",|\\.",
+        gsub(",|\\.|+|\\(|\\)|[[:blank:]]",
           replacement = "",
           stringr::str_extract(text, "[0-9].*.*")
         )

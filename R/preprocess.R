@@ -9,13 +9,13 @@ fetch_test_data <- function() {
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
 
   #info = info[3:nrow(info), ]
-  info = info[44, ]
+  info = info[42, ]
 
   info %<>%
-  dplyr::mutate(data_url = dplyr::case_when(
-    country == "Denmark" ~ "https://www.ssi.dk/sygdomme-beredskab-og-forskning/sygdomsovervaagning/c/covid19-overvaagning",
-    TRUE ~ data_url
-  )) %>%
+  # dplyr::mutate(data_url = dplyr::case_when(
+  #   country == "Denmark" ~ "https://www.ssi.dk/sygdomme-beredskab-og-forskning/sygdomsovervaagning/c/covid19-overvaagning",
+  #   TRUE ~ data_url
+  # )) %>%
     # dplyr::mutate(xpath_new = dplyr::case_when(
     #   country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
     #   TRUE ~ xpath_new
@@ -24,18 +24,18 @@ fetch_test_data <- function() {
     #   country == "Croatia" ~ "(?<=ukupno testirano)(.*)(?=osoba, od)",
     #   TRUE ~ xpath_cumul
     # )) %>%
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Croatia" ~ "(?<=osoba, od toga)(.*)(?=u (protekla|posljednja) 24 sata)",
-    #   TRUE ~ xpath_new
-    # ))
+    dplyr::mutate(xpath_new = dplyr::case_when(
+      country == "Czech Republic" ~ "/html/body/main/div[3]/div[1]/div[1]/div[1]/div/p[2]/span[2]",
+      TRUE ~ xpath_new
+    ))
     # dplyr::mutate(xpath_cumul = dplyr::case_when(
     #   country == "Scotland" ~ "(?<=A total of )(.*)(?= people in Scotland)",
     #   TRUE ~ xpath_cumul
     # )) %>%
-    dplyr::mutate(xpath_new = dplyr::case_when(
-      country == "Denmark" ~ "//*[@id=\"top\"]/div[2]/section[6]/div[1]/table/tbody/tr[3]/td[3]",
-      TRUE ~ xpath_new
-    ))
+    # dplyr::mutate(xpath_new = dplyr::case_when(
+    #   country == "Denmark" ~ "//*[@id=\"top\"]/div[2]/section[6]/div[1]/table/tbody/tr[3]/td[3]",
+    #   TRUE ~ xpath_new
+    # ))
 
 xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
                  row.names = FALSE)
