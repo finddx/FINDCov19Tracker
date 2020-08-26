@@ -9,7 +9,7 @@ fetch_test_data <- function() {
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
 
   #info = info[3:nrow(info), ]
-  info = info[25, ]
+  info = info[30, ]
 
   info %<>%
   # dplyr::mutate(xpath_new = dplyr::case_when(
@@ -21,7 +21,7 @@ fetch_test_data <- function() {
     #   TRUE ~ xpath_cumul
     # )) %>%
   dplyr::mutate(data_url = dplyr::case_when(
-    country == "Bulgaria" ~ "https://coronavirus.bg/",
+    country == "Canada" ~ "https://www.canada.ca/en/public-health/services/diseases/2019-novel-coronavirus-infection.html?topic=tilelink",
     TRUE ~ data_url
   ))
     # dplyr::mutate(xpath_new = dplyr::case_when(

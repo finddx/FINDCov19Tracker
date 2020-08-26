@@ -36,6 +36,9 @@ check_country <- function(dots, ...) {
   } else if (dots$country == "Bulgaria") {
     checkmate::assert_number(ellip$new_tests)
     checkmate::assert_number(ellip$tests_cumulative)
+  } else if (dots$country == "Canada") {
+    checkmate::assert_number(ellip$new_tests)
+    checkmate::assert_number(ellip$tests_cumulative)
   }
 
 
