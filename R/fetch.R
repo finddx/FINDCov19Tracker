@@ -239,7 +239,7 @@ fetch_from_html <- function(dots) {
       rvest::html_text()
 
     if (!grepl(",|\\.", text)) {
-      tests_cumulative <- as.numeric(text)
+      tests_cumulative <- as.numeric(gsub("[[:blank:]]", "", text))
     } else {
       tests_cumulative <- as.numeric(
         gsub(",",
@@ -255,7 +255,7 @@ fetch_from_html <- function(dots) {
       rvest::html_text()
 
     if (!grepl(",|\\.", text)) {
-      new_tests <- as.numeric(text)
+      new_tests <- as.numeric(gsub("[[:blank:]]", "", text))
     } else {
       new_tests <- as.numeric(
         gsub(",",
