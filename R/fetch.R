@@ -242,9 +242,9 @@ fetch_from_html <- function(dots) {
       tests_cumulative <- as.numeric(gsub("[[:blank:]]", "", text))
     } else {
       tests_cumulative <- as.numeric(
-        gsub(",",
+        gsub(",|\\.",
           replacement = "",
-          stringr::str_extract(text, "[0-9].*,.*")
+          stringr::str_extract(text, "[0-9].*.*")
         )
       )
     }
@@ -258,9 +258,9 @@ fetch_from_html <- function(dots) {
       new_tests <- as.numeric(gsub("[[:blank:]]", "", text))
     } else {
       new_tests <- as.numeric(
-        gsub(",",
+        gsub(",|\\.",
           replacement = "",
-          stringr::str_extract(text, "[0-9].*,.*")
+          stringr::str_extract(text, "[0-9].*.*")
         )
       )
     }

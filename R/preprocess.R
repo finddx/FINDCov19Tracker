@@ -9,21 +9,13 @@ fetch_test_data <- function() {
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
 
   #info = info[3:nrow(info), ]
-  info = info[42, ]
+  info = info[44, ]
 
   info %<>%
-  # dplyr::mutate(xpath_new = dplyr::case_when(
-  #   country == "Romania" ~ "acestea ([.0-9]+) au fost",
-  #   TRUE ~ xpath_new
-  # )) %>%
-    # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country == "Uruguay" ~ "(?<=procesado)(.*)(?=tests)",
-    #   TRUE ~ xpath_cumul
-    # )) %>%
   dplyr::mutate(data_url = dplyr::case_when(
-    country == "Czech Republic" ~ "https://onemocneni-aktualne.mzcr.cz/covid-19",
+    country == "Denmark" ~ "https://www.ssi.dk/sygdomme-beredskab-og-forskning/sygdomsovervaagning/c/covid19-overvaagning",
     TRUE ~ data_url
-  ))
+  )) %>%
     # dplyr::mutate(xpath_new = dplyr::case_when(
     #   country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
     #   TRUE ~ xpath_new
@@ -40,13 +32,13 @@ fetch_test_data <- function() {
     #   country == "Scotland" ~ "(?<=A total of )(.*)(?= people in Scotland)",
     #   TRUE ~ xpath_cumul
     # )) %>%
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Scotland" ~ "(?<=hospital with confirmed COVID-19\\. )(.*)(?= new tests)",
-    #   TRUE ~ xpath_new
-    # ))
+    dplyr::mutate(xpath_new = dplyr::case_when(
+      country == "Denmark" ~ "//*[@id=\"top\"]/div[2]/section[6]/div[1]/table/tbody/tr[3]/td[3]",
+      TRUE ~ xpath_new
+    ))
 
-  # xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
-  #                  row.names = FALSE)
+xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
+                 row.names = FALSE)
   res <- purrr::pmap(info, process_countries_rowwise)
   return(res)
 }
