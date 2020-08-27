@@ -260,9 +260,11 @@ create_shiny_data <- function() {
     summarize(latest_test_date = time[1]) %>%
     ungroup()
 
+  date_in_table <- max(data_all$time) - 1
+
   unit_info <-
     data_all %>%
-    filter(time == max(data_all$time)) %>%
+    filter(time == !! date_in_table) %>%
     select(
       set, unit,
       cases = cap_new_cases,
