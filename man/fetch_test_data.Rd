@@ -10,3 +10,8 @@ fetch_test_data()
 Rowwise processing of countries test data reports with support for any file
 type (csv, pdf, xlsx, etc.)
 }
+\details{
+Countries processed via Selenium are not yet integrated into this mechanism.
+For now, all countries until "Denmark" were checked and asserted  with two
+numeric returns (2020-08-25).
+}

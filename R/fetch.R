@@ -4,9 +4,6 @@ fetch_from_csv <- function(dots) {
   new_tests <- NA
   proc_backlog <- ifelse(is.na(dots$backlog), 0, as.numeric(dots$backlog))
 
-  browser()
-  if (dots$country == "USA") {
-  }
   if (!is.na(dots$date_format)) { # for now only Costa Rica, updated day before
     yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
     dots$data_url <- gsub("DATE", yesterday_char, dots$data_url)
@@ -71,8 +68,6 @@ fetch_from_csv <- function(dots) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
-  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
-
   return(c(new_tests, tests_cumulative))
 }
 
@@ -102,8 +97,7 @@ fetch_from_xlsx <- function(dots) {
       tryCatch(
         {
           download.file(gsub("DATE", yesterday_char, dots$data_url),
-            destfile = tmpfile, quiet = FALSE, mode =
-              "wb"
+            destfile = tmpfile, quiet = TRUE
           )
         },
         silent = FALSE,
@@ -117,8 +111,7 @@ fetch_from_xlsx <- function(dots) {
     tryCatch(
       {
         download.file(url,
-          destfile = tmpfile, quiet = FALSE, mode =
-            "wb"
+          destfile = tmpfile, quiet = TRUE
         )
       },
       silent = FALSE,
@@ -186,8 +179,6 @@ fetch_from_xlsx <- function(dots) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
-  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
-
   return(c(new_tests, tests_cumulative))
 }
 
@@ -214,7 +205,6 @@ fetch_from_json <- function(dots) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
-  check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
   return(c(new_tests, tests_cumulative))
 }
 
@@ -225,7 +215,6 @@ fetch_from_html <- function(dots) {
   tests_cumulative <- NA
   new_tests <- NA
 
-  browser()
   page <- try(xml2::read_html(dots$data_url), silent = TRUE)
   if (is.error(page)) {
     page <- try(xml2::read_html(url(dots$data_url)), silent = TRUE)
@@ -269,8 +258,6 @@ fetch_from_html <- function(dots) {
   if (is.na(dots$xpath_new)) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
-
-  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
 
   return(c(new_tests, tests_cumulative))
 }
@@ -380,8 +367,6 @@ fetch_from_pdf <- function(dots) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
-  check_country(dots, tests_cumulative = tests_cumulative, new_tests = new_tests)
-
   return(c(new_tests, tests_cumulative))
 }
 
@@ -424,25 +409,13 @@ fetch_from_pdf_list <- function(dots) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
 
-  check_country(dots, pdfs = pdfs, tests_cumulative = tests_cumulative, new_tests = new_tests)
-
   return(c(new_tests, tests_cumulative))
 }
 
 fetch_from_html_list <- function(dots) {
 
-  browser()
   tests_cumulative <- NA
   new_tests <- NA
-
-  # FIXME
-  if (dots$country == "Greece") {
-    return(c(new_tests, tests_cumulative))
-  }
-
-  if (dots$country == "Uruguay") {
-    browser()
-  }
 
   page <- xml2::read_html(dots$source)
   hrefs <- rvest::html_attr(rvest::html_nodes(page, "a"), "href")
@@ -461,8 +434,6 @@ fetch_from_html_list <- function(dots) {
     stringr::str_squish(na.omit(stringr::str_extract(content, dots$xpath_new)))
   )
 
-  check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
-
   return(c(new_tests, tests_cumulative))
 }
 
@@ -470,8 +441,6 @@ fetch_from_html2 <- function(dots) {
 
   tests_cumulative <- NA
   new_tests <- NA
-
-  browser()
 
   if (!is.na(dots$date_format)) {
     today_char <- as.character(Sys.Date(), dots$date_format)
@@ -517,8 +486,6 @@ fetch_from_html2 <- function(dots) {
   if (is.na(dots$xpath_new)) {
     new_tests <- calculate_new_tests(dots, tests_cumulative)
   }
-
-  check_country(dots, new_tests = new_tests, tests_cumulative = tests_cumulative)
 
   return(c(new_tests, tests_cumulative))
 }
