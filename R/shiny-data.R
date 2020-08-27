@@ -148,6 +148,15 @@ create_shiny_data <- function() {
 
   # calculations ---------------------------------------------------------------
 
+  # x <- c(2, 2, 2, 2, 2, 2, 1, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 2, 2, 2)
+  # robust_rollmean(x)
+  robust_rollmean <- function(x) {
+    ans <- data.table::frollmean(x, 7, na.rm = TRUE)
+    no_of_obs <- data.table::frollsum(!is.na(x), 7, na.rm = T, fill = 0)
+    ans[no_of_obs <= 3] <- NA
+    ans
+  }
+
   data_country <-
     data_combined %>%
     # prefix cummulative vars
@@ -157,7 +166,7 @@ create_shiny_data <- function() {
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
-    mutate(across(starts_with("new"), function(e) data.table::frollmean(e, 7, na.rm = TRUE))) %>%
+    mutate(across(starts_with("new"), robust_rollmean)) %>%
     ungroup() %>%
     # per capita
     mutate(
@@ -269,6 +278,6 @@ create_shiny_data <- function() {
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(data_all, "processed/data_all.csv")
-  jsonlite::stream_out(data_all, file("processed/data_all.json"))
+  # jsonlite::stream_out(data_all, file("processed/data_all.json"))
 
 }
