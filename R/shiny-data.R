@@ -11,17 +11,17 @@ create_shiny_data <- function() {
 
   # country reference data -----------------------------------------------------
 
-  # country_name <-
-  #   countrycode::codelist %>%
-  #   as_tibble() %>%
-  #   select(
-  #     name = country.name.en, country = iso2c
-  #   ) %>%
-  #   dplyr::mutate(country = dplyr::case_when(
-  #     name == "Kosovo" ~ "XK",
-  #     TRUE ~ country
-  #   ))  %>%
-  #   filter(!is.na(country))
+  country_name <-
+    countrycode::codelist %>%
+    as_tibble() %>%
+    select(
+      name = country.name.en, country = iso2c
+    ) %>%
+    dplyr::mutate(country = dplyr::case_when(
+      name == "Kosovo" ~ "XK",
+      TRUE ~ country
+    ))  %>%
+    filter(!is.na(country))
 
   # we could write it, or read it from here
   # readr::write_csv(country_name, "../FINDCov19TrackerData/raw/country_name.csv")
@@ -246,7 +246,9 @@ create_shiny_data <- function() {
     filter(!is.na(unit)) %>%
     mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e})) %>%
     select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests)) %>%
-    arrange(time, set, unit)
+    arrange(time, set, unit) %>%
+    left_join(country_name, by = c("unit" = "country")) %>%
+    relocate(name, .before = unit)
 
 
   # summary table --------------------------------------------------------------
