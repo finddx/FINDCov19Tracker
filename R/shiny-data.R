@@ -184,7 +184,9 @@ create_shiny_data <- function() {
     # positivity rate
     mutate(pos = na_if(all_new_cases / all_new_tests, Inf)) %>%
     add_column(set = "country", .before = 1) %>%
-    rename(unit = country)
+    rename(unit = country) %>%
+    # replace negative values by NA
+    mutate(across(c(-set, -unit, -time), function(e) if_else(e < 0, NA_real_, e)))
 
   # aggregate to regions, income groups
 
