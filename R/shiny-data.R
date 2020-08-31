@@ -92,7 +92,9 @@ create_shiny_data <- function() {
     # drop non countries
     filter(!(name %in% c("Scotland"))) %>%
     select(-regex) %>%
-    relocate(country)
+    relocate(country) %>%
+    # drop 0 or negative testing values
+    mutate(across(c(new_tests, tests_cumulative), function(e) if_else(e <= 0, NA_real_, e)))
 
   um <- unique(filter(cv_tests, is.na(country))$name)
   if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_tests': {um}")
@@ -166,7 +168,7 @@ create_shiny_data <- function() {
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
-    mutate(across(starts_with("new"), robust_rollmean)) %>%
+    mutate(across(c(new_cases, new_deaths, new_tests), robust_rollmean)) %>%
     ungroup() %>%
     # per capita
     mutate(
@@ -184,9 +186,7 @@ create_shiny_data <- function() {
     # positivity rate
     mutate(pos = na_if(all_new_cases / all_new_tests, Inf)) %>%
     add_column(set = "country", .before = 1) %>%
-    rename(unit = country) %>%
-    # replace negative values by NA
-    mutate(across(c(-set, -unit, -time), function(e) if_else(e < 0, NA_real_, e)))
+    rename(unit = country)
 
   # aggregate to regions, income groups
 
