@@ -76,7 +76,9 @@ create_shiny_data <- function() {
     # drop ships
     filter(!(name %in% c("DiamondPrincessCruiseShip", "MSZaandam"))) %>%
     select(-regex) %>%
-    relocate(country)
+    relocate(country) %>%
+    # drop negative cases and deaths
+    mutate(across(c(cases, deaths, new_cases, new_deaths), function(e) if_else(e < 0, NA_real_, e)))
 
   um <- unique(filter(cv_cases, is.na(country))$name)
   if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_cases': {um}")
