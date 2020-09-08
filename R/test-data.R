@@ -18,7 +18,7 @@ process_test_data <- function() {
     stringr::str_remove(., "data/")
 
   # # suppressed warning: some observations have inconsistent entries
-  last_upd_coronavirus_test <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FIND_Cov_19_Tracker/master/input_data/coronavirus_tests.csv",
+  last_upd_coronavirus_test <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
     col_types = readr::cols()
   )) %>%
     dplyr::arrange(desc(date)) %>%
