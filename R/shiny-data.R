@@ -266,7 +266,9 @@ create_shiny_data <- function() {
     summarize(latest_test_date = time[1]) %>%
     ungroup()
 
-  date_in_table <- max(data_all$time) - 1
+
+  #date_in_table <- max(data_all$time) - 1
+  date_in_table <- max(data_all$time)
 
   unit_info <-
     data_all %>%
@@ -286,6 +288,6 @@ create_shiny_data <- function() {
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(data_all, "processed/data_all.csv")
-  # jsonlite::stream_out(data_all, file("processed/data_all.json"))
+  jsonlite::stream_out(data_all, file("processed/data_all.json"))
 
 }
