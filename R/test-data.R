@@ -18,7 +18,7 @@ process_test_data <- function() {
     stringr::str_remove("data/")
 
   # # suppressed warning: some observations have inconsistent entries
-  last_upd_coronavirus_test <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FIND_Cov_19_Tracker/master/input_data/coronavirus_tests.csv",
+  last_upd_coronavirus_test <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
     col_types = readr::cols()
   )) %>%
     dplyr::arrange(desc(date)) %>%
@@ -54,7 +54,7 @@ process_test_data <- function() {
     process_jhu_data()
   }
   cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols())
-  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/countries_codes_and_coordinates.csv",
+  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
     col_types = readr::cols()
   ))
 
