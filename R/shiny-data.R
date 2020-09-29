@@ -37,20 +37,20 @@ create_shiny_data <- function() {
       regex = country.name.en.regex, country = iso2c
     )
 
-  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/processed/coronavirus_cases.csv",
+  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv",
     col_types = readr::cols()
   )
 
-  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/processed/coronavirus_tests.csv",
+  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
     col_types = readr::cols()
   )
 
-  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/UN_populations_2020.csv",
+  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv",
     col_types = readr::cols()
   )
 
   country_info <-
-    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/country_info.csv", col_types = readr::cols()) %>%
+    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols()) %>%
     select(-name_not_used) %>%
     filter(!is.na(country_iso))
 
