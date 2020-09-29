@@ -6,8 +6,8 @@
 #' @import dplyr tibble
 create_shiny_data <- function() {
 
-  # library(tidyverse)
-
+  process_jhu_data()
+  process_test_data()
 
   # country reference data -----------------------------------------------------
 
@@ -26,7 +26,6 @@ create_shiny_data <- function() {
   # we could write it, or read it from here
   # readr::write_csv(country_name, "../FINDCov19TrackerData/raw/country_name.csv")
 
-
   # read data ------------------------------------------------------------------
 
   # regex matching table
@@ -37,11 +36,11 @@ create_shiny_data <- function() {
       regex = country.name.en.regex, country = iso2c
     )
 
-  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv",
+  cv_cases_raw <- readr::read_csv("processed/coronavirus_cases.csv",
     col_types = readr::cols()
   )
 
-  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+  cv_tests_raw <- readr::read_csv("processed/coronavirus_tests.csv",
     col_types = readr::cols()
   )
 
@@ -53,7 +52,6 @@ create_shiny_data <- function() {
     readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols()) %>%
     select(-name_not_used) %>%
     filter(!is.na(country_iso))
-
 
   # use clean identifier (iso2c) -----------------------------------------------
 
