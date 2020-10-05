@@ -30,7 +30,7 @@ calculate_new_tests <- function(dots, tests_cumulative) {
   # to ensure we do not get a negative number
   new_tests <- tests_cumulative - tests_yesterday
 
-  if (new_tests < 0) new_tests <- NA
+  if (new_tests < 0) new_tests <- 0
 
   return(new_tests)
 
