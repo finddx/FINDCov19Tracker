@@ -8,7 +8,9 @@ fetch_from_csv <- function(dots) {
     yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
     dots$data_url <- gsub("DATE", yesterday_char, dots$data_url)
   }
+
   data <- rio::import(dots$data_url, format = "csv")
+
   # remove missing data
   # this removes rows which only have NA or "" in all columns
   data <- data %>%
@@ -22,11 +24,11 @@ fetch_from_csv <- function(dots) {
     sep <- seps[which(!is.na(seps))]
     idx <- unlist(stringr::str_split(dots$xpath_cumul, sep))
 
-    # account for some special cases
-    # - totalTestResultsIncrease is dropped in favor of totalTestResults, which
-    # would lead to clashes down the road
+    ### account for some special cases
+    # The following columns are dropped in favor of shorter versions of the same.
+    # Keeping both leads to clashes with the used regex down the line
     data <- data %>%
-      dplyr::select_if(!(names(.) %in% c("totalTestResultsIncrease")))
+      dplyr::select_if(!(names(.) %in% c("totalTestResultsIncrease", "TESTS_ALL_POS")))
 
     cols <- grep(idx[[2]], names(data))
     data[, cols] <- sapply(data[, cols], as.numeric)
@@ -215,13 +217,14 @@ fetch_from_html <- function(dots) {
   tests_cumulative <- NA
   new_tests <- NA
 
-  page <- try(xml2::read_html(dots$data_url), silent = TRUE)
+  page <- try(xml2::read_html(dots$source), silent = TRUE)
   if (is.error(page)) {
-    page <- try(xml2::read_html(url(dots$data_url)), silent = TRUE)
+    page <- try(xml2::read_html(url(dots$source)), silent = TRUE)
     if (is.error(page)) {
       return(c(new_tests, tests_cumulative))
     }
   }
+
   if (!is.na(dots$xpath_cumul)) {
     text <- page %>%
       rvest::html_node(xpath = dots$xpath_cumul) %>%
@@ -393,6 +396,7 @@ fetch_from_pdf_list <- function(dots) {
       )
     )
   )
+  #browser()
 
   new_tests <- na.omit(
     as.numeric(
@@ -427,12 +431,22 @@ fetch_from_html_list <- function(dots) {
   content <- xml2::read_html(url) %>%
     rvest::html_text()
   tests_cumulative <- as.numeric(
-    stringr::str_squish(na.omit(stringr::str_extract(content, dots$xpath_cumul)))
+    stringr::str_replace_all(
+      (na.omit(stringr::str_extract(stringr::str_squish(content), dots$xpath_cumul))),
+      "[.]|[,]", ""
+    )
   )
 
   new_tests <- as.numeric(
-    stringr::str_squish(na.omit(stringr::str_extract(content, dots$xpath_new)))
+    stringr::str_replace_all(
+      (na.omit(stringr::str_extract(stringr::str_squish(content), dots$xpath_new))),
+      "[.]|[,]", ""
+    )
   )
+
+  if (is.na(dots$xpath_new)) {
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
+  }
 
   return(c(new_tests, tests_cumulative))
 }
@@ -441,6 +455,7 @@ fetch_from_html2 <- function(dots) {
 
   tests_cumulative <- NA
   new_tests <- NA
+
 
   if (!is.na(dots$date_format)) {
     today_char <- as.character(Sys.Date(), dots$date_format)
@@ -465,6 +480,7 @@ fetch_from_html2 <- function(dots) {
   }
   content <- page %>%
     rvest::html_text()
+
   tests_cumulative <- as.numeric(
     stringr::str_replace_all(
       stringr::str_extract(stringr::str_squish(

@@ -11,45 +11,32 @@
 #' @export
 fetch_test_data <- function() {
 
-  info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls.xlsx")
+  # FIXME: Philippines (tableau data)
+  # FIXME: Denmark (Arc GIS dashboard)
+
+  info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls_patrick.xlsx")
+  info <- info[-c(44, 127), ]
+
+  info <- info %>%
+    dplyr::filter(!is.na(type), type != "Selenium")
 
   # select only one country for testing purposes
-  # info <- info[42, ]
+  #info <- info[c(29), ]
 
   # info %<>%
-    # dplyr::mutate(data_url = dplyr::case_when(
-    #   country == "Denmark" ~ "https://www.ssi.dk/sygdomme-beredskab-og-forskning/sygdomsovervaagning/c/covid19-overvaagning",
-    #   TRUE ~ data_url
-    # )) %>%
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
-    #   TRUE ~ xpath_new
-    # )) %>%
-    # dplyr::mutate(xpath_cumul = dplyr::case_when(
-    #   country == "Afghanistan" ~ "(?<=healthcare workers\\)\\. )(.*)(?= people out of)",
-    #   TRUE ~ xpath_cumul
-    # ))
-    # dplyr::mutate(xpath_new = dplyr::case_when(
-    #   country == "Czech Republic" ~ "/html/body/main/div[3]/div[1]/div[1]/div[1]/div/p[2]/span[2]",
-    #   TRUE ~ xpath_new
-    # ))
-  # dplyr::mutate(xpath_cumul = dplyr::case_when(
-  #   country == "Scotland" ~ "(?<=A total of )(.*)(?= people in Scotland)",
-  #   TRUE ~ xpath_cumul
-  # )) %>%
-  # dplyr::mutate(xpath_new = dplyr::case_when(
-  #   country == "Denmark" ~ "//*[@id=\"top\"]/div[2]/section[6]/div[1]/table/tbody/tr[3]/td[3]",
-  #   TRUE ~ xpath_new
-  # ))
+  #   dplyr::mutate(xpath_new = dplyr::case_when(
+  #     country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
+  #     TRUE ~ xpath_new
+  #   )) %>%
+
 
   # write data.frame in FINDCov19TrackerData repo when manual changes were made
-  # xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls.xlsx"),
+  # xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls_patrick.xlsx"),
   #   row.names = FALSE
   # )
   res <- purrr::pmap(info, process_countries_rowwise)
 
-  # each country should return both new_tests and cumul_tests
-  checkmate::assert_integer(res, len = 2)
+  res <- as.data.frame(do.call(rbind, res))
 
   return(res)
 }
@@ -57,12 +44,15 @@ fetch_test_data <- function() {
 process_countries_rowwise <- function(...) {
   dots <- list(...)
 
-  if (!is.na(dots$data_url) || !is.na(dots$source)) {
+  if (!is.na(dots$data_url)) {
     cli::cli_alert_success("{.strong {dots$country}}: Type: {.code {dots$type}}, URL: {.url {dots$data_url}}.")
+  } else if (!is.na(dots$source)) {
+    cli::cli_alert_success("{.strong {dots$country}}: Type: {.code {dots$type}}, URL: {.url {dots$source}}.")
   } else {
     cli::cli_alert_danger("{.strong {dots$country}}: 'URL' field: 'NA' -> {.emph Skipping}.")
-    res <- rep(NA, 2)
-    purrr::set_names(res, c("new_tests", "tests_cumulative"))
+    res = rep(NA, 2)
+    res <- append(res, c(dots$country, as.character(Sys.Date())))
+    res <- purrr::set_names(res, c("new_tests", "tests_cumulative", "country", "date"))
     return(res)
   }
 
@@ -79,6 +69,13 @@ process_countries_rowwise <- function(...) {
     rep(NA, 2) # all other types
   )
 
-  purrr::set_names(res, c("new_tests", "tests_cumulative"))
+  # each country should return both new_tests and cumul_tests
+  checkmate::assert_double(res, len = 2, any.missing = FALSE)
+
+  # append country name
+  res <- append(res, c(dots$country, as.character(Sys.Date())))
+
+  res <- purrr::set_names(res, c("new_tests", "tests_cumulative", "country", "date"))
+
   return(res)
 }
