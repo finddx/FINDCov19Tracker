@@ -32,6 +32,9 @@ process_test_data <- function() {
     ), col_types = readr::cols(),
     delim = ";")
   )
+
+  cli::cli_alert_info("Processing information for date {.field {as.Date(timestamp_last_upd, format = '%Y%m%d')}}.")
+
   # remove empty "ind" and "X" columns
   cv_tests %<>%
     dplyr::select(-ind, -X)
@@ -113,6 +116,7 @@ process_test_data <- function() {
 
   cv_tests_new <- cv_tests %>%
     dplyr::bind_rows(cv_tests_added)
-  readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
+  return(cv_tests_new)
+  # readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
