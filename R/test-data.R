@@ -33,7 +33,7 @@ process_test_data <- function() {
     delim = ";")
   )
 
-  cli::cli_alert_info("Processing information for date {.field {as.Date(timestamp_last_upd, format = '%Y%m%d')}}.")
+  cli::cli_alert_info("{.fun process_test_data}: Processing information for date {.field {as.Date(timestamp_last_upd, format = '%Y%m%d')}}.")
 
   # remove empty "ind" and "X" columns
   cv_tests %<>%
