@@ -116,7 +116,6 @@ process_test_data <- function() {
 
   cv_tests_new <- cv_tests %>%
     dplyr::bind_rows(cv_tests_added)
-  return(cv_tests_new)
-  # readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
+  readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
