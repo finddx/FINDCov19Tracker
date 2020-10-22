@@ -1,13 +1,3 @@
-# FIND_Cov_19_Tracker
-
-Our interactive map uses publicly available data to show the number of SARS-CoV-2 tests that have been performed in each country, and the number of positive cases.
-The map was developed using [open-source code](https://github.com/eparker12/nCoV_tracker) initially developed by the [London School of Hygiene & Tropical Medicine](https://www.lshtm.ac.uk/)
-
-Several countries and entities including the World Bank are publishing aggregate estimates on the total number of tests performed.
-These reports are published across individual websites, statistical reports and press releases – often in multiple languages and updated with different periodicity.
-Although there is currently no centralized database and many countries do not publish official reports on volumes of tests performed, we are working to build a global picture of how many people are being tested for COVID-19.
-
-[-> Map](https://finddx.shinyapps.io/FIND_Cov_19_Tracker/)
 
 ### Data sources 
 
