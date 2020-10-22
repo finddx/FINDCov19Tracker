@@ -16,7 +16,7 @@ The workflow is automated via GitHub Actions in [dsbbfinddx/data](https://github
 
 ### Data sources 
 
-**Test data** : Collated everyday by the FIND team, from information found online. [x] countries are updated automatically running the [x] script found in the main folder. The source test file is then saved in the dropbox folder under the name coronavirus_tests_YYYYMMDD_sources_SO.csv
+**Test data** : Collated everyday by the FIND team, from information found online. [x] countries are updated automatically running the [x] script found in the main folder. The source test file is then saved under the name coronavirus_tests_YYYYMMDD_sources_SO.csv on https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/raw
 
 **Case and Death data** : Downloaded daily from the COVID19 JHU repository: https://github.com/CSSEGISandData/COVID-19
 
