@@ -230,65 +230,36 @@ create_shiny_data <- function() {
   data_country <-
     data_combined %>%
     # prefix cummulative vars
-    rename(cum_cases = cases, cum_deaths = deaths, cum_tests = tests, time = date) %>%
+    rename(cum_cases = cases, cum_deaths = deaths, cum_tests_orig = tests, time = date) %>%
     # keep original data in separate columns
     mutate(across(starts_with("new"), function(e) e, .names = "{col}_orig")) %>%
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
-    mutate(new_tests_smooth = smooth_new_tests(new_tests, cum_tests)) %>%
-    mutate(cum_tests_smooth = cumsum(coalesce(new_tests_smooth, 0))) %>%
-    mutate(across(c(new_cases, new_deaths, new_tests, new_tests_smooth), robust_rollmean)) %>%
-    mutate(across(c(new_cases, new_deaths, new_tests, new_tests_smooth), round)) %>%
+    mutate(new_tests = smooth_new_tests(new_tests, cum_tests_orig)) %>%
+    mutate(cum_tests = cumsum(coalesce(new_tests, 0))) %>%
+    mutate(across(c(new_cases, new_deaths, new_tests), robust_rollmean)) %>%
+    mutate(across(c(new_cases, new_deaths, new_tests), round)) %>%
     ungroup() %>%
     # per capita
     mutate(
       across(
-        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests, new_tests_smooth, cum_tests_smooth),
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) e / pop_100k,
         .names = "cap_{col}"
       ),
       across(
-        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests, new_tests_smooth, cum_tests_smooth),
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) e,
         .names = "all_{col}"
       )
     ) %>%
     # positivity rate
-    mutate(pos = na_if(all_new_cases / all_new_tests_smooth, Inf)) %>%
+    mutate(pos = na_if(all_new_cases / all_new_tests, Inf)) %>%
     add_column(set = "country", .before = 1) %>%
     rename(unit = country)
 
 
-
-  # data_country <-
-  #   data_combined %>%
-  #   # prefix cummulative vars
-  #   rename(cum_cases = cases, cum_deaths = deaths, cum_tests = tests, time = date) %>%
-  #   # keep orginal data in separate columns
-  #   mutate(across(starts_with("new"), function(e) e, .names = "{col}_orig")) %>%
-  #   # rolling averages of 7 for new vars
-  #   arrange(country, time) %>%
-  #   group_by(country) %>%
-  #   mutate(across(c(new_cases, new_deaths, new_tests), robust_rollmean)) %>%
-  #   ungroup() %>%
-  #   # per capita
-  #   mutate(
-  #     across(
-  #       c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-  #       function(e) e / pop_100k,
-  #       .names = "cap_{col}"
-  #     ),
-  #     across(
-  #       c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-  #       function(e) e,
-  #       .names = "all_{col}"
-  #     )
-  #   ) %>%
-  #   # positivity rate
-  #   mutate(pos = na_if(all_new_cases / all_new_tests, Inf)) %>%
-  #   add_column(set = "country", .before = 1) %>%
-  #   rename(unit = country)
 
   # aggregate to regions, income groups
 
@@ -309,16 +280,16 @@ create_shiny_data <- function() {
     group_by(unit = region, time) %>%
     summarize(
       across(
-        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests_smooth, new_tests_smooth),
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_ratio(e, pop_100k),
         .names = "cap_{col}"
       ),
       across(
-        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests_smooth, cum_tests_smooth),
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_basic(e),
         .names = "all_{col}"
       ),
-      pos = sum_ratio(all_new_cases, all_new_tests_smooth)
+      pos = sum_ratio(all_new_cases, all_new_tests)
     ) %>%
     ungroup() %>%
     add_column(set = "region", .before = 1)
@@ -329,16 +300,16 @@ create_shiny_data <- function() {
     group_by(unit = income, time) %>%
     summarize(
       across(
-        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests_smooth, new_tests_smooth),
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_ratio(e, pop_100k),
         .names = "cap_{col}"
       ),
       across(
-        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests_smooth, new_tests_smooth),
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_basic(e),
         .names = "all_{col}"
       ),
-      pos = sum_ratio(all_new_cases, all_new_tests_smooth)
+      pos = sum_ratio(all_new_cases, all_new_tests)
     ) %>%
     ungroup() %>%
     add_column(set = "income", .before = 1)
@@ -347,7 +318,7 @@ create_shiny_data <- function() {
     bind_rows(data_country, data_region, data_income) %>%
     filter(!is.na(unit)) %>%
     mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e})) %>%
-    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests, cum_tests_smooth, new_tests_smooth)) %>%
+    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests)) %>%
     arrange(time, set, unit) %>%
     left_join(country_name, by = c("unit" = "country")) %>%
     relocate(name, .before = unit)
@@ -377,7 +348,7 @@ create_shiny_data <- function() {
       cases = cap_new_cases,
       deaths = cap_new_deaths,
       pos = pos,
-      tests = cap_new_tests_smooth
+      tests = cap_new_tests
     ) %>%
     left_join(country_info, by = c("unit" = "country_iso")) %>%
     left_join(latest_test_date, by = "unit")
@@ -387,6 +358,10 @@ create_shiny_data <- function() {
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(data_all, "processed/data_all.csv")
+
+  # readr::write_csv(unit_info, "/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/unit_info.csv")
+  # readr::write_csv(data_all, "/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/data_all.csv")
+
   #jsonlite::stream_out(data_all, file("processed/data_all.json"))
 
 }
