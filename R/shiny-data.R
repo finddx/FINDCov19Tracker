@@ -3,7 +3,9 @@
 #'   files from `processed/` directory.
 #'   Writes `processed/data_shiny.csv`.
 #' @export
-#' @import dplyr tibble data.table
+#' @import dplyr tibble
+
+library(data.table)
 create_shiny_data <- function() {
 
   process_jhu_data()
