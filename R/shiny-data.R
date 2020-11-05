@@ -46,14 +46,14 @@ create_shiny_data <- function() {
                                   col_types = readr::cols()
   )
 
-  # cv_tests_raw <- readr::read_csv("processed/coronavirus_tests.csv",
-  #   col_types = readr::cols()
-  # )
-
-
-  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-                                  col_types = readr::cols()
+  cv_tests_raw <- readr::read_csv("/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/coronavirus_tests.csv",
+    col_types = readr::cols()
   )
+
+
+  # cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+  #                                 col_types = readr::cols()
+  # )
 
   pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv",
     col_types = readr::cols()
@@ -105,7 +105,7 @@ create_shiny_data <- function() {
     select(-regex) %>%
     relocate(country) %>%
     # drop 0 or negative testing values
-    mutate(across(c(new_tests, tests_cumulative), function(e) if_else(e <= 0, NA_real_, e)))
+    mutate(across(c(new_tests_corrected, tests_cumulative_corrected), function(e) if_else(e <= 0, NA_real_, e)))
 
   um <- unique(filter(cv_tests, is.na(country))$name)
   if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_tests': {um}")
@@ -150,8 +150,10 @@ create_shiny_data <- function() {
       new_cases,
       deaths,
       new_deaths,
-      tests = tests_cumulative,
-      new_tests,
+      tests_orig = tests_cumulative,
+      new_tests_orig = new_tests,
+      tests = tests_cumulative_corrected,
+      new_tests = new_tests_corrected,
       pop_100k
     )
 
@@ -232,13 +234,13 @@ create_shiny_data <- function() {
   data_country <-
     data_combined %>%
     # prefix cummulative vars
-    rename(cum_cases = cases, cum_deaths = deaths, cum_tests_orig = tests, time = date) %>%
+    rename(cum_cases = cases, cum_deaths = deaths, cum_tests_orig = tests_orig, time = date) %>%
     # keep original data in separate columns
-    mutate(across(starts_with("new"), function(e) e, .names = "{col}_orig")) %>%
+    mutate(across(c(new_cases, new_deaths), function(e) e, .names = "{col}_orig")) %>%
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
-    mutate(new_tests = smooth_new_tests(new_tests, cum_tests_orig)) %>%
+    mutate(new_tests = smooth_new_tests(new_tests, tests)) %>%
     mutate(cum_tests = cumsum(coalesce(new_tests, 0))) %>%
     mutate(across(c(new_cases, new_deaths, new_tests), robust_rollmean)) %>%
     mutate(across(c(new_cases, new_deaths, new_tests), round)) %>%
@@ -320,7 +322,7 @@ create_shiny_data <- function() {
     bind_rows(data_country, data_region, data_income) %>%
     filter(!is.na(unit)) %>%
     mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e})) %>%
-    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests)) %>%
+    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, tests, cum_tests, new_tests)) %>%
     arrange(time, set, unit) %>%
     left_join(country_name, by = c("unit" = "country")) %>%
     relocate(name, .before = unit)
@@ -340,7 +342,8 @@ create_shiny_data <- function() {
     ungroup()
 
 
-  date_in_table <- max(data_all$time) - 1
+  #date_in_table <- max(data_all$time) - 1
+  date_in_table <- max(data_all$time)
 
   unit_info <-
     data_all %>%
