@@ -25,13 +25,30 @@ process_test_data <- function() {
     dplyr::slice(1) %>%
     dplyr::pull(date)
   timestamp_last_upd <- stringr::str_replace_all(last_upd_coronavirus_test, "-", "")
-  cv_tests <- suppressWarnings(
-    readr::read_delim(sprintf(
-      "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/coronavirus_tests_%s_sources_SO.csv",
-      timestamp_last_upd
-    ), col_types = readr::cols(),
-    delim = ";")
-  )
+
+  today <- Sys.Date()
+  today_str <- as.character(today,format="%Y%m%d")
+
+  if(timestamp_last_upd == today_str){
+    cv_tests <- suppressWarnings(
+      readr::read_delim(sprintf(
+        "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/coronavirus_tests_%s_sources_SO.csv",
+        timestamp_last_upd
+      ), col_types = readr::cols(),
+      delim = ";")
+    )
+  }else if(timestamp_last_upd < today_str & file.exists(paste0('raw/','coronavirus_tests_',today_str,'_sources_SO.csv'))){
+    cv_tests <- suppressWarnings(
+      readr::read_delim(sprintf(
+        "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/coronavirus_tests_%s_sources_SO.csv",
+        today_str
+      ), col_types = readr::cols(),
+      delim = ";")
+    )
+  }
+
+
+
 
   cli::cli_alert_info("{.fun process_test_data}: Processing information for date {.field {as.Date(timestamp_last_upd, format = '%Y%m%d')}}.")
 
