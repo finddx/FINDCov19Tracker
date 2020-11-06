@@ -46,14 +46,14 @@ create_shiny_data <- function() {
                                   col_types = readr::cols()
   )
 
-  cv_tests_raw <- readr::read_csv("/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/coronavirus_tests.csv",
-    col_types = readr::cols()
-  )
-
-
-  # cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-  #                                 col_types = readr::cols()
+  # cv_tests_raw <- readr::read_csv("/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/coronavirus_tests.csv",
+  #   col_types = readr::cols()
   # )
+
+
+  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+                                  col_types = readr::cols()
+  )
 
   pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv",
     col_types = readr::cols()
