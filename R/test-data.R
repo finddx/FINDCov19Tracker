@@ -121,15 +121,15 @@ process_test_data <- function() {
 
   cv_test_new_neg <- subset(cv_tests_new, new_tests_corrected < 0)
 
-  if(nrow(cv_test_new_neg)>0){
-    send.mail(from = "anna.mantsoki@finddx.org",
-              to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
-              subject = "Negative values on new tests",
-              body = paste0("There are ", nrow(cv_test_new_neg), 'new tests values in the coronavirus_tests.csv file'),
-              smtp = list(host.name = "aspmx.l.google.com", port = 25),
-              authenticate = FALSE,
-              send = TRUE)
-  }
+  # if(nrow(cv_test_new_neg)>0){
+  #   send.mail(from = "anna.mantsoki@finddx.org",
+  #             to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
+  #             subject = "Negative values on new tests",
+  #             body = paste0("There are ", nrow(cv_test_new_neg), 'new tests values in the coronavirus_tests.csv file'),
+  #             smtp = list(host.name = "aspmx.l.google.com", port = 25),
+  #             authenticate = FALSE,
+  #             send = TRUE)
+  # }
 
 
 
