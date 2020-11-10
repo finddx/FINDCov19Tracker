@@ -123,6 +123,8 @@ process_test_data <- function() {
 
   if (nrow(cv_test_new_neg) > 0) {
     readr::write_csv(cv_test_new_neg, "issues/coronavirus_tests_new_negative.csv")
+    cli::cli_alert_danger("Found negative test values.")
+    print(cv_test_new_neg)
     # mailR::send.mail(
     #   from = "anna.mantsoki@finddx.org",
     #   to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
