@@ -4,11 +4,18 @@
 #'   Writes `processed/data_shiny.csv`.
 #' @export
 #' @import dplyr tibble
+#' @importFrom gert git_status
 create_shiny_data <- function() {
 
   process_jhu_data()
   process_test_data()
 
+  # in case some countries have negative data, we exit early
+  git_mod <- gert::git_status()
+  git_mod <- git_mod[git_mod$status == "modified", ]
+  if (any("issues/coronavirus_tests_new_negative.csv" %in% git_mod$file)) {
+    return(invisible())
+  }
   # country reference data -----------------------------------------------------
 
   country_name <-

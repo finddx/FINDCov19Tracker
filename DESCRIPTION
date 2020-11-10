@@ -42,7 +42,8 @@ Imports:
     shinythemes,
     shinyWidgets,
     stringr,
-    tidyr
+    tidyr,
+    gert
 Suggests:
     testthat
 Encoding: UTF-8
