@@ -25,6 +25,7 @@ Imports:
     leaflet,
     lubridate,
     magrittr,
+    mailR,
     maps,
     plotly,
     plyr,
