@@ -1,5 +1,5 @@
 # written by Anna
-#' @importFrom data.table data.table
+#' @importFrom data.table data.table rbindlist
 smooth_new_tests <- function(x, y) {
   # rle of NAs
   m <- rle(is.na(x))
@@ -7,7 +7,7 @@ smooth_new_tests <- function(x, y) {
   no_of_NAs <- rep(ifelse(m$values, m$lengths, 0), times = m$lengths)
 
   # create a data table with variable, number of NAs and keep only the entries for values, with their original index in the data.frame
-  dat <- data.table(x, y, no_of_NAs) %>%
+  dat <- data.table::data.table(x, y, no_of_NAs) %>%
     mutate(ind = as.numeric(rownames(.))) %>%
     filter(no_of_NAs == 0)
   # if there are value in the data.table for the variable
@@ -43,7 +43,7 @@ smooth_new_tests <- function(x, y) {
       }
     })
 
-    dat_ <- rbindlist(dat_) %>%
+    dat_ <- data.table::rbindlist(dat_) %>%
       full_join(dat_NA, by = "index") %>%
       select(index, new_tests_smooth.x) %>%
       rename(new_tests_smooth = new_tests_smooth.x)
