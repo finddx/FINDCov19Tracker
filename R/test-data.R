@@ -123,18 +123,18 @@ process_test_data <- function() {
 
   if (nrow(cv_test_new_neg) > 0) {
     readr::write_csv(cv_test_new_neg, "issues/coronavirus_tests_new_negative.csv")
-    mailR::send.mail(
-      from = "anna.mantsoki@finddx.org",
-      to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
-      subject = "Negative values on new tests",
-      body = paste0(
-        "There are ", nrow(cv_test_new_neg),
-        "new tests values in the coronavirus_tests.csv file"
-      ),
-      smtp = list(host.name = "aspmx.l.google.com", port = 25),
-      authenticate = FALSE,
-      send = TRUE
-    )
+    # mailR::send.mail(
+    #   from = "anna.mantsoki@finddx.org",
+    #   to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
+    #   subject = "Negative values on new tests",
+    #   body = paste0(
+    #     "There are ", nrow(cv_test_new_neg),
+    #     "new tests values in the coronavirus_tests.csv file"
+    #   ),
+    #   smtp = list(host.name = "aspmx.l.google.com", port = 25),
+    #   authenticate = FALSE,
+    #   send = TRUE
+    # )
   } else {
     readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
   }
