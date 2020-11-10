@@ -6,6 +6,7 @@
 #'
 #' @return Writes `coronavirus_tests.csv`
 #'
+#' @importFrom mailR send.mail
 #' @export
 process_test_data <- function() {
   fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
@@ -118,24 +119,24 @@ process_test_data <- function() {
   cv_tests_new <- cv_tests %>%
     dplyr::bind_rows(cv_tests_added)
 
-
   cv_test_new_neg <- subset(cv_tests_new, new_tests_corrected < 0)
 
-  # if(nrow(cv_test_new_neg)>0){
-  #   send.mail(from = "anna.mantsoki@finddx.org",
-  #             to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
-  #             subject = "Negative values on new tests",
-  #             body = paste0("There are ", nrow(cv_test_new_neg), 'new tests values in the coronavirus_tests.csv file'),
-  #             smtp = list(host.name = "aspmx.l.google.com", port = 25),
-  #             authenticate = FALSE,
-  #             send = TRUE)
-  # }
-
-
-
-
-
-  readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
-  readr::write_csv(cv_test_new_neg, "issues/coronavirus_tests_new_negative.csv")
+  if (nrow(cv_test_new_neg) > 0) {
+    readr::write_csv(cv_test_new_neg, "issues/coronavirus_tests_new_negative.csv")
+    mailR::send.mail(
+      from = "anna.mantsoki@finddx.org",
+      to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
+      subject = "Negative values on new tests",
+      body = paste0(
+        "There are ", nrow(cv_test_new_neg),
+        "new tests values in the coronavirus_tests.csv file"
+      ),
+      smtp = list(host.name = "aspmx.l.google.com", port = 25),
+      authenticate = FALSE,
+      send = TRUE
+    )
+  } else {
+    readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
+  }
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
