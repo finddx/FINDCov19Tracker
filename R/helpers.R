@@ -1,4 +1,5 @@
 # written by Anna
+#' @importFrom data.table data.table
 smooth_new_tests <- function(x, y) {
   # rle of NAs
   m <- rle(is.na(x))
