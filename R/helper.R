@@ -44,6 +44,7 @@ clean_selenium <- function(data) {
     mutate(tests_cumulative = stringr::str_replace_all(tests_cumulative, " ", "")) %>%
     mutate(tests_cumulative = stringr::str_match(tests_cumulative, pattern = "\\d+")) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+    na.omit() %>%
     mutate(date = as.Date(date))
 
   return(data_clean)
@@ -62,8 +63,8 @@ calculate_daily_tests_selenium <- function(data) {
     ),
     progress = FALSE
   ) %>%
-    dplyr::filter(country == data$country) %>%
-    dplyr::filter(date == data$date - 1)
+    dplyr::filter(country %in% data$country) %>%
+    dplyr::filter(date %in% unique(data$date - 1))
 
   tests_yesterday <- tbl$tests_cumulative
   data$new_tests <- data$tests_cumulative - tests_yesterday
