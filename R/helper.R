@@ -35,3 +35,37 @@ calculate_new_tests <- function(dots, tests_cumulative) {
   return(new_tests)
 
 }
+
+clean_selenium <- function(data) {
+
+  data_clean <- data %>%
+    mutate(tests_cumulative = stringr::str_replace_all(tests_cumulative, ",", "")) %>%
+    mutate(tests_cumulative = stringr::str_squish(tests_cumulative)) %>%
+    mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+    mutate(date = as.Date(date))
+
+  return(data_clean)
+}
+
+
+calculate_daily_tests_selenium <- function(data) {
+  tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+    col_types = list(
+      country = readr::col_character(),
+      date = readr::col_date(format = ""),
+      new_tests = readr::col_double(),
+      tests_cumulative = readr::col_double(),
+      jhu_ID = readr::col_character(),
+      source = readr::col_character()
+    ),
+    progress = FALSE
+  ) %>%
+    dplyr::filter(country == data$country) %>%
+    dplyr::filter(date == as.Date(data$date) - 1)
+
+  tests_yesterday <- tbl$tests_cumulative
+  data$new_tests <- data$tests_cumulative - tests_yesterday
+
+  return(data)
+
+}

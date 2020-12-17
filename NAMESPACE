@@ -2,6 +2,7 @@
 
 export(create_shiny_data)
 export(fetch_test_data)
+export(get_daily_data)
 export(preprocess_jhu_data)
 export(process_jhu_data)
 export(process_test_data)

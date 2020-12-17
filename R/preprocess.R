@@ -83,8 +83,3 @@ process_countries_rowwise <- function(...) {
 
   return(res)
 }
-
-
-foo <- fetch_test_data()
-
-jsonlite::toJSON(foo)

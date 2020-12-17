@@ -112,3 +112,27 @@ process_test_data <- function() {
   readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
+
+#' Get daily data from FINDCov19TrackerData data branch
+#' @export
+get_daily_data <- function() {
+
+  today <- format(Sys.time(), "%Y-%m-%d")
+
+  selenium_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/data/automated/selenium/%s-selenium-tests.json", today)) %>%
+    mutate(source = "selenium")
+  selenium_tests_clean = clean_selenium(selenium_tests)
+  selenium_tests_daily = calculate_daily_tests_selenium(selenium_tests_clean)
+
+  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/data/automated/fetch/%s-tests-R.json", today)) %>%
+    mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+    mutate(new_tests = as.numeric(new_tests)) %>%
+    mutate(date = as.Date(date)) %>%
+    mutate(source = "fetch")
+
+  test_combined <- bind_rows(selenium_tests_daily, fetch_funs_tests)
+
+  jsonlite::write_json(test_combined, "automated-tests.json")
+
+  return(test_combined)
+}
