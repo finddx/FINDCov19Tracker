@@ -16,13 +16,13 @@ fetch_test_data <- function() {
 
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls_patrick.xlsx")
   # info <- info[-c(44, 127), ]
-  info = info[7, ]
+  info <- info[7, ]
 
   # info <- info %>%
   #   dplyr::filter(!is.na(type), type != "Selenium")
 
   # select only one country for testing purposes
-  #info <- info[c(29), ]
+  # info <- info[c(29), ]
 
   # info %<>%
   #   dplyr::mutate(xpath_new = dplyr::case_when(
@@ -39,7 +39,10 @@ fetch_test_data <- function() {
 
   res <- as.data.frame(do.call(rbind, res))
 
-  return(res)
+  res_ordered <- res %>%
+    relocate(country, date)
+
+  return(res_ordered)
 }
 
 process_countries_rowwise <- function(...) {
@@ -51,7 +54,7 @@ process_countries_rowwise <- function(...) {
     cli::cli_alert_success("{.strong {dots$country}}: Type: {.code {dots$type}}, URL: {.url {dots$source}}.")
   } else {
     cli::cli_alert_danger("{.strong {dots$country}}: 'URL' field: 'NA' -> {.emph Skipping}.")
-    res = rep(NA, 2)
+    res <- rep(NA, 2)
     res <- append(res, c(dots$country, as.character(Sys.Date())))
     res <- purrr::set_names(res, c("new_tests", "tests_cumulative", "country", "date"))
     return(res)
@@ -82,6 +85,6 @@ process_countries_rowwise <- function(...) {
 }
 
 
-foo = fetch_test_data()
+foo <- fetch_test_data()
 
 jsonlite::toJSON(foo)
