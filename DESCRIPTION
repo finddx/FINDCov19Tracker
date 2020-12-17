@@ -34,6 +34,7 @@ Imports:
     plyr,
     purrr,
     RColorBrewer,
+    pdftools,
     readr,
     readxl,
     reshape2,

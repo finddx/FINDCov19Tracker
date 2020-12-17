@@ -15,10 +15,11 @@ fetch_test_data <- function() {
   # FIXME: Denmark (Arc GIS dashboard)
 
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls_patrick.xlsx")
-  info <- info[-c(44, 127), ]
+  # info <- info[-c(44, 127), ]
+  info = info[7, ]
 
-  info <- info %>%
-    dplyr::filter(!is.na(type), type != "Selenium")
+  # info <- info %>%
+  #   dplyr::filter(!is.na(type), type != "Selenium")
 
   # select only one country for testing purposes
   #info <- info[c(29), ]
@@ -79,3 +80,8 @@ process_countries_rowwise <- function(...) {
 
   return(res)
 }
+
+
+foo = fetch_test_data()
+
+jsonlite::toJSON(foo)
