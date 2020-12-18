@@ -85,6 +85,7 @@ jobs:
 
       - name: "[Custom block] [Linux] Install poppler for pdftools package"
         run: |
+          sudo R CMD javareconf
           sudo add-apt-repository -y ppa:cran/poppler
           sudo apt-get update
           sudo apt-get install -y libpoppler-cpp-dev
