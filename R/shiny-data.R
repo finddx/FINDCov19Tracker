@@ -3,7 +3,7 @@
 #'   files from `processed/` directory.
 #'   Writes `processed/data_shiny.csv`.
 #' @export
-#' @import dplyr tibble
+#' @import dplyr
 create_shiny_data <- function() {
 
   # library(tidyverse)
