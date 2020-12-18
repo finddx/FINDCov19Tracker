@@ -399,7 +399,6 @@ fetch_from_pdf_list <- function(dots) {
       )
     )
   )
-  #browser()
 
   new_tests <- na.omit(
     as.numeric(
@@ -435,14 +434,20 @@ fetch_from_html_list <- function(dots) {
     rvest::html_text()
   tests_cumulative <- as.numeric(
     stringr::str_replace_all(
-      (na.omit(stringr::str_extract(stringr::str_squish(content), dots$xpath_cumul))),
+      (na.omit(stringr::str_extract(
+        stringr::str_squish(content),
+        dots$xpath_cumul
+      ))),
       "[.]|[,]", ""
     )
   )
 
   new_tests <- as.numeric(
     stringr::str_replace_all(
-      (na.omit(stringr::str_extract(stringr::str_squish(content), dots$xpath_new))),
+      (na.omit(stringr::str_extract(
+        stringr::str_squish(content),
+        dots$xpath_new
+      ))),
       "[.]|[,]", ""
     )
   )
@@ -464,9 +469,13 @@ fetch_from_html2 <- function(dots) {
     today_char <- as.character(Sys.Date(), dots$date_format)
     yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
 
-    page <- try(xml2::read_html(gsub("DATE", today_char, dots$data_url)), silent = TRUE)
+    page <- try(xml2::read_html(gsub("DATE", today_char, dots$data_url)),
+      silent = TRUE
+    )
     if (is.error(page)) {
-      page <- try(xml2::read_html(gsub("DATE", yesterday_char, dots$data_url)), silent = TRUE)
+      page <- try(xml2::read_html(gsub("DATE", yesterday_char, dots$data_url)),
+        silent = TRUE
+      )
       if (is.error(page)) {
         return(c(new_tests, tests_cumulative))
       }
@@ -503,7 +512,7 @@ fetch_from_html2 <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    new_tests <- calculate_new_tests(dots, tests_cumulative)
+    new_tests <- calculate_daily_tests_r_fetch(dots, tests_cumulative)
   }
 
   return(c(new_tests, tests_cumulative))

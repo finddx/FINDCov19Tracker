@@ -158,8 +158,13 @@ get_daily_test_data <- function() {
   selenium_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", today)) %>%
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
-  selenium_tests_clean = clean_selenium(selenium_tests[1:3, ])
-  selenium_tests_daily = calculate_daily_tests_selenium(selenium_tests_clean)
+  selenium_tests_clean <- clean_selenium(selenium_tests[1:3, ])
+  # FIXME
+  # selenium_tests_daily = calculate_daily_tests_selenium(selenium_tests_clean)
+  selenium_tests_daily <- selenium_tests_clean
+  selenium_tests_daily$new_tests <- NA
+
+  print(selenium_tests_daily)
 
   fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%

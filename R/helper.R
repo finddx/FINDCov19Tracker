@@ -51,25 +51,55 @@ clean_selenium <- function(data) {
   return(data_clean)
 }
 
+calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
+  data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", lubridate::today() - 1)) %>% # nolint
+    dplyr::filter(country == data$country)
 
-calculate_daily_tests_selenium <- function(data) {
-  tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-    col_types = list(
-      country = readr::col_character(),
-      date = readr::col_date(format = ""),
-      new_tests = readr::col_double(),
-      tests_cumulative = readr::col_double(),
-      jhu_ID = readr::col_character(),
-      source = readr::col_character()
-    ),
-    progress = FALSE
-  ) %>%
-    dplyr::filter(country %in% data$country) %>%
-    dplyr::filter(date %in% unique(data$date - 1))
+  # if no yesterday data exists yet, we return NA
+  if (nrow(data_yesterday) == 0) {
+    new_tests <- NA
+    cli::cli_alert_warning("{.field {data$country}}: Yesterday's data not
+      (yet) available.", wrap = TRUE)
+    return(new_tests)
+  } else {
+    tests_yesterday <- as.numeric(data_yesterday$tests_cumulative)
+    new_tests <- tests_cumulative - tests_yesterday
+  }
 
-  tests_yesterday <- tbl$tests_cumulative
-  data$new_tests <- data$tests_cumulative - tests_yesterday
-
-  return(data)
-
+  return(new_tests)
 }
+
+# calculate_daily_tests_selenium <- function(data) {
+
+#     data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", lubridate::today() - 1))
+#     data_yesterday_clean = clean_selenium(data_yesterday)
+
+#     data %>%
+#       mutate(new_tests = )
+
+
+#      %>% # nolint
+#     dplyr::filter(country %in% data$country)
+
+#     if (nrow(data_yesterday) == 0)
+
+#   tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+#     col_types = list(
+#       country = readr::col_character(),
+#       date = readr::col_date(format = ""),
+#       new_tests = readr::col_double(),
+#       tests_cumulative = readr::col_double(),
+#       jhu_ID = readr::col_character(),
+#       source = readr::col_character()
+#     ),
+#     progress = FALSE
+#   ) %>%
+#     dplyr::filter(country %in% data$country) %>%
+#     dplyr::filter(date %in% unique(data$date - 1))
+
+#   tests_yesterday <- tbl$tests_cumulative
+#   data$new_tests <- data$tests_cumulative - tests_yesterday
+
+#   return(data)
+
+# }

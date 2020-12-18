@@ -59,31 +59,31 @@ process_countries_rowwise <- function(...) {
       "new_tests", "tests_cumulative",
       "country", "date"
     ))
-
-    res <- switch(dots$type,
-      xlsx = fetch_from_xlsx(dots),
-      csv = fetch_from_csv(dots),
-      json = fetch_from_json(dots),
-      html = fetch_from_html(dots),
-      zip = fetch_from_zip(dots),
-      pdf = fetch_from_pdf(dots),
-      pdf_list = fetch_from_pdf_list(dots),
-      html_list = fetch_from_html_list(dots),
-      html2 = fetch_from_html2(dots),
-      rep(NA, 2) # all other types
-    )
-
-    # each country should return both new_tests and cumulative_tests
-    checkmate::assert_double(res, len = 2, any.missing = FALSE)
-
-    # append country name
-    res <- append(res, c(dots$country, as.character(Sys.Date())))
-
-    res <- purrr::set_names(res, c(
-      "new_tests", "tests_cumulative",
-      "country", "date"
-    ))
-
-    return(res)
   }
+
+  res <- switch(dots$type,
+    xlsx = fetch_from_xlsx(dots),
+    csv = fetch_from_csv(dots),
+    json = fetch_from_json(dots),
+    html = fetch_from_html(dots),
+    zip = fetch_from_zip(dots),
+    pdf = fetch_from_pdf(dots),
+    pdf_list = fetch_from_pdf_list(dots),
+    html_list = fetch_from_html_list(dots),
+    html2 = fetch_from_html2(dots),
+    rep(NA, 2) # all other types
+  )
+
+  # each country should return both new_tests and cumulative_tests
+  checkmate::assert_double(res, len = 2, any.missing = FALSE)
+
+  # append country name
+  res <- append(res, c(dots$country, as.character(Sys.Date())))
+
+  res <- purrr::set_names(res, c(
+    "new_tests", "tests_cumulative",
+    "country", "date"
+  ))
+
+  return(res)
 }
