@@ -6,6 +6,7 @@
 #'
 #' @return Writes `coronavirus_tests.csv`
 #'
+#' @importFrom mailR send.mail
 #' @export
 process_test_data <- function() {
   fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
@@ -14,23 +15,30 @@ process_test_data <- function() {
     access_token = gh::gh_token()
   )
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
-    stringr::str_subset("coronavirus_tests_[0-9]{8}_sources_SO.csv") %>%
-    stringr::str_remove("data/")
+    stringr::str_subset(., "coronavirus_tests_[0-9]{8}_sources_SO.csv") %>%
+    stringr::str_remove(., "data/")
 
-  # # suppressed warning: some observations have inconsistent entries
-  last_upd_coronavirus_test <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-    col_types = readr::cols()
-  )) %>%
-    dplyr::arrange(desc(date)) %>%
-    dplyr::slice(1) %>%
-    dplyr::pull(date)
-  timestamp_last_upd <- stringr::str_replace_all(last_upd_coronavirus_test, "-", "")
+  most_recent <- tail(filelist, 1)
+
+  today <- format(Sys.time(), format = "%Y%m%d")
+
+  # always read the file with the latest date - approaches using the latest
+  # modification timestamp caused troubles in the past
   cv_tests <- suppressWarnings(
-    readr::read_csv2(sprintf(
-      "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/coronavirus_tests_%s_sources_SO.csv",
-      timestamp_last_upd
-    ), col_types = readr::cols())
+    readr::read_delim(sprintf(
+      "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/%s",
+      most_recent
+    ),
+    col_types = readr::cols(),
+    delim = ";"
+    )
   )
+
+  cli::cli_alert_info("{.fun process_test_data}: Processing information for {.field {most_recent}}.")
+
+  # remove empty "ind" and "X" columns
+  cv_tests %<>%
+    dplyr::select(-ind, -X)
 
   # tests file is ok, go on with the update
   cv_tests$date <- as.Date(cv_tests$date,
@@ -43,6 +51,7 @@ process_test_data <- function() {
 
   # prevent issues in DT with non ascii characters in URL
   cv_tests$source <- iconv(cv_tests$source, from = "ISO8859-1", to = "UTF-8")
+
 
   # import data
   # coronavirus_cases.csv is created by process_jhu_data()
@@ -109,7 +118,28 @@ process_test_data <- function() {
 
   cv_tests_new <- cv_tests %>%
     dplyr::bind_rows(cv_tests_added)
-  readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
+
+  cv_test_new_neg <- subset(cv_tests_new, new_tests_corrected < 0)
+
+  if (nrow(cv_test_new_neg) > 0) {
+    readr::write_csv(cv_test_new_neg, "issues/coronavirus_tests_new_negative.csv")
+    cli::cli_alert_danger("Found negative test values.")
+    print(cv_test_new_neg)
+    # mailR::send.mail(
+    #   from = "anna.mantsoki@finddx.org",
+    #   to = c("anna.mantsoki@finddx.org", "Imane.ElIdrissi@finddx.org"),
+    #   subject = "Negative values on new tests",
+    #   body = paste0(
+    #     "There are ", nrow(cv_test_new_neg),`
+    #     "new tests values in the coronavirus_tests.csv file"
+    #   ),
+    #   smtp = list(host.name = "aspmx.l.google.com", port = 25),
+    #   authenticate = FALSE,
+    #   send = TRUE
+    # )
+  } else {
+    readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
+  }
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
 

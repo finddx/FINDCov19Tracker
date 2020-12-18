@@ -3,93 +3,133 @@
 #'   files from `processed/` directory.
 #'   Writes `processed/data_shiny.csv`.
 #' @export
-#' @import dplyr
+#' @import dplyr tibble
+#' @importFrom gert git_status
 create_shiny_data <- function() {
 
-  # library(tidyverse)
+  process_jhu_data()
+  process_test_data()
 
-  # read and cobine data -------------------------------------------------------
+  # in case some countries have negative data, we exit early
+  git_mod <- gert::git_status()
+  git_mod <- git_mod[git_mod$status == "modified", ]
+  if (any("issues/coronavirus_tests_new_negative.csv" %in% git_mod$file)) {
+    return(invisible())
+  }
+  # country reference data -----------------------------------------------------
 
-  cv_cases <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/processed/coronavirus_cases.csv",
-    col_types = readr::cols()
-  )
+  country_name <-
+    countrycode::codelist %>%
+    as_tibble() %>%
+    select(
+      name = country.name.en, country = iso2c
+    ) %>%
+    dplyr::mutate(country = dplyr::case_when(
+      name == "Kosovo" ~ "XK",
+      TRUE ~ country
+    )) %>%
+    filter(!is.na(country))
 
-  cv_tests <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/processed/coronavirus_tests.csv",
-    col_types = readr::cols()
-  )
+  # we could write it, or read it from here
+  # readr::write_csv(country_name, "../FINDCov19TrackerData/raw/country_name.csv")
 
-  pop <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/UN_populations_2020.csv",
-    col_types = readr::cols()
-  ) %>%
-    mutate(country = recode(.data$country,
-      "Republic of Korea" = "RepublicofKorea",
-      "Congo (Brazzaville)" = "Congo",
-      # "Republic of the Congo" = Congo
-      "Democratic Republic of the Congo" = "DemocraticRepublicoftheCongo",
-      "Cote d'Ivoire" = "CotedIvoire",
-      "Cruise Ship" = "DiamondPrincessCruiseShip",
-      "Diamond Princess" = "DiamondPrincessCruiseShip",
-      "Dominican Republic" = "DominicanRepublic",
-      "El Salvador" = "ElSalvador",
-      "Equatorial Guinea" = "EquatorialGuinea",
-      "Holy See" = "HolySee",
-      "MS Zaandam" = "MSZaandam",
-      "New Zealand" = "NewZealand",
-      "North Macedonia" = "NorthMacedonia",
-      "Papua New Guinea" = "PapuaNewGuinea",
-      "Saint Kitts and Nevis" = "SaintKittsandNevis",
-      "Saint Lucia" = "SaintLucia",
-      "Saint Vincent and the Grenadines" = "SaintVincentandtheGrenadines",
-      "San Marino" = "SanMarino",
-      "Sao Tome and Principe" = "SaoTomeandPrincipe",
-      "Saudi Arabia" = "SaudiArabia",
-      "Sierra Leone" = "SierraLeone",
-      "South Sudan" = "SouthSudan",
-      "Sri Lanka" = "SriLanka",
-      "Taiwan*" = "Taiwan",
-      "Trinidad and Tobago" = "TrinidadandTobago",
-      "United Arab Emirates" = "UnitedArabEmirates",
-      "United Kingdom" = "UnitedKingdom",
-      "Western Sahara" = "WesternSahara",
-      "Gambia" = "TheGambia",
-      "Antigua and Barbuda" = "AntiguaandBarbuda",
-      "Bosnia and Herzegovina" = "BosniaandHerzegovina",
-      "Burkina Faso" = "BurkinaFaso",
-      "Central African Republic" = "CentralAfricanRepublic",
-      "Costa Rica" = "CostaRica",
-      "Bahamas" = "TheBahamas",
-      "Cabo Verde" = "CapeVerde",
-      "Syria" = "SyrianArabRepublic",
-      "Timor-Leste" = "EastTimor",
-      "South Africa" = "SouthAfrica",
-      "East Timor" = "EastTimor",
-      "West Bank and Gaza" = "occupiedPalestinianterritory",
-      "Guinea-Bissau" = "GuineaBissau",
-      "Tanzania, United Republic of" = "UnitedRepublicofTanzania",
-      "Moldova, Republic of" = "RepublicofMoldova",
-      " " = "NA",
-      "United States of America" = "US",
-      "Bolivia (Plurinational State of)" = "Bolivia",
-      "Brunei Darussalam" = "Brunei",
-      "Côte d'Ivoire" = "CotedIvoire",
-      "Iran (Islamic Republic of)" = "Iran",
-      "Lao People's Democratic Republic" = "Laos",
-      "Republic of Moldova" = "Moldova",
-      "State of Palestine" = "occupiedPalestinianterritory",
-      "Russian Federation" = "Russia",
-      "Syrian Arab Republic" = "SyrianArabRepublic",
-      "China, Taiwan Province of China" = "Taiwan",
-      "United Republic of Tanzania" = "Tanzania",
-      "Venezuela (Bolivarian Republic of)" = "Venezuela",
-      "Viet Nam" = "Vietnam"
-    ))
+  # read data ------------------------------------------------------------------
 
+  # regex matching table
   iso_country <-
     countrycode::codelist %>%
     as_tibble() %>%
     select(
       regex = country.name.en.regex, country = iso2c
     )
+
+  # cv_cases_raw <- readr::read_csv("processed/coronavirus_cases.csv",
+  #   col_types = readr::cols()
+  # )
+
+  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv",
+    col_types = readr::cols()
+  )
+
+  # cv_tests_raw <- readr::read_csv("/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/coronavirus_tests.csv",
+  #   col_types = readr::cols()
+  # )
+
+
+  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+    col_types = readr::cols()
+  )
+
+  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv",
+    col_types = readr::cols()
+  )
+
+  country_info <-
+    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols()) %>%
+    select(-name_not_used) %>%
+    filter(!is.na(country_iso))
+
+  # use clean identifier (iso2c) -----------------------------------------------
+
+  cv_cases <-
+    cv_cases_raw %>%
+    rename(name = country) %>%
+    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
+    mutate(country = case_when(
+      name == "Kosovo" ~ "XK",
+      name == "SouthAfrica" ~ "ZA",
+      name == "CentralAfricanRepublic" ~ "CF",
+      name == "DominicanRepublic" ~ "DO",
+      name == "SaintLucia" ~ "LC",
+      name == "WesternSahara" ~ "EH",
+      # name == "UnitedRepublicofTanzania" ~ "TZ",
+      name == "RepublicofKorea" ~ "KR",
+      # name == "LaoPeople'sDemocraticRepublic" ~ "LA",
+      TRUE ~ country
+    )) %>%
+    # drop ships
+    filter(!(name %in% c("DiamondPrincessCruiseShip", "MSZaandam"))) %>%
+    select(-regex) %>%
+    relocate(country) %>%
+    # drop negative cases and deaths
+    mutate(across(c(cases, deaths, new_cases, new_deaths), function(e) if_else(e < 0, NA_real_, e)))
+
+  um <- unique(filter(cv_cases, is.na(country))$name)
+  if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_cases': {um}")
+
+  cv_tests <-
+    cv_tests_raw %>%
+    rename(name = country) %>%
+    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
+    mutate(country = case_when(
+      name == "Kosovo" ~ "XK",
+      TRUE ~ country
+    )) %>%
+    # drop non countries
+    filter(!(name %in% c("Scotland"))) %>%
+    select(-regex) %>%
+    relocate(country) %>%
+    # drop 0 or negative testing values
+    mutate(across(c(new_tests_corrected, tests_cumulative_corrected), function(e) if_else(e <= 0, NA_real_, e)))
+
+  um <- unique(filter(cv_tests, is.na(country))$name)
+  if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_tests': {um}")
+
+  pop <-
+    pop_raw %>%
+    rename(name = country) %>%
+    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
+    mutate(country = case_when(
+      name == "Kosovo" ~ "XK",
+      TRUE ~ country
+    )) %>%
+    # drop non countries
+    filter(!(name %in% c("Channel Islands"))) %>%
+    select(-regex) %>%
+    relocate(country)
+
+  um <- unique(filter(pop, is.na(country))$name)
+  if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'pop': {um}")
 
   # check all jhu country names have corresponding country data
   "%ni%" <- Negate("%in%")
@@ -101,82 +141,46 @@ create_shiny_data <- function() {
           countries: {countries_without_population}.", wrap = TRUE)
   }
 
-  data_combined_raw <-
-    cv_cases %>%
-    left_join(cv_tests, by = c("country" = "jhu_ID", "date" = "date")) %>%
-    left_join(pop) %>%
+  # combining data -------------------------------------------------------------
+
+  data_combined <-
+    select(cv_cases, -name) %>%
+    full_join(select(cv_tests, -name), by = c("country", "date")) %>%
+    left_join(pop, by = "country") %>%
     mutate(pop_100k = population / 100000) %>%
     select(
-      name = country,
+      country,
       date,
       cases,
       new_cases,
       deaths,
       new_deaths,
-      tests = tests_cumulative,
-      new_tests,
+      tests_orig = tests_cumulative,
+      new_tests_orig = new_tests,
+      tests = tests_cumulative_corrected,
+      new_tests = new_tests_corrected,
       pop_100k
-    ) %>%
-    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
-    mutate(country = case_when(
-      name == "Kosovo" ~ "XK",
-      name == "SouthAfrica" ~ "ZA",
-      name == "CentralAfricanRepublic" ~ "CF",
-      name == "DominicanRepublic" ~ "DO",
-      name == "SaintLucia" ~ "LC",
-      name == "WesternSahara" ~ "EH",
-      TRUE ~ country
-    )) %>%
-    # drop
-    # 1 Diamond Princess Cruise Ship
-    # 2 MS Zaandam
-    select(-regex) %>%
-    select(name, country, everything())
+    )
 
-  # filter data which no iso_code match
-  data_combined <- data_combined_raw %>%
-    filter(!is.na(country))
-
-  cli::cli_alert_danger("The following countries lack an iso code and are dropped:
-                        {setdiff(data_combined_raw$name, data_combined$name)}.")
+  um <- unique(filter(cv_tests, is.na(country))$name)
+  if (length(um) > 0) cli::cli_alert_danger("Some missing countries in 'data_combined'")
 
 
-  # process data for shiny app -------------------------------------------------
-
-  # do we still want this?
-  # readr::write_csv(data_combined, "processed/data_combined.csv")
-
-  country_name <-
-    countrycode::codelist %>%
-    as_tibble() %>%
-    select(
-      name = country.name.en, country = iso2c
-    ) %>%
-    dplyr::mutate(country = dplyr::case_when(
-      name == "Kosovo" ~ "XK",
-      TRUE ~ country
-    ))  %>%
-    filter(!is.na(country))
-
-  # we could write it, or read it from here
-  # readr::write_csv(country_name, "../FINDCov19TrackerData/raw/country_name.csv")
-
-  country_info <-
-    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/country_info.csv", col_types = readr::cols()) %>%
-    select(-name_not_used) %>%
-    filter(!is.na(country))
+  # calculations ---------------------------------------------------------------
 
   data_country <-
     data_combined %>%
-    select(-name) %>%
     # prefix cummulative vars
-    rename(cum_cases = cases, cum_deaths = deaths, cum_tests = tests, time = date) %>%
-    # keep orginal data in separate columns
-    mutate(across(starts_with("new"), function(e) e, .names = "{col}_orig")) %>%
+    rename(cum_cases = cases, cum_deaths = deaths, cum_tests_orig = tests_orig, time = date) %>%
+    # keep original data in separate columns
+    mutate(across(c(new_cases, new_deaths), function(e) e, .names = "{col}_orig")) %>%
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
-    mutate(across(starts_with("new"), function(e) data.table::frollmean(e, 7, na.rm = TRUE))) %>%
+    mutate(new_tests = smooth_new_tests(new_tests, tests)) %>%
+    mutate(cum_tests = cumsum(coalesce(new_tests, 0))) %>%
+    mutate(across(c(new_cases, new_deaths, new_tests), robust_rollmean)) %>%
+    mutate(across(c(new_cases, new_deaths, new_tests), round)) %>%
     ungroup() %>%
     # per capita
     mutate(
@@ -205,13 +209,12 @@ create_shiny_data <- function() {
     sum(nominator[in_use]) / sum(denominator[in_use])
   }
 
-  sum_basic <- function(x) {
-    sum(x, na.rm = TRUE)
-  }
-
   data_region <-
     data_country %>%
-    left_join(select(country_info, unit = country, region, income), by = "unit") %>%
+    left_join(select(country_info,
+      unit = country_iso, region = continent,
+      income
+    ), by = "unit") %>%
     group_by(unit = region, time) %>%
     summarize(
       across(
@@ -231,7 +234,10 @@ create_shiny_data <- function() {
 
   data_income <-
     data_country %>%
-    left_join(select(country_info, unit = country, region, income), by = "unit") %>%
+    left_join(select(country_info,
+      unit = country_iso, region = continent,
+      income
+    ), by = "unit") %>%
     group_by(unit = income, time) %>%
     summarize(
       across(
@@ -249,28 +255,56 @@ create_shiny_data <- function() {
     ungroup() %>%
     add_column(set = "income", .before = 1)
 
-  shiny_data <-
+  data_all <-
     bind_rows(data_country, data_region, data_income) %>%
     filter(!is.na(unit)) %>%
-    mutate(across(where(is.numeric), function(e) {e[is.na(e)] <- NA; e})) %>%
-    select(-c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests))
+    mutate(across(where(is.numeric), function(e) {
+      e[is.na(e)] <- NA
+      e
+    })) %>%
+    select(-c(
+      cum_cases, new_cases, cum_deaths, new_deaths, tests,
+      cum_tests, new_tests
+    )) %>%
+    arrange(time, set, unit) %>%
+    left_join(country_name, by = c("unit" = "country")) %>%
+    relocate(name, .before = unit)
 
-  latest <-
-    shiny_data %>%
-    filter(time == max(shiny_data$time)) %>%
+
+  # summary table --------------------------------------------------------------
+
+  latest_test_date <-
+    data_all %>%
+    filter(set == "country") %>%
+    select(unit, time, value = new_tests_orig) %>%
+    filter(!is.na(value)) %>%
+    filter(value > 0) %>%
+    arrange(desc(time)) %>%
+    group_by(unit) %>%
+    summarize(latest_test_date = time[1]) %>%
+    ungroup()
+
+
+  # date_in_table <- max(data_all$time) - 1
+  date_in_table <- max(data_all$time)
+
+  unit_info <-
+    data_all %>%
+    filter(time == !!date_in_table) %>%
     select(
       set, unit,
       cases = cap_new_cases,
       deaths = cap_new_deaths,
       pos = pos,
       tests = cap_new_tests
-    )
+    ) %>%
+    left_join(country_info, by = c("unit" = "country_iso")) %>%
+    left_join(latest_test_date, by = "unit")
 
-  unit_info <-
-    latest %>%
-    left_join(country_info, by = c("unit" = "country"))
+
+  # writing data ---------------------------------------------------------------
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
-  readr::write_csv(shiny_data, "processed/shiny_data.csv")
+  readr::write_csv(data_all, "processed/data_all.csv")
 
 }
