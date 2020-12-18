@@ -41,6 +41,7 @@ Imports:
     readr,
     readxl,
     reshape2,
+    rio,
     rlang,
     rvest,
     sf,
@@ -50,10 +51,10 @@ Imports:
     shinyWidgets,
     stringr,
     tabulizer,
+    tibble,
     tidyr,
-    xml2,
-    rio,
-    tidyselect
+    tidyselect,
+    xml2
 Suggests:
     testthat
 Encoding: UTF-8

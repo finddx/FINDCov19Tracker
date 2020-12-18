@@ -5,6 +5,7 @@
 #' @export
 #' @import dplyr
 #' @importFrom gert git_status
+#' @importFrom tibble add_column
 create_shiny_data <- function() {
 
   process_jhu_data()
@@ -220,7 +221,7 @@ create_shiny_data <- function() {
     ) %>%
     # positivity rate
     mutate(pos = na_if(all_new_cases / all_new_tests, Inf)) %>%
-    add_column(set = "country", .before = 1) %>%
+    tibble::add_column(set = "country", .before = 1) %>%
     rename(unit = country)
 
   # aggregate to regions, income groups
@@ -254,7 +255,7 @@ create_shiny_data <- function() {
       pos = sum_ratio(all_new_cases, all_new_tests)
     ) %>%
     ungroup() %>%
-    add_column(set = "region", .before = 1)
+    tibble::add_column(set = "region", .before = 1)
 
   data_income <-
     data_country %>%
@@ -277,7 +278,7 @@ create_shiny_data <- function() {
       pos = sum_ratio(all_new_cases, all_new_tests)
     ) %>%
     ungroup() %>%
-    add_column(set = "income", .before = 1)
+    tibble::add_column(set = "income", .before = 1)
 
   data_all <-
     bind_rows(data_country, data_region, data_income) %>%
