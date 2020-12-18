@@ -113,9 +113,15 @@ process_test_data <- function() {
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
 
-#' Get daily data from FINDCov19TrackerData data branch
+#' Get Test Data
+#' @description
+#'   Gets daily test data scraped via Selenium and R fetch functions from
+#'   FINDCov19TrackerData data branch.
+#'   The data is cleaned and combined and written to `automated-tests.json`
+#'   which is then deployed by CI to `automated/merged/` directory within the
+#'   FINDCov19TrackerData `data` branch.
 #' @export
-get_daily_data <- function() {
+get_daily_test_data <- function() {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
