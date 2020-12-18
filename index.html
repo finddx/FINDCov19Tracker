@@ -99,7 +99,7 @@
 <a href="#cases" class="anchor"></a>Cases</h2>
 <ul>
 <li>
-<code><a href="reference/process_jhu_data.html">FINDCov19Tracker::process_jhu_data()</a></code>: main function which starts all John Hopkins University (JHU) data processing. Calls <code><a href="reference/download_jhu_data.html">FINDCov19Tracker::download_jhu_data()</a></code>, <code><a href="reference/preprocess_jhu_data.html">FINDCov19Tracker::preprocess_jhu_data()</a></code> and <code><a href="reference/check_jhu_data.html">FINDCov19Tracker::check_jhu_data()</a></code>. Writes <code>processed/coronavirus_cases.csv</code>.</li>
+<a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html"><code>FINDCov19Tracker::process_jhu_data()</code></a>: main function which starts all John Hopkins University (JHU) data processing. Calls <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html"><code>FINDCov19Tracker::preprocess_jhu_data()</code></a> and <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html"><code>FINDCov19Tracker::check_jhu_data()</code></a>. Writes <code>processed/coronavirus_cases.csv</code>.</li>
 </ul>
 </div>
 <div id="tests" class="section level2">
@@ -107,11 +107,11 @@
 <a href="#tests" class="anchor"></a>Tests</h2>
 <p>Tests are mainly retrieved via an automated Selenium-based approach, run through CI via Python. Countries which cannot be retrieved via Selenium (e.g. because they provide their data as PDFs) are covered by R-based “fetch-functions”. Even though the main language used here is R, Selenium does not support R - hence Python was chosen to automate the Selenium approach.</p>
 <ol>
-<li><p><code><a href="reference/fetch_test_data.html">FINDCov19Tracker::fetch_test_data()</a></code>: retrieves the cumulative and new test statistics from official resources of the individual countries. Returns a <code>data.frame</code> with the information about “new tests” and “cumulative tests” for each country.</p></li>
+<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/fetch_test_data.html"><code>FINDCov19Tracker::fetch_test_data()</code></a>: retrieves the cumulative and new test statistics from official resources of the individual countries. Returns a <code>data.frame</code> with the information about “new tests” and “cumulative tests” for each country.</p></li>
 <li><p><a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/selenium/selenium/run.py"><code>run.py</code></a> and <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/selenium/selenium/test.py"><code>test.py</code></a> execute the Selenium processing.</p></li>
-<li><p><code><a href="reference/get_daily_test_data.html">FINDCov19Tracker::get_daily_test_data()</a></code> combines the test data from the Selenium and R approaches and writes a combined JSON file to FIXME containing all test</p></li>
-<li><p><code><a href="reference/process_test_data.html">FINDCov19Tracker::process_test_data()</a></code>: aligns cases and tests data. Writes <code>processed/coronavirus_tests.csv</code>.</p></li>
-<li><p><code><a href="reference/create_shiny_data.html">FINDCov19Tracker::create_shiny_data()</a></code>: makes use of <code>coronavirus_cases.csv</code> and <code>coronavirus_tests.csv</code>. Writes <code>processed/data_shiny.csv</code> which is being used by the shiny app.</p></li>
+<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/get_daily_test_data.html"><code>FINDCov19Tracker::get_daily_test_data()</code></a> combines the test data from the Selenium and R approaches and writes a combined JSON file to FIXME containing all test</p></li>
+<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_test_data.html"><code>FINDCov19Tracker::process_test_data()</code></a>: aligns cases and tests data. Writes <code>processed/coronavirus_tests.csv</code>.</p></li>
+<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html"><code>FINDCov19Tracker::create_shiny_data()</code></a>: makes use of <code>coronavirus_cases.csv</code> and <code>coronavirus_tests.csv</code>. Writes <code>processed/data_shiny.csv</code> which is being used by the shiny app.</p></li>
 </ol>
 </div>
 </div>
