@@ -76,6 +76,8 @@ process_jhu_data <- function() {
 
 #' @title Preprocess JHU data
 #' Processes JHU input data
+#' @importFrom tidyselect everything matches
+#' @param input_df Input data
 #' @export
 preprocess_jhu_data <- function(input_df) {
   input_df <- input_df %>%
@@ -166,6 +168,7 @@ preprocess_jhu_data <- function(input_df) {
 
 #' Download JHU data
 #' @description Download JHU data.
+#' @param url URL to download
 download_jhu_data <- function(url) {
   jhu_cases_ori <- readr::read_csv(url, col_types = readr::cols())
   return(jhu_cases_ori)
@@ -175,6 +178,8 @@ download_jhu_data <- function(url) {
 #'
 #' @description Compares original and preprocessed JHU datasets to ensure
 #'   consistency.
+#' @param original Original dataset
+#' @param modified Dataset to compare with
 check_jhu_data <- function(original, modified) {
   # do some consistency checks
   # get the number of cases from the most recent day

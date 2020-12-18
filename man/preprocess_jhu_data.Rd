@@ -7,6 +7,9 @@ Processes JHU input data}
 \usage{
 preprocess_jhu_data(input_df)
 }
+\arguments{
+\item{input_df}{Input data}
+}
 \description{
 Preprocess JHU data
 Processes JHU input data

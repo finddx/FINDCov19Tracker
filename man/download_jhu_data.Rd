@@ -6,6 +6,9 @@
 \usage{
 download_jhu_data(url)
 }
+\arguments{
+\item{url}{URL to download}
+}
 \description{
 Download JHU data.
 }

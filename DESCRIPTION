@@ -50,10 +50,10 @@ Imports:
     shinyWidgets,
     stringr,
     tabulizer,
-    testthat,
     tidyr,
-    tidyr,
-    xml2
+    xml2,
+    rio,
+    tidyselect
 Suggests:
     testthat
 Encoding: UTF-8
