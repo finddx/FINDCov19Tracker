@@ -11,22 +11,29 @@ Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 URL: https://github.com/dsbbfinddx/FINDCov19Tracker
 Imports:
+    checkmate,
     cli,
     countrycode,
+    curl,
     data.table,
     dplyr (>= 1.0.0),
     fs,
     fuzzyjoin,
     geojsonio,
+    gert,
     ggiraph,
     ggplot2,
     gh,
     here,
+    httr,
+    janitor,
+    jsonlite,
     leaflet,
     lubridate,
     magrittr,
     mailR,
     maps,
+    pdftools,
     plotly,
     plyr,
     purrr,
@@ -42,8 +49,11 @@ Imports:
     shinythemes,
     shinyWidgets,
     stringr,
+    tabulizer,
+    testthat,
     tidyr,
-    gert
+    tidyr,
+    xml2
 Suggests:
     testthat
 Encoding: UTF-8

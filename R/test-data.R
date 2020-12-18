@@ -63,7 +63,7 @@ process_test_data <- function() {
     process_jhu_data()
   }
   cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols())
-  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/countries_codes_and_coordinates.csv",
+  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
     col_types = readr::cols()
   ))
 
@@ -141,4 +141,35 @@ process_test_data <- function() {
     readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
   }
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
+}
+
+#' Get Test Data
+#' @description
+#'   Gets daily test data scraped via Selenium and R fetch functions from
+#'   FINDCov19TrackerData data branch.
+#'   The data is cleaned and combined and written to `automated-tests.json`
+#'   which is then deployed by CI to `automated/merged/` directory within the
+#'   FINDCov19TrackerData `data` branch.
+#' @export
+get_daily_test_data <- function() {
+
+  today <- format(Sys.time(), "%Y-%m-%d")
+
+  selenium_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", today)) %>%
+    mutate(source = "selenium") %>%
+    mutate(date = as.Date(date))
+  selenium_tests_clean = clean_selenium(selenium_tests[1:3, ])
+  selenium_tests_daily = calculate_daily_tests_selenium(selenium_tests_clean)
+
+  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>%
+    mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+    mutate(new_tests = as.numeric(new_tests)) %>%
+    mutate(date = as.Date(date)) %>%
+    mutate(source = "fetch")
+
+  test_combined <- bind_rows(selenium_tests_daily, fetch_funs_tests)
+
+  jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
+
+  return(test_combined)
 }

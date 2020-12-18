@@ -1,9 +1,9 @@
 #' @title Create Input Data for Shiny Application
-#' @description Reads coronavirus_cases.csv (cases) and coronavirus_tests.csv (tests)
-#'   files from `processed/` directory.
+#' @description Reads coronavirus_cases.csv (cases) and coronavirus_tests.csv
+#'   (tests) files from `processed/` directory.
 #'   Writes `processed/data_shiny.csv`.
 #' @export
-#' @import dplyr tibble
+#' @import dplyr
 #' @importFrom gert git_status
 create_shiny_data <- function() {
 
@@ -47,8 +47,7 @@ create_shiny_data <- function() {
   #   col_types = readr::cols()
   # )
 
-  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv",
-    col_types = readr::cols()
+  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols() # nolint
   )
 
   # cv_tests_raw <- readr::read_csv("/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/coronavirus_tests.csv",
@@ -56,16 +55,14 @@ create_shiny_data <- function() {
   # )
 
 
-  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-    col_types = readr::cols()
+  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols() # nolint
   )
 
-  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv",
-    col_types = readr::cols()
+  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv", col_types = readr::cols() # nolint
   )
 
   country_info <-
-    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols()) %>%
+    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols()) %>% # nolint
     select(-name_not_used) %>%
     filter(!is.na(country_iso))
 
@@ -74,7 +71,8 @@ create_shiny_data <- function() {
   cv_cases <-
     cv_cases_raw %>%
     rename(name = country) %>%
-    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
+    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"),
+     ignore_case = TRUE) %>%
     mutate(country = case_when(
       name == "Kosovo" ~ "XK",
       name == "SouthAfrica" ~ "ZA",
@@ -92,15 +90,23 @@ create_shiny_data <- function() {
     select(-regex) %>%
     relocate(country) %>%
     # drop negative cases and deaths
-    mutate(across(c(cases, deaths, new_cases, new_deaths), function(e) if_else(e < 0, NA_real_, e)))
+    mutate(across(
+      c(cases, deaths, new_cases, new_deaths),
+      function(e) if_else(e < 0, NA_real_, e)
+    ))
 
   um <- unique(filter(cv_cases, is.na(country))$name)
-  if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_cases': {um}")
+  if (length(um) > 0) {
+    cli::cli_alert_warning("Unmatched countries in 'cv_cases': {um}")
+  }
 
   cv_tests <-
     cv_tests_raw %>%
     rename(name = country) %>%
-    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
+    fuzzyjoin::regex_left_join(iso_country,
+      by = c("name" = "regex"),
+      ignore_case = TRUE
+    ) %>%
     mutate(country = case_when(
       name == "Kosovo" ~ "XK",
       TRUE ~ country
@@ -110,15 +116,22 @@ create_shiny_data <- function() {
     select(-regex) %>%
     relocate(country) %>%
     # drop 0 or negative testing values
-    mutate(across(c(new_tests_corrected, tests_cumulative_corrected), function(e) if_else(e <= 0, NA_real_, e)))
+    mutate(across(
+      c(new_tests_corrected, tests_cumulative_corrected),
+      function(e) if_else(e <= 0, NA_real_, e)
+    ))
 
   um <- unique(filter(cv_tests, is.na(country))$name)
-  if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'cv_tests': {um}")
+  if (length(um) > 0) {
+    cli::cli_alert_warning("Unmatched countries in 'cv_tests': {um}")
+  }
 
   pop <-
     pop_raw %>%
     rename(name = country) %>%
-    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"), ignore_case = TRUE) %>%
+    fuzzyjoin::regex_left_join(iso_country,
+      by = c("name" = "regex"), ignore_case = TRUE
+    ) %>%
     mutate(country = case_when(
       name == "Kosovo" ~ "XK",
       TRUE ~ country
@@ -129,7 +142,9 @@ create_shiny_data <- function() {
     relocate(country)
 
   um <- unique(filter(pop, is.na(country))$name)
-  if (length(um) > 0) cli::cli_alert_warning("Unmatched countries in 'pop': {um}")
+  if (length(um) > 0) {
+    cli::cli_alert_warning("Unmatched countries in 'pop': {um}")
+  }
 
   # check all jhu country names have corresponding country data
   "%ni%" <- Negate("%in%")
@@ -137,8 +152,8 @@ create_shiny_data <- function() {
     unique(pop$country)), "country"]$country)
 
   if (length(countries_without_population) > 0) {
-    cli::cli_alert_info("{.fun process_jhu_data}: Population data lacking for the following
-          countries: {countries_without_population}.", wrap = TRUE)
+    cli::cli_alert_info("{.fun process_jhu_data}: Population data lacking for
+      the following countries: {countries_without_population}.", wrap = TRUE)
   }
 
   # combining data -------------------------------------------------------------
@@ -163,7 +178,9 @@ create_shiny_data <- function() {
     )
 
   um <- unique(filter(cv_tests, is.na(country))$name)
-  if (length(um) > 0) cli::cli_alert_danger("Some missing countries in 'data_combined'")
+  if (length(um) > 0) {
+    cli::cli_alert_danger("Some missing countries in 'data_combined'")
+  }
 
 
   # calculations ---------------------------------------------------------------
@@ -171,9 +188,15 @@ create_shiny_data <- function() {
   data_country <-
     data_combined %>%
     # prefix cummulative vars
-    rename(cum_cases = cases, cum_deaths = deaths, cum_tests_orig = tests_orig, time = date) %>%
+    rename(
+      cum_cases = cases, cum_deaths = deaths, cum_tests_orig = tests_orig,
+      time = date
+    ) %>%
     # keep original data in separate columns
-    mutate(across(c(new_cases, new_deaths), function(e) e, .names = "{col}_orig")) %>%
+    mutate(across(c(new_cases, new_deaths),
+      function(e) e,
+      .names = "{col}_orig"
+    )) %>%
     # rolling averages of 7 for new vars
     arrange(country, time) %>%
     group_by(country) %>%
@@ -202,7 +225,8 @@ create_shiny_data <- function() {
 
   # aggregate to regions, income groups
 
-  # if ratios are aggregated, only use observations that have data for nominator and denominator
+  # if ratios are aggregated, only use observations that have data for
+  # nominator and denominator
   sum_ratio <- function(nominator, denominator) {
     denominator[denominator == 0] <- NA
     in_use <- !is.na(nominator) & !is.na(denominator)

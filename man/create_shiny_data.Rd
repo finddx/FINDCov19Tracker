@@ -7,7 +7,7 @@
 create_shiny_data()
 }
 \description{
-Reads coronavirus_cases.csv (cases) and coronavirus_tests.csv (tests)
-files from \verb{processed/} directory.
+Reads coronavirus_cases.csv (cases) and coronavirus_tests.csv
+(tests) files from \verb{processed/} directory.
 Writes \code{processed/data_shiny.csv}.
 }
