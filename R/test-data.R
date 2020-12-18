@@ -133,7 +133,7 @@ get_daily_data <- function() {
 
   test_combined <- bind_rows(selenium_tests_daily, fetch_funs_tests)
 
-  jsonlite::write_json(test_combined, "automated-tests.json")
+  jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
 
   return(test_combined)
 }
