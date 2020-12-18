@@ -36,13 +36,14 @@ calculate_new_tests <- function(dots, tests_cumulative) {
 
 }
 
+#' @importFrom stringr str_replace_all str_match
 clean_selenium <- function(data) {
 
   data_clean <- data %>%
-    mutate(tests_cumulative = stringr::str_replace_all(tests_cumulative, ",", "")) %>%
-    mutate(tests_cumulative = stringr::str_replace_all(tests_cumulative, "\\.", "")) %>%
-    mutate(tests_cumulative = stringr::str_replace_all(tests_cumulative, " ", "")) %>%
-    mutate(tests_cumulative = stringr::str_match(tests_cumulative, pattern = "\\d+")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, ",", "")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\.", "")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, " ", "")) %>%
+    mutate(tests_cumulative = str_match(tests_cumulative, pattern = "\\d+")) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     na.omit() %>%
     mutate(date = as.Date(date))

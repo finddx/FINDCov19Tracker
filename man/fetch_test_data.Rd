@@ -2,16 +2,12 @@
 % Please edit documentation in R/preprocess.R
 \name{fetch_test_data}
 \alias{fetch_test_data}
-\title{Scrape test data from all countries}
+\title{Scrape test data from all countries via R}
 \usage{
 fetch_test_data()
 }
 \description{
-Rowwise processing of countries test data reports with support for any file
-type (csv, pdf, xlsx, etc.)
-}
-\details{
-Countries processed via Selenium are not yet integrated into this mechanism.
-For now, all countries until "Denmark" were checked and asserted  with two
-numeric returns (2020-08-25).
+Rowwise processing of countries test data reports with support for various
+file type (csv, pdf, xlsx, etc.).
+Used for all countries which cannot be scraped via Selenium.
 }
