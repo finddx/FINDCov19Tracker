@@ -6,6 +6,11 @@
 \usage{
 check_jhu_data(original, modified)
 }
+\arguments{
+\item{original}{Original dataset}
+
+\item{modified}{Dataset to compare with}
+}
 \description{
 Compares original and preprocessed JHU datasets to ensure
 consistency.

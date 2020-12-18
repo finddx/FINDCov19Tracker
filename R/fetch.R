@@ -1,3 +1,5 @@
+#' @importFrom rio import
+#' @importFrom stats na.omit time
 fetch_from_csv <- function(dots) {
 
   tests_cumulative <- NA
@@ -73,6 +75,7 @@ fetch_from_csv <- function(dots) {
   return(c(new_tests, tests_cumulative))
 }
 
+#' @importFrom utils download.file tail unzip
 fetch_from_xlsx <- function(dots) {
 
   tests_cumulative <- NA
@@ -196,7 +199,7 @@ fetch_from_json <- function(dots) {
   if (!is.na(dots$xpath_cumul)) {
     # FIXME: prefix namespace of last so we do not need to import all of dplyr
     # because of "dplyr::last()" embedded in xpath_cumul
-    library(dplyr)
+    # library(dplyr)
     tests_cumulative <- as.numeric(eval(parse(text = dots$xpath_cumul)))
   }
   if (!is.na(dots$xpath_new)) {

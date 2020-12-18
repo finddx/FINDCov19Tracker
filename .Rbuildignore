@@ -3,3 +3,6 @@
 ^\.ccache$
 ^\.github$
 ^tic\.R$
+^renv\.lock$
+^LICENSE\.md$
+^processed$
