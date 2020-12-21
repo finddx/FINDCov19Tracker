@@ -178,7 +178,7 @@ get_daily_test_data <- function() {
   countries_error <- selenium_tests_daily %>%
     dplyr::filter(is.na(tests_cumulative)) %>%
     dplyr::select(country)
-  readr::write_csv(countries_manual, "countries-error.csv")
+  readr::write_csv(countries_error, "countries-error.csv")
 
 
   return(invisible(test_combined))
