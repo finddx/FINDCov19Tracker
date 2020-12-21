@@ -11,8 +11,9 @@ read_urls <- function(path) {
 }
 
 calculate_new_tests <- function(dots, tests_cumulative) {
-  cli::cli_alert_info("Generating {.strong new_tests} for {.emph {dots$country}} manually from yesterday's data.")
-  tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+  cli::cli_alert_info("Generating {.strong new_tests} for
+    {.emph {dots$country}} manually from yesterday's data.", wrap = TRUE)
+  tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", # nolint
     col_types = list(
       country = readr::col_character(),
       date = readr::col_date(format = ""),
@@ -30,8 +31,6 @@ calculate_new_tests <- function(dots, tests_cumulative) {
   # to ensure we do not get a negative number
   new_tests <- tests_cumulative - tests_yesterday
 
-  if (new_tests < 0) new_tests <- 0
-
   return(new_tests)
 
 }
@@ -45,7 +44,6 @@ clean_selenium <- function(data) {
     mutate(tests_cumulative = str_replace_all(tests_cumulative, " ", "")) %>%
     mutate(tests_cumulative = str_match(tests_cumulative, pattern = "\\d+")) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
-    na.omit() %>%
     mutate(date = as.Date(date))
 
   return(data_clean)

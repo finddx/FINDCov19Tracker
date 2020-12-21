@@ -171,9 +171,15 @@ get_daily_test_data <- function() {
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-  test_combined <- bind_rows(selenium_tests_daily, fetch_funs_tests)
-
+  test_combined <- dplyr::bind_rows(selenium_tests_daily, fetch_funs_tests)
   jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
+
+  # get countries with NA (these errored during scraping)
+  countries_error <- selenium_tests_daily %>%
+    dplyr::filter(is.na(tests_cumulative)) %>%
+    dplyr::select(country)
+  readr::write_csv(countries_manual, "countries-error.csv")
+
 
   return(invisible(test_combined))
 }
