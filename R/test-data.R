@@ -11,7 +11,7 @@
 process_test_data <- function() {
   fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
     owner = "dsbbfinddx",
-    repo = "data",
+    repo = "FINDCov19TrackerData",
     access_token = gh::gh_token()
   )
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
@@ -164,7 +164,8 @@ get_daily_test_data <- function() {
   selenium_tests_daily <- selenium_tests_clean
   selenium_tests_daily$new_tests <- NA
 
-  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>% # nolint
+  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>%
+    # nolint
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
     mutate(date = as.Date(date)) %>%
@@ -175,4 +176,33 @@ get_daily_test_data <- function() {
   jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
 
   return(invisible(test_combined))
+}
+
+#' Combine test data from all countries across all dates
+#' @description This function reads all clean input files from the [automated/merged]() directory and row-binds them. The output is written to a file called
+#' `countries-tests-all-dates.csv` and uploaded to `automated/countries-tests-all-dates.csv`.
+#' @importFrom stringr str_subset
+#' @importFrom gh gh
+#' @importFrom purrr map_dfr
+#' @importFrom readr write_csv
+#' @importFrom dplyr mutate arrange desc
+#' @importFrom jsonlite read_json
+combine_all_tests <- function() {
+
+  fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/selenium?recursive=1",
+    owner = "dsbbfinddx",
+    repo = "FINDCov19TrackerData",
+    branch = "selenium"
+  )
+
+  filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
+    stringr::str_subset(., "automated/merged/") %>%
+    paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/", .)
+
+  files_df <- purrr::map_dfr(filelist, jsonlite::read_json) %>%
+    dplyr::mutate(date = as.Date(date)) %>%
+    dplyr::arrange(dplyr::desc(date, country))
+
+  readr::write_csv(files_df, "countries-tests-all-dates.csv")
+
 }

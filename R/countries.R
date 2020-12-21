@@ -25,3 +25,4 @@ calc_manual_countries <- function() {
     "countries-manual.csv"
   )
 }
+
