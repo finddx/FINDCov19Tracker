@@ -13,7 +13,7 @@ calc_manual_countries <- function() {
     dplyr::pull(country)
 
   # read list of automated countries
-  countries_automated <- jsonlite::read_json("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/merged/2020-12-18-automated-tests.json", simplifyVector = TRUE) %>% # nolint
+  countries_automated <- jsonlite::read_json(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/merged/%s-automated-tests.json", as.character(Sys.Date(), format = "%Y-%m-%d")), simplifyVector = TRUE) %>% # nolint
     dplyr::pull(country)
 
   # calc diff
