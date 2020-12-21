@@ -380,35 +380,53 @@ fetch_from_pdf_list <- function(dots) {
   tests_cumulative <- NA
   new_tests <- NA
 
-  page <- xml2::read_html(dots$source)
-  hrefs <- rvest::html_attr(rvest::html_nodes(page, "a"), "href")
+  tests_cumulative <- tryCatch(
+    {
+      page <- xml2::read_html(dots$source)
+      hrefs <- rvest::html_attr(rvest::html_nodes(page, "a"), "href")
 
-  pdfs <- grep(dots$data_url, hrefs, ignore.case = TRUE, value = TRUE)
+      pdfs <- grep(dots$data_url, hrefs, ignore.case = TRUE, value = TRUE)
 
-  pdf <- pdfs[1]
+      pdf <- pdfs[1]
 
-  content <- pdftools::pdf_text(pdf)
+      content <- pdftools::pdf_text(pdf)
 
-  tests_cumulative <- na.omit(
-    as.numeric(
-      stringr::str_replace_all(
-        stringr::str_extract(stringr::str_squish(
-          content
-        ), dots$xpath_cumul),
-        "[.]|[,]", ""
+      tests_cumulative <- na.omit(
+        as.numeric(
+          stringr::str_replace_all(
+            stringr::str_extract(stringr::str_squish(
+              content
+            ), dots$xpath_cumul),
+            "[.]|[,]", ""
+          )
+        )
       )
-    )
+    },
+    error = function() {
+      cli::cli_alert_danger("Getting {.field tests_cumulative} failed for
+        country {.field {dots$country}}.", wrap = TRUE)
+      return(NA)
+    }
   )
 
-  new_tests <- na.omit(
-    as.numeric(
-      stringr::str_replace_all(
-        stringr::str_extract(stringr::str_squish(
-          content
-        ), dots$xpath_new),
-        "[.]|[,]", ""
+  new_tests <- tryCatch(
+    {
+      new_tests <- na.omit(
+        as.numeric(
+          stringr::str_replace_all(
+            stringr::str_extract(stringr::str_squish(
+              content
+            ), dots$xpath_new),
+            "[.]|[,]", ""
+          )
+        )
       )
-    )
+    },
+    error = function() {
+      cli::cli_alert_danger("Getting {.field new_tests} failed for country
+        {.field {dots$country}}.", wrap = TRUE)
+      return(NA)
+    }
   )
 
   if (is.na(dots$xpath_new)) {

@@ -13,7 +13,7 @@ fetch_test_data <- function() {
 
   info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls_patrick.xlsx") # nolint
   # info <- info[-c(44, 127), ]
-  info <- info[7, ]
+  info <- info[c(1, 6), ]
 
   # info <- info %>%
   #   dplyr::filter(!is.na(type), type != "Selenium")
@@ -74,8 +74,14 @@ process_countries_rowwise <- function(...) {
     rep(NA, 2) # all other types
   )
 
+  print(res)
+  # in case of problematic returns
+  if (length(res) == 0) {
+    res <- c(NA, NA)
+  }
+
   # each country should return both new_tests and cumulative_tests
-  checkmate::assert_double(res, len = 2, any.missing = FALSE)
+  checkmate::assert_double(res, len = 2)
 
   # append country name
   res <- append(res, c(dots$country, as.character(Sys.Date())))
