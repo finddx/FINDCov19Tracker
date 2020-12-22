@@ -185,7 +185,7 @@ get_daily_test_data <- function() {
 }
 
 #' Combine test data from all countries across all dates
-#' @description This function reads all clean input files from the [automated/merged]() directory and row-binds them. The output is written to a file called
+#' @description This function reads all clean input files from the [automated/merged](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/selenium/automated/merged) directory and row-binds them. The output is written to a file called
 #' `countries-tests-all-dates.csv` and uploaded to `automated/countries-tests-all-dates.csv`.
 #' @importFrom stringr str_subset
 #' @importFrom gh gh
@@ -193,6 +193,7 @@ get_daily_test_data <- function() {
 #' @importFrom readr write_csv
 #' @importFrom dplyr mutate arrange desc
 #' @importFrom jsonlite read_json
+#' @export
 combine_all_tests <- function() {
 
   fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/selenium?recursive=1",
