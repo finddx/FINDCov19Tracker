@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get Test Data — get_daily_test_data • FINDCov19Tracker</title>
+<title>Get and combine test data from different sources — get_daily_test_data • FINDCov19Tracker</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,15 @@
 
 
 
-<meta property="og:title" content="Get Test Data — get_daily_test_data" />
-<meta property="og:description" content="Gets daily test data scraped via Selenium and R fetch functions from
-FINDCov19TrackerData data branch.
-The data is cleaned and combined and written to automated-tests.json
-which is then deployed by CI to automated/merged/ directory within the
-FINDCov19TrackerData data branch." />
+<meta property="og:title" content="Get and combine test data from different sources — get_daily_test_data" />
+<meta property="og:description" content="Input: Daily test data scraped via Selenium and &quot;R fetch functions&quot; from
+automated/fetch and automated/selenium directories.
+Output:
+automated-tests.json
+countries-error.csv
+
+
+which are then deployed by CI to the automated/merged/ directory in the dsbbfinddx/FINDCov19TrackerData repo." />
 
 
 
@@ -112,17 +115,20 @@ FINDCov19TrackerData data branch." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get Test Data</h1>
+    <h1>Get and combine test data from different sources</h1>
     <small class="dont-index">Source: <a href='https://github.com/dsbbfinddx/FINDCov19Tracker/blob/master/R/test-data.R'><code>R/test-data.R</code></a></small>
     <div class="hidden name"><code>get_daily_test_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Gets daily test data scraped via Selenium and R fetch functions from
-FINDCov19TrackerData data branch.
-The data is cleaned and combined and written to <code>automated-tests.json</code>
-which is then deployed by CI to <code>automated/merged/</code> directory within the
-FINDCov19TrackerData <code>data</code> branch.</p>
+    <p><strong>Input:</strong> Daily test data scraped via Selenium and "R fetch functions" from
+<a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch'><code>automated/fetch</code></a> and <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium'><code>automated/selenium</code></a> directories.</p>
+<p><strong>Output:</strong></p><ul>
+<li><p><code>automated-tests.json</code></p></li>
+<li><p><code>countries-error.csv</code></p></li>
+</ul>
+
+<p>which are then deployed by CI to the <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged'><code>automated/merged/</code></a> directory in the <code>dsbbfinddx/FINDCov19TrackerData</code> repo.</p>
     </div>
 
     <pre class="usage"><span class='fu'>get_daily_test_data</span><span class='op'>(</span><span class='op'>)</span></pre>

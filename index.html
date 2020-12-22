@@ -73,10 +73,15 @@
 <li>
 <a href="#findcov19tracker">FINDCov19Tracker</a>
 <ul>
-<li><a href="#data-sources">Data sources</a></li>
-<li><a href="#workflow-description">Workflow Description</a></li>
-<li><a href="#cases">Cases</a></li>
-<li><a href="#tests">Tests</a></li>
+<li><a href="#data-sources">Data Sources</a></li>
+<li>
+<a href="#workflow-description">Workflow Description</a>
+<ul>
+<li><a href="#covid-19-cases">COVID-19 Cases</a></li>
+<li><a href="#covid-19-tests">COVID-19 Tests</a></li>
+<li><a href="#shiny-app">Shiny App</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -85,34 +90,32 @@
 <p><a href="https://www.finddx.org/covid-19/test-tracker" class="uri">https://www.finddx.org/covid-19/test-tracker</a></p>
 <div id="data-sources" class="section level2">
 <h2 class="hasAnchor">
-<a href="#data-sources" class="anchor"></a>Data sources</h2>
+<a href="#data-sources" class="anchor"></a>Data Sources</h2>
 <p><strong>Test data</strong> : Collated everyday by the FIND team, from information found online. A large portion is automated via Python and R (see below in section <a href="#tests">Tests</a>). A minor portion is gathered by manual visits to the respective country websites. <em>Usually the official government websites of each country are consulted.</em></p>
 <p><strong>Case data</strong> : Downloaded daily from the COVID19 <a href="https://github.com/CSSEGISandData/COVID-19">John Hopkins University (JHU) repository</a>.</p>
 </div>
 <div id="workflow-description" class="section level2">
 <h2 class="hasAnchor">
 <a href="#workflow-description" class="anchor"></a>Workflow Description</h2>
-<p>The processing is done by R package {FINDCovTracker19} found in this repo. A GitHub Actions workflow in <a href="https://github.com/dsbbfinddx/FindCov19TrackerData">dsbbfinddx/FindCov19TrackerData</a> executes the processing.</p>
-</div>
-<div id="cases" class="section level2">
-<h2 class="hasAnchor">
-<a href="#cases" class="anchor"></a>Cases</h2>
+<p>The querying and processing of the cases and test data is done by R package {FINDCovTracker19} found in this repo.</p>
+<div id="covid-19-cases" class="section level3">
+<h3 class="hasAnchor">
+<a href="#covid-19-cases" class="anchor"></a>COVID-19 Cases</h3>
 <ul>
 <li>
-<a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html"><code>FINDCov19Tracker::process_jhu_data()</code></a>: main function which starts all John Hopkins University (JHU) data processing. Calls <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html"><code>FINDCov19Tracker::preprocess_jhu_data()</code></a> and <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html"><code>FINDCov19Tracker::check_jhu_data()</code></a>. Writes <code>processed/coronavirus_cases.csv</code>.</li>
+<a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html"><code>FINDCov19Tracker::process_jhu_data()</code></a>: main function which starts all John Hopkins University (JHU) data processing. The functions calls <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html"><code>FINDCov19Tracker::preprocess_jhu_data()</code></a> and <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html"><code>FINDCov19Tracker::check_jhu_data()</code></a> and writes <code>processed/coronavirus_cases.csv</code>.</li>
 </ul>
 </div>
-<div id="tests" class="section level2">
-<h2 class="hasAnchor">
-<a href="#tests" class="anchor"></a>Tests</h2>
-<p>Tests are mainly retrieved via an automated Selenium-based approach, run through CI via Python. Countries which cannot be retrieved via Selenium (e.g. because they provide their data as PDFs) are covered by R-based “fetch-functions”. Even though the main language used here is R, Selenium does not support R - hence Python was chosen to automate the Selenium approach.</p>
-<ol>
-<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/fetch_test_data.html"><code>FINDCov19Tracker::fetch_test_data()</code></a>: retrieves the cumulative and new test statistics from official resources of the individual countries. Returns a <code>data.frame</code> with the information about “new tests” and “cumulative tests” for each country.</p></li>
-<li><p><a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/selenium/selenium/run.py"><code>run.py</code></a> and <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/selenium/selenium/test.py"><code>test.py</code></a> execute the Selenium processing.</p></li>
-<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/get_daily_test_data.html"><code>FINDCov19Tracker::get_daily_test_data()</code></a> combines the test data from the Selenium and R approaches and writes a combined JSON file to FIXME containing all test</p></li>
-<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_test_data.html"><code>FINDCov19Tracker::process_test_data()</code></a>: aligns cases and tests data. Writes <code>processed/coronavirus_tests.csv</code>.</p></li>
-<li><p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html"><code>FINDCov19Tracker::create_shiny_data()</code></a>: makes use of <code>coronavirus_cases.csv</code> and <code>coronavirus_tests.csv</code>. Writes <code>processed/data_shiny.csv</code> which is being used by the shiny app.</p></li>
-</ol>
+<div id="covid-19-tests" class="section level3">
+<h3 class="hasAnchor">
+<a href="#covid-19-tests" class="anchor"></a>COVID-19 Tests</h3>
+<p>Test data scraping is mainly automated and run in a GitHub Actions workflow in the <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData">dsbbfinddx/FINDCov19TrackerData</a> repository. See the repos <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData">README</a> for a high-level and detailed workflow description.</p>
+</div>
+<div id="shiny-app" class="section level3">
+<h3 class="hasAnchor">
+<a href="#shiny-app" class="anchor"></a>Shiny App</h3>
+<p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html"><code>FINDCov19Tracker::create_shiny_data()</code></a>: makes use of <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_cases.csv"><code>coronavirus_cases.csv</code></a> and <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_tests.csv"><code>coronavirus_tests.csv</code></a>. The function writes <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/data_all.csv"><code>processed/data_all.csv</code></a> which is being used as the input for the Shiny app.</p>
+</div>
 </div>
 </div>
   </div>
