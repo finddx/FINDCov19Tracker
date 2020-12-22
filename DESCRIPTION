@@ -56,8 +56,9 @@ Imports:
     tidyselect,
     xml2
 Suggests:
-    testthat
+    testthat (>= 3.0.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Config/testthat/edition: 3
