@@ -1,0 +1,18 @@
+reference:
+  - title: Test data
+    contents:
+      - fetch_test_data
+      - get_daily_test_data
+      - combine_all_tests
+      - calc_manual_countries
+      - process_test_data
+  - title: Cases data
+    contents:
+      - download_jhu_data
+      - check_jhu_data
+      - preprocess_jhu_data
+      - process_jhu_data
+
+  - title: Prepare Shiny App Input
+    contents:
+      - create_shiny_data
