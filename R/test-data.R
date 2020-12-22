@@ -172,7 +172,8 @@ get_daily_test_data <- function() {
 
   test_combined <- dplyr::bind_rows(selenium_tests_daily, fetch_funs_tests,
     manual_tests) %>%
-    dplyr::arrange(date, country)
+    dplyr::arrange(date, country) %>%
+    dplyr::relocate(country, tests_cumulative, new_tests, date, source)
   jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
 
   # get countries with NA (these errored during scraping)
@@ -196,7 +197,7 @@ get_daily_test_data <- function() {
 #' @export
 combine_all_tests <- function() {
 
-  fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/selenium?recursive=1",
+  fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
     owner = "dsbbfinddx",
     repo = "FINDCov19TrackerData",
     branch = "selenium"
@@ -204,7 +205,7 @@ combine_all_tests <- function() {
 
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
     stringr::str_subset(., "automated/merged/.*tests.json$") %>%
-    paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/", .)
+    paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
 
   files_df <- purrr::map_dfr(filelist, jsonlite::read_json) %>%
     dplyr::mutate(date = as.Date(date)) %>%

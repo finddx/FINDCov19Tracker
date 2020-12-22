@@ -8,10 +8,10 @@ test_that("get_daily_test_data() works as expected", {
     simplifyVector = TRUE
   )
   expect_s3_class(automated, "data.frame")
-  expect_equal(colnames(automated), c(
+  expect_named(automated, c(
     "country", "tests_cumulative",
     "new_tests", "date", "source"
-  ))
+  ), ignore.order = TRUE)
   unlink("automated-tests.json")
   unlink("countries-error.csv")
 })
@@ -30,10 +30,10 @@ test_that("combine_all_tests() works as expected", {
 
   all <- read.csv("countries-tests-all-dates.csv")
   expect_s3_class(all, "data.frame")
-  expect_equal(colnames(automated), c(
+  expect_named(automated, c(
     "country", "tests_cumulative",
     "new_tests", "date", "source"
-  ))
+  ), ignore.order = TRUE)
 
   unlink("countries-tests-all-dates.csv")
 })
