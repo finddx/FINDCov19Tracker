@@ -52,7 +52,6 @@ process_test_data <- function() {
   # prevent issues in DT with non ascii characters in URL
   cv_tests$source <- iconv(cv_tests$source, from = "ISO8859-1", to = "UTF-8")
 
-
   # import data
   # coronavirus_cases.csv is created by process_jhu_data()
 
