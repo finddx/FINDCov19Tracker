@@ -9,10 +9,7 @@
 calc_manual_countries <- function() {
 
   # read list of all countries
-  countries_all <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-all.csv", col_types = list(readr::col_character())) %>% # nolint
-    dplyr::pull(country)
-
-  countries_all <- readr::read_csv("/Users/pjs/git/clients/find-1/FINDCov19TrackerData/resources/countries-urls.csv") %>% # nolint
+  countries_all <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv") %>% # nolint
     dplyr::select(jhu_ID, source)
 
   countries_all_sub <- countries_all %>%
