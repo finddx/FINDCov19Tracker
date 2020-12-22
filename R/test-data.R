@@ -155,20 +155,24 @@ get_daily_test_data <- function() {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
-  selenium_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", today)) %>% # nolint
+  selenium_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.json", today)) %>% # nolint
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
   selenium_tests_clean <- clean_selenium(selenium_tests)
   # FIXME
   selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean)
 
-  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>%
+  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.json", today)) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-  test_combined <- dplyr::bind_rows(selenium_tests_daily, fetch_funs_tests)
+  manual_tests = readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/%s-tests-manual.csv", today)) # nolint
+
+  test_combined <- dplyr::bind_rows(selenium_tests_daily, fetch_funs_tests,
+    manual_tests) %>%
+    dplyr::arrange(date, country)
   jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
 
   # get countries with NA (these errored during scraping)
@@ -181,7 +185,7 @@ get_daily_test_data <- function() {
 }
 
 #' Combine test data from all countries across all dates
-#' @description This function reads all clean input files from the [automated/merged](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/selenium/automated/merged) directory and row-binds them. The output is written to a file called
+#' @description This function reads all clean input files from the [automated/merged](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory and row-binds them. The output is written to a file called
 #' `countries-tests-all-dates.csv` and uploaded to `automated/countries-tests-all-dates.csv`.
 #' @importFrom stringr str_subset
 #' @importFrom gh gh

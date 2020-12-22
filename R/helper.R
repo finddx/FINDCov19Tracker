@@ -42,10 +42,10 @@ calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
   return(new_tests)
 }
 
-#' @importFrom dplyr left_join mutate rename relacate select
+#' @importFrom dplyr left_join mutate rename relocate select
 calculate_daily_tests_selenium <- function(data) {
 
-  data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", lubridate::today() - 1)) %>% # nolint
+  data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.json", lubridate::today() - 1)) %>% # nolint
     clean_selenium() %>%
     slice(1:10)
 

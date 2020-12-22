@@ -7,6 +7,6 @@
 combine_all_tests()
 }
 \description{
-This function reads all clean input files from the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/selenium/automated/merged}{automated/merged} directory and row-binds them. The output is written to a file called
+This function reads all clean input files from the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged} directory and row-binds them. The output is written to a file called
 \code{countries-tests-all-dates.csv} and uploaded to \code{automated/countries-tests-all-dates.csv}.
 }
