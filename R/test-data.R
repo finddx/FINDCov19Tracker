@@ -199,13 +199,13 @@ combine_all_tests <- function() {
   )
 
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
-    stringr::str_subset(., "automated/merged/") %>%
+    stringr::str_subset(., "automated/merged/.*tests.json$") %>%
     paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/", .)
 
   files_df <- purrr::map_dfr(filelist, jsonlite::read_json) %>%
     dplyr::mutate(date = as.Date(date)) %>%
-    dplyr::arrange(dplyr::desc(date, country))
+    dplyr::arrange(dplyr::desc(date, country)) %>%
+    dplyr::relocate(country, tests_cumulative, new_tests)
 
   readr::write_csv(files_df, "countries-tests-all-dates.csv")
-
 }
