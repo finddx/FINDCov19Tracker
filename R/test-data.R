@@ -1,7 +1,7 @@
-#' Update covid data
+#' Postprocess tests data for input into Shiny App
 #'
 #' During the process, `coronavirus_cases.csv` (case data) is read and used.
-#' This file is created/updated by `process_jhu_data()` which should be run
+#' This file is created/updated by `process_jhu_data()` which needs to be run
 #' before.
 #'
 #' @return Writes `coronavirus_tests.csv`
@@ -143,13 +143,16 @@ process_test_data <- function() {
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
 
-#' Get Test Data
+#' Get and combine test data from different sources
 #' @description
-#'   Gets daily test data scraped via Selenium and R fetch functions from
-#'   FINDCov19TrackerData data branch.
-#'   The data is cleaned and combined and written to `automated-tests.json`
-#'   which is then deployed by CI to `automated/merged/` directory within the
-#'   FINDCov19TrackerData `data` branch.
+#'   **Input:** Daily test data scraped via Selenium and "R fetch functions" from
+#'   [`automated/fetch`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
+#'
+#'   **Output:**
+#'   - `automated-tests.json`
+#'   - `countries-error.csv`
+#'
+#'   which are then deployed by CI to the [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
 #' @export
 get_daily_test_data <- function() {
 
@@ -185,7 +188,7 @@ get_daily_test_data <- function() {
   return(invisible(test_combined))
 }
 
-#' Combine test data from all countries across all dates
+#' Combine test daily data from all countries across all dates
 #' @description This function reads all clean input files from the [automated/merged](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory and row-binds them. The output is written to a file called
 #' `countries-tests-all-dates.csv` and uploaded to `automated/countries-tests-all-dates.csv`.
 #' @importFrom stringr str_subset

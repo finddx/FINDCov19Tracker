@@ -2,14 +2,19 @@
 % Please edit documentation in R/test-data.R
 \name{get_daily_test_data}
 \alias{get_daily_test_data}
-\title{Get Test Data}
+\title{Get and combine test data from different sources}
 \usage{
 get_daily_test_data()
 }
 \description{
-Gets daily test data scraped via Selenium and R fetch functions from
-FINDCov19TrackerData data branch.
-The data is cleaned and combined and written to \code{automated-tests.json}
-which is then deployed by CI to \verb{automated/merged/} directory within the
-FINDCov19TrackerData \code{data} branch.
+\strong{Input:} Daily test data scraped via Selenium and "R fetch functions" from
+\href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch}{\code{automated/fetch}} and \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium}{\code{automated/selenium}} directories.
+
+\strong{Output:}
+\itemize{
+\item \code{automated-tests.json}
+\item \code{countries-error.csv}
+}
+
+which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/test-data.R
 \name{process_test_data}
 \alias{process_test_data}
-\title{Update covid data}
+\title{Postprocess tests data for input into Shiny App}
 \usage{
 process_test_data()
 }
@@ -11,6 +11,6 @@ Writes \code{coronavirus_tests.csv}
 }
 \description{
 During the process, \code{coronavirus_cases.csv} (case data) is read and used.
-This file is created/updated by \code{process_jhu_data()} which should be run
+This file is created/updated by \code{process_jhu_data()} which needs to be run
 before.
 }

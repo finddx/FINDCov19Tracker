@@ -1,4 +1,4 @@
-#' Scrape test data from all countries via R
+#' Scrape test data from countries via R
 #'
 #' @description
 #' Rowwise processing of countries test data reports with support for various

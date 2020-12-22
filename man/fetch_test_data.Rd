@@ -2,7 +2,7 @@
 % Please edit documentation in R/preprocess.R
 \name{fetch_test_data}
 \alias{fetch_test_data}
-\title{Scrape test data from all countries via R}
+\title{Scrape test data from countries via R}
 \usage{
 fetch_test_data()
 }

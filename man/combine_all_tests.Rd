@@ -2,7 +2,7 @@
 % Please edit documentation in R/test-data.R
 \name{combine_all_tests}
 \alias{combine_all_tests}
-\title{Combine test data from all countries across all dates}
+\title{Combine test daily data from all countries across all dates}
 \usage{
 combine_all_tests()
 }
