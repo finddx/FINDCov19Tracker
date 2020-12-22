@@ -11,7 +11,7 @@ fetch_test_data <- function() {
   # FIXME: Philippines (tableau data)
   # FIXME: Denmark (Arc GIS dashboard)
 
-  info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/manual/tests_urls_patrick.xlsx") # nolint
+  info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/resources/tests_urls_patrick.xlsx") # nolint
   # info <- info[-c(44, 127), ]
   info <- info[c(1, 6), ]
 
@@ -62,15 +62,15 @@ process_countries_rowwise <- function(...) {
   }
 
   res <- switch(dots$type,
-    xlsx = fetch_from_xlsx(dots),
-    csv = fetch_from_csv(dots),
-    json = fetch_from_json(dots),
-    html = fetch_from_html(dots),
-    zip = fetch_from_zip(dots),
-    pdf = fetch_from_pdf(dots),
+    # xlsx = fetch_from_xlsx(dots),
+    # csv = fetch_from_csv(dots),
+    # json = fetch_from_json(dots),
+    # html = fetch_from_html(dots),
+    # zip = fetch_from_zip(dots),
+    # pdf = fetch_from_pdf(dots),
     pdf_list = fetch_from_pdf_list(dots),
-    html_list = fetch_from_html_list(dots),
-    html2 = fetch_from_html2(dots),
+    # html_list = fetch_from_html_list(dots),
+    # html2 = fetch_from_html2(dots),
     rep(NA, 2) # all other types
   )
 
