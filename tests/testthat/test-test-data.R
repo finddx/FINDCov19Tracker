@@ -4,15 +4,13 @@ test_that("get_daily_test_data() works as expected", {
   countries_error <- read.csv("countries-error.csv")
   expect_s3_class(countries_error, "data.frame")
 
-  automated <- jsonlite::read_json("automated-tests.json",
-    simplifyVector = TRUE
-  )
+  automated <- readr::read_csv("automated-tests.csv")
   expect_s3_class(automated, "data.frame")
   expect_named(automated, c(
     "country", "tests_cumulative",
     "new_tests", "date", "source"
   ), ignore.order = TRUE)
-  unlink("automated-tests.json")
+  unlink("automated-tests.csv")
   unlink("countries-error.csv")
 })
 

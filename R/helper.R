@@ -25,7 +25,7 @@ clean_selenium <- function(data) {
 }
 
 calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
-  data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.json", lubridate::today() - 1)) %>% # nolint
+  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", lubridate::today() - 1)) %>% # nolint
     dplyr::filter(country == data$country)
 
   # if no yesterday data exists yet, we return NA
@@ -45,7 +45,7 @@ calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
 #' @importFrom dplyr left_join mutate rename relocate select
 calculate_daily_tests_selenium <- function(data) {
 
-  data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.json", lubridate::today() - 1)) %>% # nolint
+  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", lubridate::today() - 1)) %>% # nolint
     clean_selenium() %>%
     slice(1:10)
 

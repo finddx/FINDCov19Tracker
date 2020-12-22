@@ -16,7 +16,7 @@ calc_manual_countries <- function() {
     dplyr::pull(jhu_ID)
 
   # read list of automated countries
-  countries_automated <- jsonlite::read_json(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.json", as.character(Sys.Date(), format = "%Y-%m-%d")), simplifyVector = TRUE) %>% # nolint
+  countries_automated <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", as.character(Sys.Date(), format = "%Y-%m-%d"))) %>% # nolint
     dplyr::pull(country)
 
   countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d"))) %>%  # nolint

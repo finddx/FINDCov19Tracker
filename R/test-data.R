@@ -158,14 +158,14 @@ get_daily_test_data <- function() {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
-  selenium_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.json", today)) %>% # nolint
+  selenium_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", today)) %>% # nolint
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
   selenium_tests_clean <- clean_selenium(selenium_tests)
   # FIXME
   selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean)
 
-  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.json", today)) %>%
+  fetch_funs_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", today)) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
     mutate(date = as.Date(date)) %>%
@@ -214,7 +214,8 @@ combine_all_tests <- function() {
 
   files_df <- rio::import_list(filelist, rbind = TRUE) %>%
     dplyr::arrange(dplyr::desc(date, country)) %>%
-    dplyr::relocate(country, tests_cumulative, new_tests)
+    dplyr::relocate(country, tests_cumulative, new_tests) %>%
+    dplyr::select(country, tests_cumulative, new_tests, date, source)
 
   readr::write_csv(files_df, "countries-tests-all-dates.csv")
 }
