@@ -160,11 +160,9 @@ get_daily_test_data <- function() {
     mutate(date = as.Date(date))
   selenium_tests_clean <- clean_selenium(selenium_tests)
   # FIXME
-  # selenium_tests_daily = calculate_daily_tests_selenium(selenium_tests_clean)
-  selenium_tests_daily <- selenium_tests_clean
-  selenium_tests_daily$new_tests <- NA
+  selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean)
 
-  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>% # nolint
+  fetch_funs_tests <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/fetch/%s-tests-R.json", today)) %>%
     # nolint
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
@@ -179,7 +177,6 @@ get_daily_test_data <- function() {
     dplyr::filter(is.na(tests_cumulative)) %>%
     dplyr::select(country)
   readr::write_csv(countries_error, "countries-error.csv")
-
 
   return(invisible(test_combined))
 }

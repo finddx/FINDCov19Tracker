@@ -67,37 +67,20 @@ calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
   return(new_tests)
 }
 
-# calculate_daily_tests_selenium <- function(data) {
+#' @importFrom dplyr left_join mutate rename relacate select
+calculate_daily_tests_selenium <- function(data) {
 
-#     data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", lubridate::today() - 1))
-#     data_yesterday_clean = clean_selenium(data_yesterday)
+  data_yesterday <- jsonlite::fromJSON(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/selenium/automated/selenium/%s-tests-selenium.json", lubridate::today() - 1)) %>% # nolint
+    clean_selenium() %>%
+    slice(1:10)
 
-#     data %>%
-#       mutate(new_tests = )
+  data_comb <- dplyr::left_join(data, data_yesterday, by = "country")
 
+  data_new_tests <- data_comb %>%
+    dplyr::mutate(new_tests = tests_cumulative.x - tests_cumulative.y) %>%
+    dplyr::rename(tests_cumulative = tests_cumulative.x, date = date.x) %>%
+    dplyr::relocate(country, tests_cumulative, new_tests, date) %>%
+    dplyr::select(-tests_cumulative.y, -date.y)
 
-#      %>% # nolint
-#     dplyr::filter(country %in% data$country)
-
-#     if (nrow(data_yesterday) == 0)
-
-#   tbl <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
-#     col_types = list(
-#       country = readr::col_character(),
-#       date = readr::col_date(format = ""),
-#       new_tests = readr::col_double(),
-#       tests_cumulative = readr::col_double(),
-#       jhu_ID = readr::col_character(),
-#       source = readr::col_character()
-#     ),
-#     progress = FALSE
-#   ) %>%
-#     dplyr::filter(country %in% data$country) %>%
-#     dplyr::filter(date %in% unique(data$date - 1))
-
-#   tests_yesterday <- tbl$tests_cumulative
-#   data$new_tests <- data$tests_cumulative - tests_yesterday
-
-#   return(data)
-
-# }
+  return(data_new_tests)
+}
