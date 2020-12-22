@@ -177,9 +177,9 @@ get_daily_test_data <- function() {
   jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
 
   # get countries with NA (these errored during scraping)
-  countries_error <- selenium_tests_daily %>%
+  countries_error <- test_combined %>%
     dplyr::filter(is.na(tests_cumulative)) %>%
-    dplyr::select(country)
+    dplyr::select(country, source)
   readr::write_csv(countries_error, "countries-error.csv")
 
   return(invisible(test_combined))
