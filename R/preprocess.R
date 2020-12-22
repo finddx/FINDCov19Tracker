@@ -8,10 +8,7 @@
 #' @export
 fetch_test_data <- function() {
 
-  # FIXME: Philippines (tableau data)
-  # FIXME: Denmark (Arc GIS dashboard)
-
-  info <- read_urls("https://github.com/dsbbfinddx/FINDCov19TrackerData/raw/master/resources/tests_urls_patrick.xlsx") # nolint
+  info <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv") # nolint
   # info <- info[-c(44, 127), ]
   info <- info[c(1, 6), ]
 
@@ -21,17 +18,6 @@ fetch_test_data <- function() {
   # select only one country for testing purposes
   # info <- info[c(29), ]
 
-  # info %<>%
-  #   dplyr::mutate(xpath_new = dplyr::case_when(
-  #     country == "Uruguay" ~ "(?<=a cabo)(.*)(?=análisis)",
-  #     TRUE ~ xpath_new
-  #   )) %>%
-
-
-  # write data.frame in FINDCov19TrackerData repo when manual changes were made
-  # xlsx::write.xlsx(as.data.frame(info), fs::path_expand("~/git/cynkra/find/FINDCov19TrackerData/manual/tests_urls_patrick.xlsx"),
-  #   row.names = FALSE
-  # )
   res <- purrr::pmap(info, process_countries_rowwise)
 
   # rowbind results

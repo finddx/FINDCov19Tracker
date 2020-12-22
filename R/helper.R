@@ -3,13 +3,6 @@ get_status <- function(url) {
     httr::status_code()))
 }
 
-read_urls <- function(path) {
-  tf <- tempfile(fileext = ".xlsx")
-  curl::curl_download(path, tf)
-  file <- readxl::read_xlsx(tf, sheet = 1)
-  return(file)
-}
-
 #' @importFrom stringr str_replace_all str_match
 clean_selenium <- function(data) {
 
