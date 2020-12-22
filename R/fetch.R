@@ -430,7 +430,7 @@ fetch_from_pdf_list <- function(dots) {
   )
 
   if (is.na(dots$xpath_new)) {
-    new_tests <- calculate_new_tests(dots, tests_cumulative)
+    new_tests <- calculate_daily_tests_r_fetch(dots, tests_cumulative)
   }
 
   return(c(new_tests, tests_cumulative))
