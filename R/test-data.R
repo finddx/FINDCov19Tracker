@@ -7,6 +7,7 @@
 #' @return Writes `coronavirus_tests.csv`
 #'
 #' @importFrom mailR send.mail
+#' @importFrom utils tail
 #' @export
 process_test_data <- function() {
   fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
@@ -18,7 +19,7 @@ process_test_data <- function() {
     stringr::str_subset(., "coronavirus_tests_[0-9]{8}_sources_SO.csv") %>%
     stringr::str_remove(., "data/")
 
-  most_recent <- tail(filelist, 1)
+  most_recent <- utils::tail(filelist, 1)
 
   today <- format(Sys.time(), format = "%Y%m%d")
 
@@ -170,13 +171,15 @@ get_daily_test_data <- function() {
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-  manual_tests = readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/%s-tests-manual.csv", today)) # nolint
+  manual_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/%s-tests-manual.csv", today)) # nolint
 
-  test_combined <- dplyr::bind_rows(selenium_tests_daily, fetch_funs_tests,
-    manual_tests) %>%
+  test_combined <- dplyr::bind_rows(
+    selenium_tests_daily, fetch_funs_tests,
+    manual_tests
+  ) %>%
     dplyr::arrange(date, country) %>%
     dplyr::relocate(country, tests_cumulative, new_tests, date, source)
-  jsonlite::write_json(test_combined, "automated-tests.json", pretty = TRUE)
+  readr::write_csv(test_combined, "automated-tests.csv")
 
   # get countries with NA (these errored during scraping)
   countries_error <- test_combined %>%
@@ -195,7 +198,7 @@ get_daily_test_data <- function() {
 #' @importFrom purrr map_dfr
 #' @importFrom readr write_csv
 #' @importFrom dplyr mutate arrange desc
-#' @importFrom jsonlite read_json
+#' @importFrom rio import_list
 #' @export
 combine_all_tests <- function() {
 
@@ -206,11 +209,10 @@ combine_all_tests <- function() {
   )
 
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
-    stringr::str_subset(., "automated/merged/.*tests.json$") %>%
+    stringr::str_subset(., "automated/merged/.*tests.csv$") %>%
     paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
 
-  files_df <- purrr::map_dfr(filelist, jsonlite::read_json) %>%
-    dplyr::mutate(date = as.Date(date)) %>%
+  files_df <- rio::import_list(filelist, rbind = TRUE) %>%
     dplyr::arrange(dplyr::desc(date, country)) %>%
     dplyr::relocate(country, tests_cumulative, new_tests)
 

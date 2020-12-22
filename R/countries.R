@@ -1,6 +1,6 @@
 #' Find and write countries which need manual processing
 #' @description
-#'  This functions reads the list of [automated countries](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/selenium/manual/countries-all.csv) via
+#'  This functions reads the list of [automated countries](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/manual/countries-urls.csv) via
 #' Selenium and R fetch functions and calculates which countries still need
 #' manual processing.
 #' @importFrom readr read_csv write_csv

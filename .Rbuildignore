@@ -6,3 +6,6 @@
 ^renv\.lock$
 ^LICENSE\.md$
 ^processed$
+^docs$
+^pkgdown$
+^\.vscode$

@@ -30,7 +30,7 @@ test_that("combine_all_tests() works as expected", {
 
   all <- read.csv("countries-tests-all-dates.csv")
   expect_s3_class(all, "data.frame")
-  expect_named(automated, c(
+  expect_named(all, c(
     "country", "tests_cumulative",
     "new_tests", "date", "source"
   ), ignore.order = TRUE)

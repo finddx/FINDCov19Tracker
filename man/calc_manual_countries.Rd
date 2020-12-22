@@ -7,7 +7,7 @@
 calc_manual_countries()
 }
 \description{
-This functions reads the list of \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/selenium/manual/countries-all.csv}{automated countries} via
+This functions reads the list of \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/manual/countries-urls.csv}{automated countries} via
 Selenium and R fetch functions and calculates which countries still need
 manual processing.
 }
