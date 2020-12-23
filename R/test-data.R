@@ -161,8 +161,8 @@ get_daily_test_data <- function() {
   selenium_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", today), # nolint
     col_types = cols(
       country = col_character(),
-      tests_cumulative = col_character(),
-      date = col_date(format = "")
+      date = col_date(format = ""),
+      tests_cumulative = col_character()
     )
   ) %>% # nolint
     mutate(source = "selenium") %>%
