@@ -4,7 +4,15 @@ test_that("get_daily_test_data() works as expected", {
   countries_error <- read.csv("countries-error.csv")
   expect_s3_class(countries_error, "data.frame")
 
-  automated <- readr::read_csv("automated-tests.csv")
+  automated <- readr::read_csv("automated-tests.csv",
+    col_types = cols(
+      country = col_character(),
+      tests_cumulative = col_double(),
+      new_tests = col_double(),
+      date = col_date(format = ""),
+      source = col_character()
+    )
+  )
   expect_s3_class(automated, "data.frame")
   expect_named(automated, c(
     "country", "tests_cumulative",
@@ -26,7 +34,8 @@ test_that("calc_manual_countries() works as expected", {
 test_that("combine_all_tests() works as expected", {
   combine_all_tests()
 
-  all <- read.csv("countries-tests-all-dates.csv")
+  all <- read.csv("countries-tests-all-dates.csv"
+  )
   expect_s3_class(all, "data.frame")
   expect_named(all, c(
     "country", "tests_cumulative",

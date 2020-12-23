@@ -201,7 +201,8 @@ get_daily_test_data <- function() {
     manual_tests
   ) %>%
     dplyr::arrange(date, country) %>%
-    dplyr::relocate(country, tests_cumulative, new_tests, date, source)
+    dplyr::relocate(country, tests_cumulative, new_tests, date, source) %>%
+    dplyr::select(-tests)
   readr::write_csv(test_combined, "automated-tests.csv")
 
   # get countries with NA (these errored during scraping)

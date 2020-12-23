@@ -12,29 +12,44 @@ calc_manual_countries <- function() {
   # read list of all countries
   countries_all <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
     col_types = cols(
-  country = col_character(),
-  jhu_ID = col_character(),
-  source = col_character(),
-  `alternative link` = col_character(),
-  type = col_character(),
-  data_url = col_character(),
-  date_format = col_character(),
-  xpath_cumul = col_character(),
-  xpath_new = col_character(),
-  backlog = col_double(),
-  comment = col_character(),
-  status_automate = col_character()
-)) %>% # nolint
+      country = col_character(),
+      jhu_ID = col_character(),
+      source = col_character(),
+      `alternative link` = col_character(),
+      type = col_character(),
+      data_url = col_character(),
+      date_format = col_character(),
+      xpath_cumul = col_character(),
+      xpath_new = col_character(),
+      backlog = col_double(),
+      comment = col_character(),
+      status_automate = col_character()
+    )
+  ) %>% # nolint
     dplyr::select(jhu_ID, source)
 
   countries_all_sub <- countries_all %>%
     dplyr::pull(jhu_ID)
 
   # read list of automated countries
-  countries_automated <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", as.character(Sys.Date(), format = "%Y-%m-%d"))) %>% # nolint
+  countries_automated <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
+    col_types = cols(
+      country = col_character(),
+      tests_cumulative = col_double(),
+      new_tests = col_double(),
+      date = col_date(format = ""),
+      source = col_character(),
+      tests = col_character()
+    )
+  ) %>% # nolint
     dplyr::pull(country)
 
-  countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d"))) %>%  # nolint
+  countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
+    col_types = cols(
+      country = col_character(),
+      source = col_character()
+    )
+  ) %>% # nolint
     dplyr::pull(country)
 
   # remove the countries which errored from the list of automated countries
