@@ -268,113 +268,68 @@
 #   return(c(new_tests, tests_cumulative))
 # }
 
-# fetch_from_pdf <- function(dots) {
+fetch_from_pdf <- function(dots) {
 
-#   # if (!dots$country == "Switzerland") {
-#   #   stop(sprintf(
-#   #     "Country %s is not supported yet for PDF extraction.",
-#   #     dots$country
-#   #   ))
-#   # }
+  # if (!dots$country == "Switzerland") {
+  #   stop(sprintf(
+  #     "Country %s is not supported yet for PDF extraction.",
+  #     dots$country
+  #   ))
+  # }
 
-#   tests_cumulative <- NA
-#   new_tests <- NA
+  tests_cumulative <- NA
+  new_tests <- NA
 
-#   tmpfile <- tempfile("country_data", fileext = ".pdf")
+  tmpfile <- tempfile("country_data", fileext = ".pdf")
 
-#   if (is.na(dots$date_format)) {
-#     tryCatch(
-#       {
-#         download.file(dots$data_url,
-#           destfile = tmpfile, quiet = TRUE,
-#         )
-#       },
-#       silent = FALSE,
-#       condition = function(err) { }
-#     )
-#     if (file.size(tmpfile) == 0) {
-#       return(c(new_tests, tests_cumulative))
-#     }
-#   } else {
-#     # today_char <-  as.character(Sys.Date(), dots$date_format)
-#     yesterday_char <- as.character(Sys.Date() - 1, dots$date_format)
+    tryCatch(
+      {
+        download.file(dots$source,
+          destfile = tmpfile, quiet = TRUE,
+        )
+      },
+      silent = FALSE,
+      condition = function(err) { }
+    )
+    if (file.size(tmpfile) == 0) {
+      return(c(new_tests, tests_cumulative))
+    }
 
-#     # FIXME: only use pdf_text() instead of tabulizer?
-#     # tryCatch(
-#     #   {
-#     #     download.file(gsub("DATE", today_char, dots$data_url),
-#     #       destfile = tmpfile, quiet = TRUE
-#     #     )
-#     #   },
-#     #   silent = FALSE,
-#     #   condition = function(err) { }
-#     # )
-#     # if (file.size(tmpfile) == 0) {
-#     #   tryCatch(
-#     #     {
-#     #       download.file(gsub("DATE", yesterday_char, dots$data_url),
-#     #         destfile = tmpfile, quiet = FALSE, mode =
-#     #           "wb"
-#     #       )
-#     #     },
-#     #     silent = FALSE,
-#     #     condition = function(err) { }
-#     #   )
-#     #   if (file.size(tmpfile) == 0) {
-#     #     return(c(new_tests, tests_cumulative))
-#     #   }
-#     # }
-#   }
-#   # if (dots$country == "Switzerland") {
-#   #   table <- tabulizer::extract_tables(tmpfile,
-#   #     guess = FALSE,
-#   #     area = list(c(379, 201, 389, 326)),
-#   #     output = "character"
-#   #   )[[1]] %>%
-#   #     stringr::str_split(., pattern = "\t") %>%
-#   #     magrittr::extract2(1) %>%
-#   #     stringr::str_replace(., pattern = " ", replacement = "") %>%
-#   #     stringr::str_remove(., pattern = "\\+")
-#   #
-#   #   new_tests <- table[2]
-#   #   tests_cumulative <- table[1]
-#   # }
+  content <- pdftools::pdf_text(tmpfile)
 
-#   content <- pdftools::pdf_text(gsub("DATE", yesterday_char, dots$data_url))
+  tests_cumulative <- na.omit(
+    as.numeric(
+      stringr::str_replace_all(
+        stringr::str_extract(stringr::str_squish(
+          content
+        ), dots$xpath_cumul),
+        "[.]|[,]", ""
+      )
+    )
+  )
 
-#   tests_cumulative <- na.omit(
-#     as.numeric(
-#       stringr::str_replace_all(
-#         stringr::str_extract(stringr::str_squish(
-#           content
-#         ), dots$xpath_cumul),
-#         "[.]|[,]", ""
-#       )
-#     )
-#   )
+  new_tests <- na.omit(
+    as.numeric(
+      stringr::str_replace_all(
+        stringr::str_extract(stringr::str_squish(
+          content
+        ), dots$xpath_new),
+        "[.]|[,]", ""
+      )
+    )
+  )
 
-#   new_tests <- na.omit(
-#     as.numeric(
-#       stringr::str_replace_all(
-#         stringr::str_extract(stringr::str_squish(
-#           content
-#         ), dots$xpath_new),
-#         "[.]|[,]", ""
-#       )
-#     )
-#   )
+  # in case something goes wrong, we fall back to the manual calculation of new_tests
+  if (length(new_tests) == 0) {
+    dots$xpath_new <- NA
+  }
 
-#   # in case something goes wrong, we fall back to the manual calculation of new_tests
-#   if (length(new_tests) == 0) {
-#     dots$xpath_new <- NA
-#   }
+  if (is.na(dots$xpath_new)) {
+    new_tests <- calculate_new_tests(dots, tests_cumulative)
+  }
 
-#   if (is.na(dots$xpath_new)) {
-#     new_tests <- calculate_new_tests(dots, tests_cumulative)
-#   }
-
-#   return(c(new_tests, tests_cumulative))
-# }
+  return(c(new_tests, tests_cumulative))
+}
 
 fetch_from_pdf_list <- function(dots) {
   tests_cumulative <- NA

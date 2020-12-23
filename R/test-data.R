@@ -158,20 +158,43 @@ get_daily_test_data <- function() {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
-  selenium_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", today)) %>% # nolint
+  selenium_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", today), # nolint
+    col_types = cols(
+      country = col_character(),
+      tests_cumulative = col_character(),
+      date = col_date(format = "")
+    )
+  ) %>% # nolint
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
   selenium_tests_clean <- clean_selenium(selenium_tests)
   # FIXME
   selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean)
 
-  fetch_funs_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", today)) %>%
+  fetch_funs_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", today), # nolint
+    col_types = cols(
+      country = col_character(),
+      date = col_date(format = ""),
+      new_tests = col_double(),
+      tests_cumulative = col_double()
+    )
+  ) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-  manual_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/%s-tests-manual.csv", today)) # nolint
+
+  manual_tests <- tryCatch(
+    {
+      readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/%s-tests-manual.csv", today)) # nolint
+    },
+    error = function(cond) {
+      cli::cli_alert_info("No file with manual test countries found for
+        today. Ignoring input.", wrap = TRUE)
+      return(NULL)
+    }
+  )
 
   test_combined <- dplyr::bind_rows(
     selenium_tests_daily, fetch_funs_tests,

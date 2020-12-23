@@ -38,7 +38,13 @@ calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
 #' @importFrom dplyr left_join mutate rename relocate select
 calculate_daily_tests_selenium <- function(data) {
 
-  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", lubridate::today() - 1)) %>% # nolint
+  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", lubridate::today() - 1),
+    col_types = cols(
+      country = col_character(),
+      tests_cumulative = col_character(),
+      date = col_date(format = "")
+    )
+  ) %>% # nolint
     clean_selenium() %>%
     slice(1:10)
 

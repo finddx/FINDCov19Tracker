@@ -8,9 +8,10 @@
 #' @export
 fetch_test_data <- function() {
 
-  info <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv") # nolint
+  # info <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv") # nolint
+  info <- readr::read_csv("/Users/pjs/git/clients/find-1/FINDCov19TrackerData/resources/countries-urls.csv") # nolint
   # info <- info[-c(44, 127), ]
-  info <- info[c(1, 6), ]
+  info <- info[c(47), ]
 
   # info <- info %>%
   #   dplyr::filter(!is.na(type), type != "Selenium")
@@ -53,7 +54,7 @@ process_countries_rowwise <- function(...) {
     # json = fetch_from_json(dots),
     # html = fetch_from_html(dots),
     # zip = fetch_from_zip(dots),
-    # pdf = fetch_from_pdf(dots),
+    pdf = fetch_from_pdf(dots),
     pdf_list = fetch_from_pdf_list(dots),
     # html_list = fetch_from_html_list(dots),
     # html2 = fetch_from_html2(dots),
