@@ -40,8 +40,7 @@ calculate_daily_tests_selenium <- function(data) {
 
   data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", lubridate::today() - 1)
   ) %>% # nolint
-    clean_selenium() %>%
-    slice(1:10)
+    clean_selenium()
 
   data_comb <- dplyr::left_join(data, data_yesterday, by = "country")
 
