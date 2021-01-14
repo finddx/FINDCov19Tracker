@@ -26,7 +26,7 @@ calc_manual_countries <- function() {
       status_automate = col_character()
     )
   ) %>% # nolint
-    dplyr::select(jhu_ID, source)
+    dplyr::select(jhu_ID, status_automate, source)
 
   countries_all_sub <- countries_all %>%
     dplyr::pull(jhu_ID)
