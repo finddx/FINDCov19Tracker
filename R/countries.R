@@ -23,10 +23,10 @@ calc_manual_countries <- function() {
       xpath_new = col_character(),
       backlog = col_double(),
       comment = col_character(),
-      status_automate = col_character()
+      status = col_character()
     )
   ) %>% # nolint
-    dplyr::select(jhu_ID, status_automate, source)
+    dplyr::select(jhu_ID, status, source)
 
   countries_all_sub <- countries_all %>%
     dplyr::pull(jhu_ID)
@@ -38,8 +38,7 @@ calc_manual_countries <- function() {
       tests_cumulative = col_double(),
       new_tests = col_double(),
       date = col_date(format = ""),
-      source = col_character(),
-      tests = col_character()
+      source = col_character()
     )
   ) %>% # nolint
     dplyr::pull(country)
