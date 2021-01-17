@@ -10,8 +10,9 @@
 calc_manual_countries <- function() {
 
   # read list of all countries
-  countries_all <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
-    col_types = cols(
+  countries_all <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    cols(
       country = col_character(),
       jhu_ID = col_character(),
       source = col_character(),
@@ -21,10 +22,10 @@ calc_manual_countries <- function() {
       date_format = col_character(),
       xpath_cumul = col_character(),
       xpath_new = col_character(),
-      backlog = col_double(),
+      backlog = col_character(),
       comment = col_character(),
       status = col_character()
-    )
+    ), col_names = TRUE
   ) %>% # nolint
     dplyr::select(jhu_ID, status, source)
 

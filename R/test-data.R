@@ -168,7 +168,6 @@ get_daily_test_data <- function() {
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
   selenium_tests_clean <- clean_selenium(selenium_tests)
-  # FIXME
   selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean)
 
   fetch_funs_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", today), # nolint
