@@ -199,9 +199,11 @@ get_daily_test_data <- function() {
     selenium_tests_daily, fetch_funs_tests,
     manual_tests
   ) %>%
+    dplyr::mutate(new_tests_corrected = NA, tests_cumulative_corrected = NA) %>%
     dplyr::arrange(date, country) %>%
     dplyr::relocate(country, tests_cumulative, new_tests, date, source) %>%
-    dplyr::select(country, tests_cumulative, new_tests, date, source)
+    dplyr::select(country, tests_cumulative, new_tests,
+     tests_cumulative_corrected, new_tests_corrected, date, source)
   readr::write_csv(test_combined, "automated-tests.csv")
 
   # get countries with NA (these errored during scraping)
@@ -238,7 +240,8 @@ combine_all_tests <- function() {
   files_df <- rio::import_list(filelist, rbind = TRUE) %>%
     dplyr::arrange(dplyr::desc(date, country)) %>%
     dplyr::relocate(country, tests_cumulative, new_tests) %>%
-    dplyr::select(country, tests_cumulative, new_tests, date, source)
+    dplyr::select(country, tests_cumulative, new_tests,
+     tests_cumulative_corrected, new_tests_corrected, date, source)
 
   readr::write_csv(files_df, "countries-tests-all-dates.csv")
 }
