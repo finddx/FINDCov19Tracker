@@ -206,7 +206,7 @@ get_daily_test_data <- function() {
 
   # get countries with NA (these errored during scraping)
   countries_error <- test_combined %>%
-    dplyr::filter(is.na(tests_cumulative)) %>%
+    dplyr::filter(is.na(tests_cumulative) | tests_cumulative < 0 ) %>%
     dplyr::select(country, source)
   readr::write_csv(countries_error, "countries-error.csv")
 
