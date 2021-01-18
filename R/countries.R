@@ -66,6 +66,6 @@ calc_manual_countries <- function() {
   # write csv
   readr::write_csv(
     data.frame(country = countries_manual_csv),
-    "countries-manual.csv"
+    "need-manual-processing.csv"
   )
 }
