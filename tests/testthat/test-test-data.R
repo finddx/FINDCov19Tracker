@@ -16,7 +16,8 @@ test_that("get_daily_test_data() works as expected", {
   expect_s3_class(automated, "data.frame")
   expect_named(automated, c(
     "country", "tests_cumulative",
-    "new_tests", "date", "source"
+    "new_tests", "tests_cumulative_corrected", "new_tests_corrected",
+     "date", "source"
   ), ignore.order = TRUE)
   unlink("automated-tests.csv")
   unlink("countries-error.csv")
@@ -25,10 +26,10 @@ test_that("get_daily_test_data() works as expected", {
 test_that("calc_manual_countries() works as expected", {
   calc_manual_countries()
 
-  countries_manual <- read.csv("countries-manual.csv")
+  countries_manual <- read.csv("need-manual-processing.csv")
   expect_s3_class(countries_manual, "data.frame")
 
-  unlink("countries-manual.csv")
+  unlink("need-manual-processing.csv")
 })
 
 test_that("combine_all_tests() works as expected", {
@@ -39,7 +40,8 @@ test_that("combine_all_tests() works as expected", {
   expect_s3_class(all, "data.frame")
   expect_named(all, c(
     "country", "tests_cumulative",
-    "new_tests", "date", "source"
+    "new_tests", "tests_cumulative_corrected",
+    "new_tests_corrected", "date", "source"
   ), ignore.order = TRUE)
 
   unlink("countries-tests-all-dates.csv")
