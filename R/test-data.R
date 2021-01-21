@@ -85,10 +85,11 @@ process_test_data <- function() {
   cv_tests_max_date <- max(cv_tests$date)
   cv_max_date <- max(c(cv_cases_max_date, cv_tests_max_date))
 
-  cv_tests_sum <- cv_tests %>%
-    dplyr::filter(date == cv_tests_max_date) %>%
-    dplyr::mutate(max_date = date) %>%
+  cv_tests_sum <-  cv_tests %>%
     dplyr::group_by(country) %>%
+    dplyr::mutate(max_date = max(date)) %>%
+    dplyr::filter(date == max_date) %>%
+    plyr::mutate(max_date = date) %>%
     dplyr::mutate(last_tests_cum = tests_cumulative) %>%
     dplyr::ungroup() %>%
     dplyr::select(date, country, last_tests_cum, jhu_ID)
