@@ -202,7 +202,8 @@ get_daily_test_data <- function() {
     selenium_tests_daily, fetch_funs_tests,
     manual_tests
   ) %>%
-    dplyr::mutate(new_tests_corrected = NA, tests_cumulative_corrected = NA) %>%
+    dplyr::mutate(new_tests_corrected = new_tests,
+      tests_cumulative_corrected = tests_cumulative) %>%
     dplyr::arrange(date, country) %>%
     dplyr::relocate(country, tests_cumulative, new_tests, date, source) %>%
     dplyr::select(country, tests_cumulative, new_tests,
@@ -211,7 +212,7 @@ get_daily_test_data <- function() {
 
   # get countries with NA (these errored during scraping)
   countries_error <- test_combined %>%
-    dplyr::filter(is.na(tests_cumulative) | tests_cumulative < 0 ) %>%
+    dplyr::filter(is.na(tests_cumulative) | tests_cumulative < 0) %>%
     dplyr::select(country, source)
   readr::write_csv(countries_error, "countries-error.csv")
 
