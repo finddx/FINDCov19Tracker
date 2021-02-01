@@ -41,7 +41,7 @@ process_jhu_data <- function() {
   # load country data
   # suppress warning for the first column being unnamed
   countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/countries_codes_and_coordinates.csv",
-    col_types = readr::cols()
+    col_types = readr::cols(), quoted_na = FALSE
   ))
 
   # check all jhu country names have corresponding country data
@@ -170,7 +170,10 @@ preprocess_jhu_data <- function(input_df) {
 #' @description Download JHU data.
 #' @param url URL to download
 download_jhu_data <- function(url) {
-  jhu_cases_ori <- readr::read_csv(url, col_types = readr::cols())
+  jhu_cases_ori <- readr::read_csv(url,
+    col_types = readr::cols(),
+    quoted_na = FALSE
+  )
   return(jhu_cases_ori)
 }
 

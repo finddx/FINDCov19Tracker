@@ -8,7 +8,7 @@
 #' @export
 fetch_test_data <- function() {
 
-  info <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv") # nolint
+  info <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv", quoted_na = FALSE) # nolint
   # info <- readr::read_csv("/Users/pjs/git/clients/find-1/FINDCov19TrackerData/resources/countries-urls.csv") # nolint
   # info <- info[-c(44, 127), ]
   # info <- info[c(47), ]

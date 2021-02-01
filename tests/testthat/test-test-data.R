@@ -11,7 +11,8 @@ test_that("get_daily_test_data() works as expected", {
       new_tests = col_double(),
       date = col_date(format = ""),
       source = col_character()
-    )
+    ),
+    quoted_na = FALSE
   )
   expect_s3_class(automated, "data.frame")
   expect_named(automated, c(

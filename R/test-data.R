@@ -62,9 +62,9 @@ process_test_data <- function() {
   ) {
     process_jhu_data()
   }
-  cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols())
+  cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
   countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
-    col_types = readr::cols()
+    col_types = readr::cols(), quoted_na = FALSE
   ))
 
   # check consistency of country names across datasets
@@ -164,7 +164,8 @@ get_daily_test_data <- function() {
       country = col_character(),
       date = col_date(format = ""),
       tests_cumulative = col_character()
-    )
+    ),
+    quoted_na = FALSE
   ) %>% # nolint
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
@@ -177,7 +178,8 @@ get_daily_test_data <- function() {
       date = col_date(format = ""),
       new_tests = col_double(),
       tests_cumulative = col_double()
-    )
+    ),
+    quoted_na = FALSE
   ) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
@@ -187,7 +189,7 @@ get_daily_test_data <- function() {
 
   manual_tests <- tryCatch(
     {
-      readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today)) # nolint
+      readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
     },
     error = function(cond) {
       cli::cli_alert_info("No file with manual test countries found for

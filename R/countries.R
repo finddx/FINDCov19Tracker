@@ -25,7 +25,8 @@ calc_manual_countries <- function() {
       backlog = col_character(),
       comment = col_character(),
       status = col_character()
-    ), col_names = TRUE
+    ),
+    col_names = TRUE, quoted_na = FALSE
   ) %>% # nolint
     dplyr::select(jhu_ID, status, source)
 
@@ -40,7 +41,8 @@ calc_manual_countries <- function() {
       new_tests = col_double(),
       date = col_date(format = ""),
       source = col_character()
-    )
+    ),
+    quoted_na = FALSE
   ) %>% # nolint
     dplyr::pull(country)
 
@@ -48,7 +50,8 @@ calc_manual_countries <- function() {
     col_types = cols(
       country = col_character(),
       source = col_character()
-    )
+    ),
+    quoted_na = FALSE
   ) %>% # nolint
     dplyr::pull(country)
 
