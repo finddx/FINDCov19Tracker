@@ -237,7 +237,7 @@ create_shiny_data <- function() {
       income
     ), by = "unit") %>%
     group_by(unit = region, time) %>%
-    summarize(
+    summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_ratio(e, pop_100k),
@@ -260,7 +260,7 @@ create_shiny_data <- function() {
       income
     ), by = "unit") %>%
     group_by(unit = income, time) %>%
-    summarize(
+    summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_ratio(e, pop_100k),
@@ -329,3 +329,4 @@ create_shiny_data <- function() {
   readr::write_csv(data_all, "processed/data_all.csv")
 
 }
+
