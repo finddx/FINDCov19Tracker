@@ -48,14 +48,13 @@ create_shiny_data <- function() {
   #   col_types = readr::cols()
   # )
 
-  cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  #cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
-  # cv_tests_raw <- readr::read_csv("/Users/Anna/FIND_Onedrive/OneDrive - Foundation for Innovative New Diagnostics FIND/BB_Projects/Shinyapps_projects/FINDCov19TrackerData/processed/coronavirus_tests.csv",
-  #   col_types = readr::cols()
-  # )
+  cv_cases_raw <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
 
+  #cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
-  cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  cv_tests_raw <- readr::read_csv("processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE)
 
   pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
@@ -238,7 +237,7 @@ create_shiny_data <- function() {
       income
     ), by = "unit") %>%
     group_by(unit = region, time) %>%
-    summarize(
+    summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_ratio(e, pop_100k),
@@ -261,7 +260,7 @@ create_shiny_data <- function() {
       income
     ), by = "unit") %>%
     group_by(unit = income, time) %>%
-    summarize(
+    summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         function(e) sum_ratio(e, pop_100k),
@@ -330,3 +329,4 @@ create_shiny_data <- function() {
   readr::write_csv(data_all, "processed/data_all.csv")
 
 }
+
