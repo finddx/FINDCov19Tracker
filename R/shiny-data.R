@@ -206,12 +206,12 @@ create_shiny_data <- function() {
     mutate(
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        function(e) e / pop_100k,
+        ~ .x / pop_100k,
         .names = "cap_{col}"
       ),
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        function(e) e,
+        ~ .x,
         .names = "all_{col}"
       )
     ) %>%
@@ -240,12 +240,12 @@ create_shiny_data <- function() {
     summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        function(e) sum_ratio(e, pop_100k),
+        ~ sum_ratio(.x, pop_100k),
         .names = "cap_{col}"
       ),
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        function(e) sum_basic(e),
+        ~ sum_basic(.x),
         .names = "all_{col}"
       ),
       pos = sum_ratio(all_new_cases, all_new_tests)
