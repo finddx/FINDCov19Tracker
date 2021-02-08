@@ -64,7 +64,13 @@ calc_manual_countries <- function() {
   # only keep countries which need manual processing (including their
   # source URLS)
   countries_manual_csv <- countries_all %>%
-    dplyr::filter(jhu_ID %in% countries_manual)
+    dplyr::filter(jhu_ID %in% countries_manual) %>%
+    dplyr::rename(url = source) %>%
+    tibble::add_column(tests_cumulative = NA,
+                       new_tests = NA,
+                       date = as.character(Sys.Date(), format = "%Y-%m-%d"),
+                       source = "manually") %>%
+    dplyr::relocate(c(status, url), .after = source)
 
   # write csv
   readr::write_csv(
