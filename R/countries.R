@@ -65,7 +65,7 @@ calc_manual_countries <- function() {
   # source URLS)
   countries_manual_csv <- countries_all %>%
     dplyr::filter(jhu_ID %in% countries_manual) %>%
-    dplyr::rename(url = source) %>%
+    dplyr::rename(country = jhu_ID, url = source) %>%
     tibble::add_column(tests_cumulative = NA,
                        new_tests = NA,
                        date = as.character(Sys.Date(), format = "%Y-%m-%d"),
@@ -74,7 +74,7 @@ calc_manual_countries <- function() {
 
   # write csv
   readr::write_csv(
-    data.frame(country = countries_manual_csv),
+    data.frame(countries_manual_csv),
     "need-manual-processing.csv"
   )
 }
