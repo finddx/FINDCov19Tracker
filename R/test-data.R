@@ -186,17 +186,17 @@ get_daily_test_data <- function() {
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-
-  manual_tests <- tryCatch(
-    {
-      readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
-    },
-    error = function(cond) {
-      cli::cli_alert_info("No file with manual test countries found for
+manual_tests <- tryCatch(
+  {
+    processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
+    calculate_tests_manual_file(processed_manual)
+  },
+  error = function(cond) {
+    cli::cli_alert_info("No file with manual test countries found for
         today. Ignoring input.", wrap = TRUE)
-      return(NULL)
-    }
-  )
+    return(NULL)
+  }
+)
 
   test_combined <- dplyr::bind_rows(
     selenium_tests_daily, fetch_funs_tests,
@@ -212,7 +212,7 @@ get_daily_test_data <- function() {
 
   # get countries with NA (these errored during scraping)
   countries_error <- test_combined %>%
-    dplyr::filter(is.na(tests_cumulative) | tests_cumulative < 0) %>%
+    dplyr::filter(is.na(tests_cumulative) | new_tests < 0) %>%
     dplyr::select(country, source)
   readr::write_csv(countries_error, "countries-error.csv")
 
