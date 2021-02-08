@@ -53,6 +53,29 @@ calculate_daily_tests_selenium <- function(data) {
   return(data_new_tests)
 }
 
+#' @importFrom dplyr left_join mutate rename relocate select
+calculate_number_tests_manual_file <- function(data) {
+
+  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", lubridate::today() - 1)
+  )
+
+  data_comb <- dplyr::left_join(data, data_yesterday, by = "country")
+
+  data_number_tests <- data_comb %>%
+    dplyr::mutate(
+      new_tests = if_else(is.na(new_tests.x),
+                          tests_cumulative.x - tests_cumulative.y,
+                          new_tests.x),
+      tests_cumulative = if_else(is.na(tests_cumulative.x),
+                                 new_tests.x + tests_cumulative.y,
+                                 tests_cumulative.x)
+    ) %>%
+    dplyr::rename(date = date.x, source = source.x) %>%
+    dplyr::select(country, tests_cumulative, new_tests, date, source)
+
+  return(data_number_tests)
+}
+
 # written by Anna
 #' @importFrom data.table data.table rbindlist
 smooth_new_tests <- function(x, y) {

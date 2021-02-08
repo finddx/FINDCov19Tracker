@@ -189,7 +189,8 @@ get_daily_test_data <- function() {
 
   manual_tests <- tryCatch(
     {
-      readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
+      processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
+      calculate_number_tests_manual_file(processed_manual)
     },
     error = function(cond) {
       cli::cli_alert_info("No file with manual test countries found for
