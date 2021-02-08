@@ -221,7 +221,7 @@ get_daily_test_data <- function() {
 
 #' Combine test daily data from all countries across all dates
 #' @description This function reads all clean input files from the [automated/merged](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory and row-binds them. The output is written to a file called
-#' `countries-tests-all-dates.csv` and uploaded to `automated/countries-tests-all-dates.csv`.
+#' `coronavirus_tests_new.csv` and uploaded to `automated/coronavirus_tests_new.csv`.
 #' @importFrom stringr str_subset
 #' @importFrom gh gh
 #' @importFrom purrr map_dfr
@@ -247,5 +247,5 @@ combine_all_tests <- function() {
     dplyr::select(country, tests_cumulative, new_tests,
      tests_cumulative_corrected, new_tests_corrected, date, source)
 
-  readr::write_csv(files_df, "countries-tests-all-dates.csv")
+  readr::write_csv(files_df, "coronavirus_tests_new.csv")
 }

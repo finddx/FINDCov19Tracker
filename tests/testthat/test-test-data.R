@@ -36,7 +36,7 @@ test_that("calc_manual_countries() works as expected", {
 test_that("combine_all_tests() works as expected", {
   combine_all_tests()
 
-  all <- read.csv("countries-tests-all-dates.csv"
+  all <- read.csv("coronavirus_tests_new.csv"
   )
   expect_s3_class(all, "data.frame")
   expect_named(all, c(
@@ -45,5 +45,5 @@ test_that("combine_all_tests() works as expected", {
     "new_tests_corrected", "date", "source"
   ), ignore.order = TRUE)
 
-  unlink("countries-tests-all-dates.csv")
+  unlink("coronavirus_tests_new.csv")
 })
