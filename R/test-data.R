@@ -186,18 +186,17 @@ get_daily_test_data <- function() {
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-
-  manual_tests <- tryCatch(
-    {
-      processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
-      calculate_number_tests_manual_file(processed_manual)
-    },
-    error = function(cond) {
-      cli::cli_alert_info("No file with manual test countries found for
+manual_tests <- tryCatch(
+  {
+    processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
+    calculate_tests_manual_file(processed_manual)
+  },
+  error = function(cond) {
+    cli::cli_alert_info("No file with manual test countries found for
         today. Ignoring input.", wrap = TRUE)
-      return(NULL)
-    }
-  )
+    return(NULL)
+  }
+)
 
   test_combined <- dplyr::bind_rows(
     selenium_tests_daily, fetch_funs_tests,
