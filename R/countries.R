@@ -4,7 +4,8 @@
 #' Selenium and R fetch functions and calculates which countries still need
 #' manual processing.
 #' @importFrom readr read_csv write_csv
-#' @importFrom dplyr pull
+#' @importFrom dplyr pull filter rename
+#' @importFrom tibble add_column
 #' @import readr
 #' @export
 calc_manual_countries <- function() {
@@ -34,7 +35,7 @@ calc_manual_countries <- function() {
     dplyr::pull(jhu_ID)
 
   # read list of automated countries
-  countries_automated <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
+  countries_automated_all <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
     col_types = cols(
       country = col_character(),
       tests_cumulative = col_double(),
@@ -43,7 +44,9 @@ calc_manual_countries <- function() {
       source = col_character()
     ),
     quoted_na = FALSE
-  ) %>% # nolint
+  ) # nolint
+
+  countries_automated <- countries_automated_all %>%
     dplyr::pull(country)
 
   countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
@@ -66,10 +69,12 @@ calc_manual_countries <- function() {
   countries_manual_csv <- countries_all %>%
     dplyr::filter(jhu_ID %in% countries_manual) %>%
     dplyr::rename(country = jhu_ID, url = source) %>%
-    tibble::add_column(tests_cumulative = NA,
-                       new_tests = NA,
-                       date = as.character(Sys.Date(), format = "%Y-%m-%d"),
-                       source = "manually") %>%
+    dplyr::left_join(countries_automated_all, by = "country") %>%
+    select(-date, -source) %>%
+    tibble::add_column(
+      date = as.character(Sys.Date(), format = "%Y-%m-%d"),
+      source = "manually"
+    ) %>%
     dplyr::relocate(c(status, url), .after = source)
 
   # write csv

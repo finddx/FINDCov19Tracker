@@ -170,7 +170,9 @@ get_daily_test_data <- function() {
     mutate(source = "selenium") %>%
     mutate(date = as.Date(date))
   selenium_tests_clean <- clean_selenium(selenium_tests)
-  selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean)
+  selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean) %>%
+    mutate(tests_cumulative_corrected = NA_real_) %>%
+    mutate(new_tests_corrected = NA_real_)
 
   fetch_funs_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", today), # nolint
     col_types = cols(
@@ -183,31 +185,44 @@ get_daily_test_data <- function() {
   ) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(new_tests = as.numeric(new_tests)) %>%
+    mutate(tests_cumulative_corrected = NA_real_) %>%
+    mutate(new_tests_corrected = NA_real_) %>%
     mutate(date = as.Date(date)) %>%
     mutate(source = "fetch")
 
-manual_tests <- tryCatch(
-  {
-    processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
-    calculate_tests_manual_file(processed_manual)
-  },
-  error = function(cond) {
-    cli::cli_alert_info("No file with manual test countries found for
-        today. Ignoring input.", wrap = TRUE)
-    return(NULL)
-  }
-)
+  manual_tests <- tryCatch(
+    {
+      processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
+      calculate_tests_manual_file(processed_manual)
+    },
+    error = function(cond) {
+      cli::cli_alert_info("No file with manual test countries found for
+          today. Ignoring input.", wrap = TRUE)
+      return(NULL)
+    }
+  )
 
   test_combined <- dplyr::bind_rows(
     selenium_tests_daily, fetch_funs_tests,
     manual_tests
   ) %>%
-    dplyr::mutate(new_tests_corrected = new_tests,
-      tests_cumulative_corrected = tests_cumulative) %>%
+    dplyr::group_by(country) %>%
+    dplyr::filter(n() == 1 | source == "manually") %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(new_tests_corrected = if_else(is.na(new_tests_corrected),
+      new_tests,
+      new_tests_corrected
+    )) %>%
+    dplyr::mutate(tests_cumulative_corrected = if_else(is.na(tests_cumulative_corrected),
+      tests_cumulative,
+      tests_cumulative_corrected
+    )) %>%
     dplyr::arrange(date, country) %>%
     dplyr::relocate(country, tests_cumulative, new_tests, date, source) %>%
-    dplyr::select(country, tests_cumulative, new_tests,
-     tests_cumulative_corrected, new_tests_corrected, date, source)
+    dplyr::select(
+      country, tests_cumulative, new_tests,
+      tests_cumulative_corrected, new_tests_corrected, date, source
+    )
   readr::write_csv(test_combined, "automated-tests.csv")
 
   # get countries with NA (these errored during scraping)
