@@ -192,7 +192,18 @@ get_daily_test_data <- function() {
 
   manual_tests <- tryCatch(
     {
-      processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), quoted_na = FALSE) # nolint
+  processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), # nolint
+    col_types = cols(
+      country = col_character(),
+      tests_cumulative = col_double(),
+      new_tests = col_double(),
+      tests_cumulative_corrected = col_double(),
+      new_tests_corrected = col_double(),
+      date = col_date(format = ""),
+      source = col_character()
+    ),
+    quoted_na = FALSE
+  ) # nolint
       calculate_tests_manual_file(processed_manual)
     },
     error = function(cond) {

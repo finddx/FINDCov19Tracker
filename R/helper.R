@@ -55,7 +55,18 @@ calculate_daily_tests_selenium <- function(data) {
 
 #' @importFrom dplyr left_join mutate rename relocate select
 calculate_tests_manual_file <- function(data) {
-  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", lubridate::today() - 1)) # nolint
+  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", lubridate::today() - 1), # nolint
+    col_types = cols(
+      country = col_character(),
+      tests_cumulative = col_double(),
+      new_tests = col_double(),
+      tests_cumulative_corrected = col_double(),
+      new_tests_corrected = col_double(),
+      date = col_date(format = ""),
+      source = col_character()
+    ),
+    quoted_na = FALSE
+  ) # nolint
 
   data_comb <- dplyr::left_join(data, data_yesterday, by = "country")
 
