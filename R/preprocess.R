@@ -12,8 +12,7 @@ fetch_test_data <- function() {
   # info <- readr::read_csv("/Users/pjs/git/clients/find-1/FINDCov19TrackerData/resources/countries-urls.csv") # nolint
   # info <- info[-c(44, 127), ]
   # info <- info[c(47), ]
-  info <- info[c(1,6), ]
-
+  info <- info[info$country == "Afghanistan" | info$country == "Argentina", ]
   # info <- info %>%
   #   dplyr::filter(!is.na(type), type != "Selenium")
 
