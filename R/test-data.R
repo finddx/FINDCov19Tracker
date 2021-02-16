@@ -154,72 +154,122 @@ process_test_data <- function() {
 #'   - `countries-error.csv`
 #'
 #'   which are then deployed by CI to the [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
+#' @param days days to combine. It should always be bigger than 0.
+#' @param write if csv files should be written. Default TRUE.
 #' @export
-get_daily_test_data <- function() {
+get_test_data <- function(days = 1, write = TRUE) {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
-  selenium_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", today), # nolint
-    col_types = cols(
-      country = col_character(),
-      date = col_date(format = ""),
-      tests_cumulative = col_character()
-    ),
-    quoted_na = FALSE
-  ) %>% # nolint
-    mutate(source = "selenium") %>%
-    mutate(date = as.Date(date))
+  # it includes the day before to retrieve this date and calculate tests for day 1
+  first_date <- as.Date(today) - days
+
+  window_update <- seq(first_date, as.Date(today), by = "days")
+
+  selenium_list <- sprintf(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", # nolint
+    window_update
+  )
+  selenium_tests <- rio::import_list(selenium_list, rbind = TRUE) %>%
+    dplyr::mutate(source = "selenium") %>%
+    dplyr::mutate(date = as.Date(date)) %>%
+    dplyr::select(-`_file`)
   selenium_tests_clean <- clean_selenium(selenium_tests)
-  selenium_tests_daily <- calculate_daily_tests_selenium(selenium_tests_clean) %>%
-    mutate(tests_cumulative_corrected = NA_real_) %>%
-    mutate(new_tests_corrected = NA_real_)
+  selenium_tests_daily <- selenium_tests_clean %>%
+    dplyr::mutate(new_tests = NA_real_) %>%
+    dplyr::mutate(tests_cumulative_corrected = NA_real_) %>%
+    dplyr::mutate(new_tests_corrected = NA_real_) %>%
+    dplyr::relocate(
+      country, tests_cumulative, new_tests,
+      tests_cumulative_corrected, new_tests_corrected,
+      date, source
+    )
 
-  fetch_funs_tests <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", today), # nolint
-    col_types = cols(
-      country = col_character(),
-      date = col_date(format = ""),
-      new_tests = col_double(),
-      tests_cumulative = col_double()
-    ),
-    quoted_na = FALSE
-  ) %>%
-    mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
-    mutate(new_tests = as.numeric(new_tests)) %>%
-    mutate(tests_cumulative_corrected = NA_real_) %>%
-    mutate(new_tests_corrected = NA_real_) %>%
-    mutate(date = as.Date(date)) %>%
-    mutate(source = "fetch")
+  fetch_list <- sprintf(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", # nolint
+    seq(first_date, as.Date(today), by = "days")
+  )
+  fetch_tests_daily <- rio::import_list(fetch_list, rbind = TRUE) %>%
+    dplyr::select(-`_file`) %>%
+    dplyr::mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+    dplyr::mutate(new_tests = as.numeric(new_tests)) %>%
+    dplyr::mutate(tests_cumulative_corrected = NA_real_) %>%
+    dplyr::mutate(new_tests_corrected = NA_real_) %>%
+    dplyr::mutate(date = as.Date(date)) %>%
+    dplyr::mutate(source = "fetch") %>%
+    dplyr::relocate(
+      country, tests_cumulative, new_tests,
+      tests_cumulative_corrected, new_tests_corrected,
+      date, source
+    )
 
-  manual_tests <- tryCatch(
+  manual_list <- sprintf(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", # nolint
+    window_update
+  )
+
+  manual_tests_daily <- tryCatch(
     {
-  processed_manual <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", today), # nolint
-    col_types = cols(
-      country = col_character(),
-      tests_cumulative = col_double(),
-      new_tests = col_double(),
-      tests_cumulative_corrected = col_double(),
-      new_tests_corrected = col_double(),
-      date = col_date(format = ""),
-      source = col_character()
-    ),
-    quoted_na = FALSE
-  ) # nolint
-      calculate_tests_manual_file(processed_manual)
+      fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
+        owner = "dsbbfinddx",
+        repo = "FINDCov19TrackerData",
+        branch = "selenium"
+      )
+
+      filelist_manual <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
+        stringr::str_subset(., "manual/processed/.*processed-manually.csv$") %>%
+        paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
+
+      manual_files <- manual_list[which(manual_list %in% filelist_manual)]
+
+      processed_manual <- rio::import_list(manual_files, rbind = TRUE) %>%
+        dplyr::select(-`_file`, -status, -url) %>%
+        dplyr::mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+        dplyr::mutate(new_tests = as.numeric(new_tests)) %>%
+        dplyr::mutate(tests_cumulative_corrected = as.numeric(tests_cumulative_corrected)) %>%
+        dplyr::mutate(new_tests_corrected = (new_tests_corrected)) %>%
+        dplyr::mutate(date = as.Date(date)) %>%
+        dplyr::mutate(source = "manually") %>%
+        dplyr::relocate(
+          country, tests_cumulative, new_tests,
+          tests_cumulative_corrected, new_tests_corrected,
+          date, source
+        )
     },
     error = function(cond) {
       cli::cli_alert_info("No file with manual test countries found for
-          today. Ignoring input.", wrap = TRUE)
+                today. Ignoring input.", wrap = TRUE)
       return(NULL)
     }
   )
 
   test_combined <- dplyr::bind_rows(
-    selenium_tests_daily, fetch_funs_tests,
-    manual_tests
+    selenium_tests_daily, fetch_tests_daily,
+    manual_tests_daily
   ) %>%
-    dplyr::group_by(country) %>%
+    # keeping only manual source when there is multiple
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country, date) %>%
     dplyr::filter(n() == 1 | source == "manually") %>%
     dplyr::ungroup() %>%
+    # calculating tests_cumulative when new_tests is available
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
+    dplyr::mutate(tests_cumulative = if_else(dplyr::row_number() != 1 &
+      is.na(tests_cumulative) &
+      !is.na(new_tests),
+      dplyr::lag(tests_cumulative) + new_tests,
+    tests_cumulative
+    )) %>%
+    # calculating new_tests
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
+    dplyr::mutate(new_tests = if_else(dplyr::row_number() != 1,
+      tests_cumulative - dplyr::lag(tests_cumulative),
+      new_tests
+    )) %>%
+    dplyr::ungroup() %>%
+    # populating corrected columns
     dplyr::mutate(new_tests_corrected = if_else(is.na(new_tests_corrected),
       new_tests,
       new_tests_corrected
@@ -228,19 +278,40 @@ get_daily_test_data <- function() {
       tests_cumulative,
       tests_cumulative_corrected
     )) %>%
-    dplyr::arrange(date, country) %>%
-    dplyr::relocate(country, tests_cumulative, new_tests, date, source) %>%
-    dplyr::select(
-      country, tests_cumulative, new_tests,
-      tests_cumulative_corrected, new_tests_corrected, date, source
+    dplyr::arrange(date, country)
+
+  test_combined_split <- test_combined %>%
+    dplyr::group_split(date)
+  # The firs date didn't change
+  test_combined_split <- test_combined_split[-1]
+
+  if (write == TRUE) {
+    mapply(
+      readr::write_csv,
+      test_combined_split,
+      paste0(window_update[-1], "-automated-tests.csv")
     )
-  readr::write_csv(test_combined, "automated-tests.csv")
+  }
 
   # get countries with NA (these errored during scraping)
   countries_error <- test_combined %>%
-    dplyr::filter(is.na(tests_cumulative) | new_tests < 0) %>%
-    dplyr::select(country, source)
-  readr::write_csv(countries_error, "countries-error.csv")
+    dplyr::filter(is.na(tests_cumulative_corrected) | new_tests_corrected < 0) %>%
+    dplyr::select(country, date, source)
+
+  countries_error_split <- countries_error %>%
+    dplyr::group_split(date)
+  # The firs date didn't change
+  countries_error_split <- countries_error_split[-1]
+  countries_error_date <- as.Date(unique(countries_error$date))
+  countries_error_date <- countries_error_date[which(as.Date(unique(countries_error$date)) != first_date)]
+
+  if (write == TRUE) {
+    mapply(
+      readr::write_csv,
+      countries_error_split,
+      paste0(countries_error_date, "-countries-error.csv")
+    )
+  }
 
   return(invisible(test_combined))
 }

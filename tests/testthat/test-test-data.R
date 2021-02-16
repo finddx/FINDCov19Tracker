@@ -1,10 +1,12 @@
-test_that("get_daily_test_data() works as expected", {
-  get_daily_test_data()
+test_that("get_test_data() works as expected", {
+  get_test_data()
 
-  countries_error <- read.csv("countries-error.csv")
+  today <- format(Sys.time(), "%Y-%m-%d")
+
+  countries_error <- read.csv(sprintf("%s-countries-error.csv", today))
   expect_s3_class(countries_error, "data.frame")
 
-  automated <- readr::read_csv("automated-tests.csv",
+  automated <- readr::read_csv(sprintf("%s-automated-tests.csv", today),
     col_types = cols(
       country = col_character(),
       tests_cumulative = col_double(),
