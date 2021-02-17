@@ -12,7 +12,7 @@ test_that("get_test_data() works as expected", {
      "date", "source"
   ), ignore.order = TRUE)
 
-  expect_equal(unique(algo[["test_combined"]]$date), today)
+  expect_equal(unique(automated[["test_combined"]]$date), today)
 
 })
 
