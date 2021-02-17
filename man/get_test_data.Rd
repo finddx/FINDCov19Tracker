@@ -2,7 +2,9 @@
 % Please edit documentation in R/test-data.R
 \name{get_test_data}
 \alias{get_test_data}
-\title{Get and combine test data from different sources}
+\title{Get tests from different sources (Selenium, fetch, and manual) and combine them.
+Using the parameter \code{days}, all files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.
+Countries with negative values or \code{NA} are listed as well given the \code{days} input in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues}{\verb{issues/}}.}
 \usage{
 get_test_data(days = 1, write = TRUE)
 }
@@ -22,4 +24,8 @@ get_test_data(days = 1, write = TRUE)
 }
 
 which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
+}
+\examples{
+get_test_data(days = 8, write = FALSE)
+
 }

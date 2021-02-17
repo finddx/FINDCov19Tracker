@@ -144,7 +144,9 @@ process_test_data <- function() {
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 }
 
-#' Get and combine test data from different sources
+#' Get tests from different sources (Selenium, fetch, and manual) and combine them.
+#' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
+#' Countries with negative values or `NA` are listed as well given the `days` input in the folder [`issues/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues).
 #' @description
 #'   **Input:** Daily test data scraped via Selenium and "R fetch functions" from
 #'   [`automated/fetch`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
@@ -156,6 +158,11 @@ process_test_data <- function() {
 #'   which are then deployed by CI to the [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
 #' @param days days to combine. It should always be bigger than 0.
 #' @param write if csv files should be written. Default TRUE.
+#'
+#' @examples
+#' get_test_data(days = 8, write = FALSE)
+#'
+#' @importFrom dplyr left_join mutate rename relocate select
 #' @export
 get_test_data <- function(days = 1, write = TRUE) {
 
@@ -211,11 +218,13 @@ get_test_data <- function(days = 1, write = TRUE) {
   manual_tests_daily <- tryCatch(
     {
       fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
-        owner = "dsbbfinddx",
-        repo = "FINDCov19TrackerData",
-        branch = "selenium"
+                      owner = "dsbbfinddx",
+                      repo = "FINDCov19TrackerData",
+                      branch = "selenium"
       )
 
+      # takes the manual files uploaded between
+      # the time frame to update (first_date and today)
       filelist_manual <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
         stringr::str_subset(., "manual/processed/.*processed-manually.csv$") %>%
         paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
@@ -237,8 +246,8 @@ get_test_data <- function(days = 1, write = TRUE) {
         )
     },
     error = function(cond) {
-      cli::cli_alert_info("No file with manual test countries found for
-                today. Ignoring input.", wrap = TRUE)
+      cli::cli_alert_info("Any file founded in folder manual/processed for the
+              input days. Ignoring uploaded manual tests.", wrap = TRUE)
       return(NULL)
     }
   )
@@ -247,6 +256,15 @@ get_test_data <- function(days = 1, write = TRUE) {
     selenium_tests_daily, fetch_tests_daily,
     manual_tests_daily
   ) %>%
+    # Preserving name for Lao and Palestin
+    dplyr::mutate(country = if_else(country == "OccupiedPalestinianterritory",
+      "occupiedPalestinianterritory",
+      country
+    )) %>%
+    dplyr::mutate(country = if_else(country == "LaoPeoplesDemoraticRepublic",
+      "LaoPeople'sDemocraticRepublic",
+      country
+    )) %>%
     # keeping only manual source when there is multiple
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country, date) %>%
@@ -258,9 +276,10 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::mutate(tests_cumulative = if_else(dplyr::row_number() != 1 &
       is.na(tests_cumulative) &
       !is.na(new_tests),
-      dplyr::lag(tests_cumulative) + new_tests,
+    dplyr::lag(tests_cumulative) + new_tests,
     tests_cumulative
     )) %>%
+    dplyr::ungroup() %>%
     # calculating new_tests
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
@@ -278,12 +297,14 @@ get_test_data <- function(days = 1, write = TRUE) {
       tests_cumulative,
       tests_cumulative_corrected
     )) %>%
-    dplyr::arrange(date, country)
+    dplyr::arrange(date, country) %>%
+    # First date is not updated is just used to calculate new test
+    filter(date != first_date)
 
+  # Splitting combined data frame in data frame per days
+  # to write files in folder automated/merged
   test_combined_split <- test_combined %>%
     dplyr::group_split(date)
-  # The firs date didn't change
-  test_combined_split <- test_combined_split[-1]
 
   if (write == TRUE) {
     mapply(
@@ -300,8 +321,6 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   countries_error_split <- countries_error %>%
     dplyr::group_split(date)
-  # The firs date didn't change
-  countries_error_split <- countries_error_split[-1]
   countries_error_date <- as.Date(unique(countries_error$date))
   countries_error_date <- countries_error_date[which(as.Date(unique(countries_error$date)) != first_date)]
 
@@ -313,7 +332,7 @@ get_test_data <- function(days = 1, write = TRUE) {
     )
   }
 
-  return(invisible(test_combined))
+  return(list(test_combined = test_combined, countries_error = countries_error))
 }
 
 #' Combine test daily data from all countries across all dates
