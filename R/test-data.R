@@ -255,8 +255,11 @@ get_test_data <- function(days = 1, write = TRUE) {
 
       manual_files <- manual_list[which(manual_list %in% filelist_manual)]
 
-      processed_manual <- rio::import_list(manual_files, rbind = TRUE) %>%
-        dplyr::select(-`_file`, -status, -url) %>%
+      processed_manual <- rio::import_list(manual_files,
+        rbind = TRUE,
+        rbind_label = "file_name"
+        ) %>%
+        dplyr::select(-dplyr::any_of(c("file_name", "status", "url"))) %>%
         dplyr::mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
         dplyr::mutate(new_tests = as.numeric(new_tests)) %>%
         dplyr::mutate(tests_cumulative_corrected = as.numeric(tests_cumulative_corrected)) %>%
