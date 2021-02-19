@@ -353,7 +353,7 @@ get_test_data <- function(days = 1, write = TRUE) {
     )
   }
 
-  return(list(test_combined = test_combined, countries_error = countries_error))
+  return(list(test_combined = test_combined_all_countries, countries_error = countries_error))
 }
 
 #' Combine test daily data from all countries across all dates
