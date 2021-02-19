@@ -17,10 +17,15 @@ test_that("get_test_data() works as expected", {
 })
 
 test_that("calc_manual_countries() works as expected", {
-  calc_manual_countries()
+    manual_countries <- calc_manual_countries()
 
-  countries_manual <- read.csv("need-manual-processing.csv")
-  expect_s3_class(countries_manual, "data.frame")
+    expect_named(manual_countries, c(
+      "country", "tests_cumulative",
+      "new_tests", "tests_cumulative_corrected", "new_tests_corrected",
+      "date", "source", "status", "url"
+    ), ignore.order = TRUE)
+
+  expect_s3_class(manual_countries, "data.frame")
 
   unlink("need-manual-processing.csv")
 })

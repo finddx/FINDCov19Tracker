@@ -54,9 +54,11 @@ calc_manual_countries <- function() {
     tibble::add_column(
       source = "manually"
     ) %>%
-    dplyr::relocate(country, tests_cumulative, new_tests,
-                    tests_cumulative_corrected, new_tests_corrected,
-                    date, source, status, url)
+    dplyr::relocate(
+      country, tests_cumulative, new_tests,
+      tests_cumulative_corrected, new_tests_corrected,
+      date, source, status, url
+    )
 
   # write csv
   readr::write_csv(
