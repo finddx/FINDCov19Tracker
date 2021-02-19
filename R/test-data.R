@@ -340,8 +340,7 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   # get countries with NA (these errored during scraping)
   countries_error <- test_combined_all_countries %>%
-    dplyr::filter(is.na(tests_cumulative_corrected) | new_tests_corrected < 0) %>%
-    dplyr::select(country, date, source)
+    dplyr::filter(is.na(tests_cumulative_corrected) | new_tests_corrected < 0)
 
   countries_error_split <- countries_error %>%
     dplyr::group_split(date)

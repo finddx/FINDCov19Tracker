@@ -29,29 +29,34 @@ calc_manual_countries <- function() {
     ),
     col_names = TRUE, quoted_na = FALSE
   ) %>% # nolint
-    dplyr::select(jhu_ID, status, source)
+    dplyr::select(jhu_ID, status, source) %>%
+    dplyr::rename(country = jhu_ID, url = source)
 
 
   countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
     col_types = cols(
       country = col_character(),
       date = col_date(format = ""),
+      tests_cumulative = col_double(),
+      new_tests = col_double(),
+      tests_cumulative_corrected = col_double(),
+      new_tests_corrected = col_double(),
       source = col_character()
     ),
     quoted_na = FALSE
   ) %>% # nolint
-    dplyr::pull(country)
+    dplyr::select(-source)
 
   # only keep countries which need manual processing (including their
   # source URLS)
-  countries_manual_csv <- countries_all %>%
-    dplyr::filter(jhu_ID %in% countries_error) %>%
-    dplyr::rename(country = jhu_ID, url = source) %>%
+  countries_manual_csv <- countries_error %>%
+    dplyr::left_join(countries_all) %>%
     tibble::add_column(
-      date = as.character(Sys.Date(), format = "%Y-%m-%d"),
       source = "manually"
     ) %>%
-    dplyr::relocate(c(status, url), .after = source)
+    dplyr::relocate(country, tests_cumulative, new_tests,
+                    tests_cumulative_corrected, new_tests_corrected,
+                    date, source, status, url)
 
   # write csv
   readr::write_csv(
