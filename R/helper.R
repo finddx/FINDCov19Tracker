@@ -35,67 +35,6 @@ calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
   return(new_tests)
 }
 
-#' @importFrom dplyr left_join mutate rename relocate select
-calculate_daily_tests_selenium <- function(data) {
-
-  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", lubridate::today() - 1)
-  ) %>% # nolint
-    clean_selenium()
-
-  data_comb <- dplyr::left_join(data, data_yesterday, by = "country")
-
-  data_new_tests <- data_comb %>%
-    dplyr::mutate(new_tests = tests_cumulative.x - tests_cumulative.y) %>%
-    dplyr::rename(tests_cumulative = tests_cumulative.x, date = date.x) %>%
-    dplyr::relocate(country, tests_cumulative, new_tests, date) %>%
-    dplyr::select(-tests_cumulative.y, -date.y)
-
-  return(data_new_tests)
-}
-
-#' @importFrom dplyr left_join mutate rename relocate select
-calculate_tests_manual_file <- function(data) {
-  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/%s-automated-tests.csv", lubridate::today() - 1), # nolint
-    col_types = cols(
-      country = col_character(),
-      tests_cumulative = col_double(),
-      new_tests = col_double(),
-      tests_cumulative_corrected = col_double(),
-      new_tests_corrected = col_double(),
-      date = col_date(format = ""),
-      source = col_character()
-    ),
-    quoted_na = FALSE
-  ) # nolint
-
-  data_comb <- dplyr::left_join(data, data_yesterday, by = "country")
-
-  data_number_tests <- data_comb %>%
-    dplyr::mutate(new_tests = if_else(is.na(new_tests.x),
-      tests_cumulative.x - tests_cumulative.y,
-      new_tests.x
-    )) %>%
-    dplyr::mutate(tests_cumulative = if_else(is.na(tests_cumulative.x),
-      new_tests.x + tests_cumulative.y,
-      tests_cumulative.x
-    )) %>%
-    dplyr::mutate(new_tests_corrected = if_else(new_tests.x < 0,
-      new_tests_corrected.x,
-      new_tests
-    )) %>%
-    dplyr::mutate(tests_cumulative_corrected = if_else(new_tests.x < 0,
-      tests_cumulative_corrected.x,
-      tests_cumulative
-    )) %>%
-    dplyr::rename(date = date.x, source = source.x) %>%
-    dplyr::select(
-      country, tests_cumulative, new_tests,
-      tests_cumulative_corrected, new_tests_corrected, date, source
-    )
-
-  return(data_number_tests)
-}
-
 # written by Anna
 #' @importFrom data.table data.table rbindlist
 smooth_new_tests <- function(x, y) {

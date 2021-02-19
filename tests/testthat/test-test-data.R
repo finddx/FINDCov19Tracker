@@ -1,27 +1,19 @@
-test_that("get_daily_test_data() works as expected", {
-  get_daily_test_data()
+test_that("get_test_data() works as expected", {
+  automated <- get_test_data(write = FALSE)
 
-  countries_error <- read.csv("countries-error.csv")
-  expect_s3_class(countries_error, "data.frame")
+  today <- format(Sys.time(), "%Y-%m-%d")
 
-  automated <- readr::read_csv("automated-tests.csv",
-    col_types = cols(
-      country = col_character(),
-      tests_cumulative = col_double(),
-      new_tests = col_double(),
-      date = col_date(format = ""),
-      source = col_character()
-    ),
-    quoted_na = FALSE
-  )
-  expect_s3_class(automated, "data.frame")
-  expect_named(automated, c(
+  expect_s3_class(automated[["countries_error"]], "data.frame")
+
+  expect_s3_class(automated[["test_combined"]], "data.frame")
+  expect_named(automated[["test_combined"]], c(
     "country", "tests_cumulative",
     "new_tests", "tests_cumulative_corrected", "new_tests_corrected",
      "date", "source"
   ), ignore.order = TRUE)
-  unlink("automated-tests.csv")
-  unlink("countries-error.csv")
+
+  expect_equal(unique(automated[["test_combined"]]$date), as.Date(today))
+
 })
 
 test_that("calc_manual_countries() works as expected", {
