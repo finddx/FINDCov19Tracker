@@ -35,7 +35,7 @@ calc_manual_countries <- function() {
   countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
     col_types = cols(
       country = col_character(),
-      #date = col_date(format = ""),
+      date = col_date(format = ""),
       source = col_character()
     ),
     quoted_na = FALSE
