@@ -173,6 +173,30 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   window_update <- seq(first_date, as.Date(today), by = "days")
 
+  # read list of all countries
+  countries_all <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    cols(
+      country = col_character(),
+      jhu_ID = col_character(),
+      source = col_character(),
+      `alternative link` = col_character(),
+      type = col_character(),
+      data_url = col_character(),
+      date_format = col_character(),
+      xpath_cumul = col_character(),
+      xpath_new = col_character(),
+      backlog = col_character(),
+      comment = col_character(),
+      status = col_character()
+    ),
+    col_names = TRUE, quoted_na = FALSE
+  ) %>% # nolint
+    dplyr::select(jhu_ID) %>%
+    dplyr::rename(country = jhu_ID) %>%
+    merge(window_update) %>%
+    rename(date = y)
+
   selenium_list <- sprintf(
     "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", # nolint
     window_update
@@ -246,8 +270,8 @@ get_test_data <- function(days = 1, write = TRUE) {
         )
     },
     error = function(cond) {
-      cli::cli_alert_info("Any file founded in folder manual/processed for the
-              input days. Ignoring uploaded manual tests.", wrap = TRUE)
+      cli::cli_alert_info("No file found in folder manual/processed for last {days} days. Ignoring
+                          manual test files for these days.", wrap = TRUE)
       return(NULL)
     }
   )
@@ -256,20 +280,17 @@ get_test_data <- function(days = 1, write = TRUE) {
     selenium_tests_daily, fetch_tests_daily,
     manual_tests_daily
   ) %>%
-    # Preserving name for Lao and Palestin
-    dplyr::mutate(country = if_else(country == "OccupiedPalestinianterritory",
-      "occupiedPalestinianterritory",
-      country
-    )) %>%
-    dplyr::mutate(country = if_else(country == "LaoPeoplesDemoraticRepublic",
-      "LaoPeople'sDemocraticRepublic",
-      country
-    )) %>%
     # keeping only manual source when there is multiple
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country, date) %>%
     dplyr::filter(n() == 1 | source == "manually") %>%
-    dplyr::ungroup() %>%
+    dplyr::ungroup()
+
+  # If manual files are not uploaded test_combined doesn't have those countries
+  # Ensure all countries are in the ouptut even the manual ones
+  test_combined_all_countries <- countries_all %>%
+    left_join(test_combined) %>%
+    arrange(country, date) %>%
     # calculating tests_cumulative when new_tests is available
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
@@ -303,7 +324,7 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   # Splitting combined data frame in data frame per days
   # to write files in folder automated/merged
-  test_combined_split <- test_combined %>%
+  test_combined_split <- test_combined_all_countries %>%
     dplyr::group_split(date)
 
   if (write == TRUE) {
@@ -315,7 +336,7 @@ get_test_data <- function(days = 1, write = TRUE) {
   }
 
   # get countries with NA (these errored during scraping)
-  countries_error <- test_combined %>%
+  countries_error <- test_combined_all_countries %>%
     dplyr::filter(is.na(tests_cumulative_corrected) | new_tests_corrected < 0) %>%
     dplyr::select(country, date, source)
 
