@@ -10,67 +10,100 @@
 #' @importFrom utils tail
 #' @export
 process_test_data <- function() {
-  fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
-    owner = "dsbbfinddx",
-    repo = "FINDCov19TrackerData",
-    access_token = gh::gh_token()
-  )
-  filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
-    stringr::str_subset(., "coronavirus_tests_[0-9]{8}_sources_SO.csv") %>%
-    stringr::str_remove(., "data/")
 
-  most_recent <- utils::tail(filelist, 1)
-
-  today <- format(Sys.time(), format = "%Y%m%d")
-
-  # always read the file with the latest date - approaches using the latest
-  # modification timestamp caused troubles in the past
-  cv_tests <- suppressWarnings(
-    readr::read_delim(sprintf(
-      "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/%s",
-      most_recent
-    ),
-    col_types = readr::cols(),
-    delim = ";"
+  # read list of all countries
+  cv_tests <- readr::read_csv(
+  "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv",
+  cols(
+    country = col_character(),
+    tests_cumulative = col_double(),
+    new_tests = col_double(),
+    tests_cumulative_corrected = col_double(),
+    new_tests_corrected = col_double(),
+    date = col_date(format = ""),
+    source = col_character()
+  ),
+  col_names = TRUE, quoted_na = FALSE
+) %>% # nolint
+  dplyr::arrange(country, date) %>%
+  dplyr::rename(jhu_ID = country) %>%
+  dplyr::mutate(jhu_ID = if_else(jhu_ID == "LaoPeoplesDemocraticRepublic",
+    "Laos",
+    jhu_ID
+  )) %>%
+  dplyr::mutate(jhu_ID = if_else(jhu_ID == "OccupiedPalestinianterritory",
+    "occupiedPalestinianterritory",
+    jhu_ID
+  )) %>%
+  dplyr::mutate(jhu_ID = if_else(jhu_ID == "UnitedRepublicofTanzania",
+    "Tanzania",
+    jhu_ID
+  )) %>%
+  dplyr::mutate(
+    jhu_ID = if_else(jhu_ID == "Saint Lucia",
+      "SaintLucia",
+      jhu_ID
     )
   )
 
-  cli::cli_alert_info("{.fun process_test_data}: Processing information for {.field {most_recent}}.")
-
-  # remove empty "ind" and "X" columns
-  cv_tests %<>%
-    dplyr::select(-ind, -X)
-
-  # tests file is ok, go on with the update
-  cv_tests$date <- as.Date(cv_tests$date,
-    tryFormats = c("%d.%m.%y", "%d/%m/%Y", "%Y/%m/%d", "%Y-%m-%d")
-  )
+  # prevent issues in DT with non ascii characters in URL
+  cv_tests$source <- iconv(cv_tests$source, from = "ISO8859-1", to = "UTF-8")
 
   # be sure no NA in new_tests field
   cv_tests$new_tests <- ifelse(is.na(cv_tests$new_tests), 0, cv_tests$new_tests)
   cli::cli_alert("total count of new tests: {sum(cv_tests$new_tests)}.")
 
-  # prevent issues in DT with non ascii characters in URL
-  cv_tests$source <- iconv(cv_tests$source, from = "ISO8859-1", to = "UTF-8")
-
-  # import data
-  # coronavirus_cases.csv is created by process_jhu_data()
+  # be sure no NA in tests_cumulative field
+  cv_tests <- cv_tests %>%
+    dplyr::arrange(jhu_ID, date) %>%
+    dplyr::group_by(jhu_ID) %>%
+    dplyr::mutate(tests_cumulative = if_else(dplyr::row_number() != 1 &
+      is.na(tests_cumulative) &
+      !is.na(new_tests),
+    dplyr::lag(tests_cumulative) + new_tests,
+    tests_cumulative
+    )) %>%
+    # When there's negative values, taking into account the last date
+    dplyr::ungroup() %>%
+    dplyr::arrange(jhu_ID, date) %>%
+    dplyr::group_by(jhu_ID) %>%
+    dplyr::mutate(tests_cumulative = if_else(new_tests < 0,
+      dplyr::lag(tests_cumulative),
+      tests_cumulative
+    )) %>%
+    dplyr::mutate(new_tests = if_else(new_tests < 0,
+      0,
+      new_tests
+    )) %>%
+    dplyr::ungroup() %>%
+    # populating corrected columns
+    dplyr::mutate(
+      new_tests_corrected = if_else((is.na(new_tests_corrected) |
+                                       new_tests_corrected < 0),
+      new_tests,
+      new_tests_corrected
+    )) %>%
+    dplyr::mutate(tests_cumulative_corrected = if_else(is.na(tests_cumulative_corrected),
+      tests_cumulative,
+      tests_cumulative_corrected
+    )) %>%
+    dplyr::arrange(date, jhu_ID)
 
   # coronavirus_cases.csv needs to be updated before coronavirus_test.csv
   if (!file.exists("processed/coronavirus_tests.csv") ||
-    file.mtime("processed/coronavirus_cases.csv") > file.mtime("processed/coronavirus_tests.csv")
+      file.mtime("processed/coronavirus_cases.csv") > file.mtime("processed/coronavirus_tests.csv")
   ) {
     process_jhu_data()
   }
   cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
   countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
-    col_types = readr::cols(), quoted_na = FALSE
+                                                col_types = readr::cols(), quoted_na = FALSE
   ))
 
   # check consistency of country names across datasets
   countries_without_coordinates <- setdiff(
-    unique(cv_tests$country),
-    unique(countries$country)
+    unique(cv_tests$jhu_ID),
+    unique(countries$jhu_ID)
   )
 
   if (length(countries_without_coordinates) > 0) {
@@ -81,49 +114,8 @@ process_test_data <- function() {
     )
   }
 
-  cv_cases_max_date <- max(cv_cases$date)
-  cv_tests_max_date <- max(cv_tests$date)
-  cv_max_date <- max(c(cv_cases_max_date, cv_tests_max_date))
-
-  cv_tests_sum <-  cv_tests %>%
-    dplyr::group_by(country) %>%
-    dplyr::mutate(max_date = max(date)) %>%
-    dplyr::filter(date == max_date) %>%
-    plyr::mutate(max_date = date) %>%
-    dplyr::mutate(last_tests_cum = tests_cumulative) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(date, country, last_tests_cum, jhu_ID)
-
-  cv_tests_summ_missing <- subset(cv_tests_sum, date < cv_max_date)
-
-  if (length(cv_tests_summ_missing$country >= 1)) {
-    cli::cli_alert_info("{.fun process_test_data}: Adding new tests data information to
-        {.file coronavirus_tests.csv} for countries:", wrap = TRUE)
-    cli::cli_ul(cv_tests_summ_missing$country)
-  }
-  cv_tests_added <- purrr::map(cv_tests_summ_missing$country, ~ {
-    df <- subset(cv_tests_sum, country == .x)
-    dates <- seq(lubridate::ymd(df$date) + 1,
-      lubridate::ymd(cv_max_date),
-      by = "day"
-    )
-    df_add <- data.frame(
-      ind = "", country = df$country, date = dates,
-      new_tests = rep(0, length(dates)),
-      tests_cumulative = rep(df$last_tests_cum, length(dates)),
-      jhu_ID = df$jhu_ID
-    )
-  })
-
-  cv_tests_added <- dplyr::bind_rows(cv_tests_added)
-
-  cv_tests_new <- cv_tests %>%
-    dplyr::bind_rows(cv_tests_added)
-
-  cv_test_new_neg <- subset(cv_tests_new, new_tests_corrected < 0)
-
-  if (nrow(cv_test_new_neg) > 0) {
-    readr::write_csv(cv_test_new_neg, "issues/coronavirus_tests_new_negative.csv")
+  if (nrow(cv_tests[cv_tests$new_tests_corrected < 0,]) > 0) {
+    readr::write_csv(cv_test_new_neg, "coronavirus_tests_new_negative.csv")
     cli::cli_alert_danger("Found negative test values.")
     print(cv_test_new_neg)
     # mailR::send.mail(
@@ -139,9 +131,10 @@ process_test_data <- function() {
     #   send = TRUE
     # )
   } else {
-    readr::write_csv(cv_tests_new, "processed/coronavirus_tests.csv")
+    readr::write_csv(cv_tests, "processed/coronavirus_tests.csv")
   }
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
+
 }
 
 #' Get tests from different sources (Selenium, fetch, and manual) and combine them.
