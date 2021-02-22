@@ -12,6 +12,28 @@
 process_test_data <- function() {
 
   # read list of all countries
+  countries_all <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    cols(
+      country = col_character(),
+      jhu_ID = col_character(),
+      source = col_character(),
+      `alternative link` = col_character(),
+      type = col_character(),
+      data_url = col_character(),
+      date_format = col_character(),
+      xpath_cumul = col_character(),
+      xpath_new = col_character(),
+      backlog = col_character(),
+      comment = col_character(),
+      status = col_character()
+    ),
+    col_names = TRUE, quoted_na = FALSE
+  ) %>% # nolint
+    dplyr::select(country, jhu_ID, source) %>%
+    dplyr::rename(url = source)
+
+  # read test data combining Scrape, fetch, and manual data
   cv_tests <- readr::read_csv(
   "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv",
   cols(
@@ -27,24 +49,22 @@ process_test_data <- function() {
 ) %>% # nolint
   dplyr::arrange(country, date) %>%
   dplyr::rename(jhu_ID = country) %>%
+  dplyr::left_join(countries_all) %>%
+  # Keeping the country names coronavirus_tests.csv had
   dplyr::mutate(jhu_ID = if_else(jhu_ID == "LaoPeoplesDemocraticRepublic",
-    "Laos",
+    "LaoPeople'sDemocraticRepublic",
     jhu_ID
   )) %>%
   dplyr::mutate(jhu_ID = if_else(jhu_ID == "OccupiedPalestinianterritory",
     "occupiedPalestinianterritory",
     jhu_ID
   )) %>%
-  dplyr::mutate(jhu_ID = if_else(jhu_ID == "UnitedRepublicofTanzania",
-    "Tanzania",
-    jhu_ID
-  )) %>%
-  dplyr::mutate(
-    jhu_ID = if_else(jhu_ID == "Saint Lucia",
-      "SaintLucia",
-      jhu_ID
-    )
-  )
+  # joining source(url) only since automated Selenium workflow implemented
+  dplyr::mutate(source = if_else(date >= as.Date("2021-02-18"),
+    url,
+    source)) %>%
+  dplyr::select(-url)
+
 
   # prevent issues in DT with non ascii characters in URL
   cv_tests$source <- iconv(cv_tests$source, from = "ISO8859-1", to = "UTF-8")
@@ -63,31 +83,45 @@ process_test_data <- function() {
     dplyr::lag(tests_cumulative) + new_tests,
     tests_cumulative
     )) %>%
+    # populating tests_cumulative_corrected and new_tests_corrected
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      new_tests_corrected = if_else(is.na(new_tests_corrected),
+                                    new_tests,
+                                    new_tests_corrected
+      )) %>%
+    dplyr::mutate(tests_cumulative_corrected = if_else(is.na(tests_cumulative_corrected),
+                                                       tests_cumulative,
+                                                       tests_cumulative_corrected
+    )) %>%
     # When there's negative values, taking into account the last date
+    # and no negative values in tests_cumulative_corrected and new_tests_corrected
     dplyr::ungroup() %>%
     dplyr::arrange(jhu_ID, date) %>%
     dplyr::group_by(jhu_ID) %>%
-    dplyr::mutate(tests_cumulative = if_else(new_tests < 0,
-      dplyr::lag(tests_cumulative),
-      tests_cumulative
+    #date since started negative values
+    dplyr::mutate(date_change = if_else(
+      new_tests_corrected < 0,
+      date,
+      max(date)
     )) %>%
-    dplyr::mutate(new_tests = if_else(new_tests < 0,
+    dplyr::mutate(date_negative = min(date_change)) %>%
+    dplyr::mutate(new_tests_corrected = if_else(
+      date >= date_negative,
       0,
       new_tests
     )) %>%
+    dplyr::group_by(jhu_ID) %>%
+    dplyr::mutate(tests_cumulative_corrected = if_else(
+      date >= date_negative,
+      max(tests_cumulative),
+      tests_cumulative
+    )) %>%
     dplyr::ungroup() %>%
-    # populating corrected columns
-    dplyr::mutate(
-      new_tests_corrected = if_else((is.na(new_tests_corrected) |
-                                       new_tests_corrected < 0),
-      new_tests,
-      new_tests_corrected
-    )) %>%
-    dplyr::mutate(tests_cumulative_corrected = if_else(is.na(tests_cumulative_corrected),
-      tests_cumulative,
-      tests_cumulative_corrected
-    )) %>%
-    dplyr::arrange(date, jhu_ID)
+    dplyr::arrange(jhu_ID, date) %>%
+    dplyr::select(-date_change, -date_negative) %>%
+    dplyr::relocate(country,date,new_tests,tests_cumulative,
+      jhu_ID,source,new_tests_corrected,tests_cumulative_corrected)
 
   # coronavirus_cases.csv needs to be updated before coronavirus_test.csv
   if (!file.exists("processed/coronavirus_tests.csv") ||
@@ -102,8 +136,8 @@ process_test_data <- function() {
 
   # check consistency of country names across datasets
   countries_without_coordinates <- setdiff(
-    unique(cv_tests$jhu_ID),
-    unique(countries$jhu_ID)
+    unique(cv_tests$country),
+    unique(countries$country)
   )
 
   if (length(countries_without_coordinates) > 0) {
@@ -282,15 +316,14 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::filter(n() == 1 | source == "manually") %>%
     dplyr::ungroup()
 
-  # If manual files are not uploaded test_combined doesn't have those countries
-  # Ensure all countries are in the ouptut even the manual ones
   test_combined_all_countries <- countries_all %>%
     left_join(test_combined) %>%
     arrange(country, date) %>%
     # calculating tests_cumulative when new_tests is available
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
-    dplyr::mutate(tests_cumulative = if_else(dplyr::row_number() != 1 &
+    dplyr::mutate(tests_cumulative = if_else(
+      dplyr::row_number() != 1 &
       is.na(tests_cumulative) &
       !is.na(new_tests),
     dplyr::lag(tests_cumulative) + new_tests,
@@ -300,22 +333,25 @@ get_test_data <- function(days = 1, write = TRUE) {
     # calculating new_tests
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
-    dplyr::mutate(new_tests = if_else(dplyr::row_number() != 1,
+    dplyr::mutate(new_tests = if_else(
+      dplyr::row_number() != 1,
       tests_cumulative - dplyr::lag(tests_cumulative),
       new_tests
     )) %>%
     dplyr::ungroup() %>%
     # populating corrected columns
-    dplyr::mutate(new_tests_corrected = if_else(is.na(new_tests_corrected),
+    dplyr::mutate(new_tests_corrected = if_else(
+      is.na(new_tests_corrected),
       new_tests,
       new_tests_corrected
     )) %>%
-    dplyr::mutate(tests_cumulative_corrected = if_else(is.na(tests_cumulative_corrected),
+    dplyr::mutate(tests_cumulative_corrected = if_else(
+      is.na(tests_cumulative_corrected),
       tests_cumulative,
       tests_cumulative_corrected
     )) %>%
-    dplyr::arrange(date, country) %>%
-    # First date is not updated is just used to calculate new test
+    dplyr::arrange(country, date) %>%
+    # First date is not updated is just used to calculate new_tests
     filter(date != first_date)
 
   # Splitting combined data frame in data frame per days
