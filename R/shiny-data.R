@@ -99,19 +99,13 @@ create_shiny_data <- function() {
 
   cv_tests <-
     cv_tests_raw %>%
-    rename(name = jhu_ID) %>%
+    rename(name = country) %>%
     fuzzyjoin::regex_left_join(iso_country,
       by = c("name" = "regex"),
       ignore_case = TRUE
     ) %>%
     mutate(country = case_when(
       name == "Kosovo" ~ "XK",
-      name == "CentralAfricanRepublic" ~ "CF",
-      name == "DominicanRepublic" ~ "DO",
-      name == "RepublicofKorea" ~ "KR",
-      name == "SaintLucia" ~ "LC",
-      name == "WesternSahara" ~ "EH",
-      name == "SouthAfrica" ~ "EH",
       TRUE ~ country
     )) %>%
     # drop non countries
