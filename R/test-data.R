@@ -99,9 +99,9 @@ process_test_data <- function() {
     dplyr::ungroup() %>%
     dplyr::arrange(jhu_ID, date) %>%
     dplyr::group_by(jhu_ID) %>%
-    #date since started negative values
+    #date since started negative values after the implementation of selenium workflow
     dplyr::mutate(date_change = if_else(
-      new_tests_corrected < 0,
+      new_tests_corrected < 0 & date >= as.Date("2021-02-15"),
       date,
       max(date)
     )) %>%
@@ -109,13 +109,13 @@ process_test_data <- function() {
     dplyr::mutate(new_tests_corrected = if_else(
       date >= date_negative,
       0,
-      new_tests
+      new_tests_corrected
     )) %>%
     dplyr::group_by(jhu_ID) %>%
     dplyr::mutate(tests_cumulative_corrected = if_else(
       date >= date_negative,
       max(tests_cumulative),
-      tests_cumulative
+      tests_cumulative_corrected
     )) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(jhu_ID, date) %>%
@@ -147,6 +147,8 @@ process_test_data <- function() {
       wrap = TRUE
     )
   }
+
+  cv_test_new_neg <- subset(cv_tests, new_tests_corrected < 0)
 
   if (nrow(cv_tests[cv_tests$new_tests_corrected < 0,]) > 0) {
     readr::write_csv(cv_test_new_neg, "coronavirus_tests_new_negative.csv")
