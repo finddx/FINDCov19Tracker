@@ -40,9 +40,9 @@
 
 
 <meta property="og:title" content="Postprocess tests data for input into Shiny App — process_test_data" />
-<meta property="og:description" content="During the process, coronavirus_cases.csv (case data) is read and used.
-This file is created/updated by process_jhu_data() which needs to be run
-before." />
+<meta property="og:description" content="Creates coronavirus_cases.csv, based on coronavirus_cases_new.csv.
+coronavirus_cases_new.csv combines different sources (Selenium, fetch, and manual),
+and might have NA or negative values for new_test_corrected." />
 
 
 
@@ -116,17 +116,24 @@ before." />
     </div>
 
     <div class="ref-description">
-    <p>During the process, <code>coronavirus_cases.csv</code> (case data) is read and used.
-This file is created/updated by <code><a href='process_jhu_data.html'>process_jhu_data()</a></code> which needs to be run
-before.</p>
+    <p>Creates <code>coronavirus_cases.csv</code>, based on <code>coronavirus_cases_new.csv</code>.
+<code>coronavirus_cases_new.csv</code> combines different sources (Selenium, fetch, and manual),
+and might have NA or negative values for new_test_corrected.</p>
     </div>
 
     <pre class="usage"><span class='fu'>process_test_data</span><span class='op'>(</span><span class='op'>)</span></pre>
 
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Writes <code>coronavirus_tests.csv</code></p>
+    <p>This file is created/updated by <code><a href='process_jhu_data.html'>process_jhu_data()</a></code> which needs to be run
+before.
+<strong>Input:</strong> test data combined from different sources (Selenium, fetch, and manual)<a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/automated/coronavirus_tests_new.csv'><code>automated/coronavirus_tests_new.csv</code></a>.</p>
+<p>#'   <strong>Output:</strong></p><ul>
+<li><p><code>coronavirus_cases.csv</code></p></li>
+</ul>
+
+<p>which is then deployed by CI to the <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/processed'><code>processed/</code></a> directory in the <code>dsbbfinddx/FINDCov19TrackerData</code> repo.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
