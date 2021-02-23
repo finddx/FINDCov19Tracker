@@ -40,9 +40,11 @@
 
 
 <meta property="og:title" content="Find and write countries which need manual processing — calc_manual_countries" />
-<meta property="og:description" content="This functions reads the list of automated countries via
-Selenium and R fetch functions and calculates which countries still need
-manual processing." />
+<meta property="og:description" content="This functions reads the file with errors for the current date in the folder issues,
+and generates a template for the current day in manual/need-processing/.
+This process updates the file -need-manual-processing.csv only for the current day.
+To see if there are errors for past dates check the folder issues
+For the automated countries with error test_cumulative is set to 0 in the templates manual/need-processing/." />
 
 
 
@@ -116,9 +118,11 @@ manual processing." />
     </div>
 
     <div class="ref-description">
-    <p>This functions reads the list of <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/manual/countries-urls.csv'>automated countries</a> via
-Selenium and R fetch functions and calculates which countries still need
-manual processing.</p>
+    <p>This functions reads the file with errors for the current date in the folder <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues'>issues</a>,
+and generates a template for the current day in <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/need-processing'>manual/need-processing/</a>.</p>
+<p>This process updates the file <code>-need-manual-processing.csv</code> <em>only</em> for the current day.
+To see if there are errors for past dates check the folder <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues'>issues</a></p>
+<p>For the automated countries with error <code>test_cumulative</code> is set to 0 in the templates <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/need-processing'>manual/need-processing/</a>.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calc_manual_countries</span><span class='op'>(</span><span class='op'>)</span></pre>
