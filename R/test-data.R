@@ -402,7 +402,6 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::group_by(country) %>%
     dplyr::mutate(new_tests = if_else(
       dplyr::row_number() != 1 &
-        is.na(new_tests) &
         !is.na(tests_cumulative) &
         !is.na(dplyr::lag(tests_cumulative)),
       tests_cumulative - dplyr::lag(tests_cumulative),
