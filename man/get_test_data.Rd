@@ -2,10 +2,8 @@
 % Please edit documentation in R/test-data.R
 \name{get_test_data}
 \alias{get_test_data}
-\title{When manual countries have not been updated,
-\code{coronavirus_cases_new.csv} has NA for tests_cumulative and new_tests.
-When selenium process failed, \code{coronavirus_cases_new.csv} might have negative values or NA
-in new_tests and new_tests_corrected variables, and those values have not been corrected manually.}
+\title{Get tests from different sources (Selenium, fetch, and manual) and combine them.
+Using the parameter \code{days}, all files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.}
 \usage{
 get_test_data(days = 1, write = TRUE)
 }
@@ -27,9 +25,16 @@ get_test_data(days = 1, write = TRUE)
 which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
 }
 \details{
-Get tests from different sources (Selenium, fetch, and manual) and combine them.
-Using the parameter \code{days}, all files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.
+#' When manual countries have not been updated,
+\code{coronavirus_cases_new.csv} has \code{NA} for tests_cumulative and new_tests.
+When selenium or fetch process failed and those values have not been corrected manually,
+\code{coronavirus_cases_new.csv} might have negative values or NA in new_tests and new_tests_corrected variables.
+
 Countries with negative values or \code{NA} are listed as well given the \code{days} input in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues}{\verb{issues/}}.
+
+Parameter days allows to update past dates using manual files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/processed}{manual/processed/}; except for dates on "2021-02-18" or before.
+It allows to update from "2021-02-19" when the automatic workflow was implemented.
+To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged/}.
 }
 \examples{
 get_test_data(days = 8, write = FALSE)

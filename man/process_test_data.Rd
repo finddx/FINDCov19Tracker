@@ -9,7 +9,7 @@ process_test_data()
 \description{
 Creates \code{coronavirus_cases.csv}, based on \code{coronavirus_cases_new.csv}.
 \code{coronavirus_cases_new.csv} combines different sources (Selenium, fetch, and manual),
-and might have NA or negative values for new_test_corrected.
+and might have \code{NA} or negative values for new_test_corrected.
 }
 \details{
 This file is created/updated by \code{process_jhu_data()} which needs to be run

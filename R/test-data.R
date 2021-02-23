@@ -2,7 +2,7 @@
 #'
 #' Creates `coronavirus_cases.csv`, based on `coronavirus_cases_new.csv`.
 #' `coronavirus_cases_new.csv` combines different sources (Selenium, fetch, and manual),
-#' and might have NA or negative values for new_test_corrected.
+#' and might have `NA` or negative values for new_test_corrected.
 #'
 #' This file is created/updated by `process_jhu_data()` which needs to be run
 #' before.
@@ -93,11 +93,12 @@ process_test_data <- function() {
                                     new_tests,
                                     new_tests_corrected
       )) %>%
-    dplyr::mutate(tests_cumulative_corrected = if_else(is.na(tests_cumulative_corrected),
-                                                       tests_cumulative,
-                                                       tests_cumulative_corrected
+    dplyr::mutate(tests_cumulative_corrected = if_else(
+      is.na(tests_cumulative_corrected),
+      tests_cumulative,
+      tests_cumulative_corrected
     )) %>%
-    # recalculating new_tests after filling tests_cumulative and after implementation of wrokflow
+    # recalculating new_tests after filling tests_cumulative and after implementation of workflow
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
     dplyr::mutate(new_tests = if_else(
@@ -135,8 +136,8 @@ process_test_data <- function() {
     dplyr::ungroup() %>%
     dplyr::arrange(jhu_ID, date) %>%
     dplyr::select(-date_change, -date_negative) %>%
-    dplyr::relocate(country,date,new_tests,tests_cumulative,
-      jhu_ID,source,new_tests_corrected,tests_cumulative_corrected)
+    dplyr::relocate(country, date, new_tests, tests_cumulative,
+      jhu_ID, source, new_tests_corrected, tests_cumulative_corrected)
 
   # coronavirus_cases.csv needs to be updated before coronavirus_test.csv
   if (!file.exists("processed/coronavirus_tests.csv") ||
@@ -146,7 +147,7 @@ process_test_data <- function() {
   }
   cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
   countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
-                                                col_types = readr::cols(), quoted_na = FALSE
+    col_types = readr::cols(), quoted_na = FALSE
   ))
 
   # check consistency of country names across datasets
@@ -165,7 +166,7 @@ process_test_data <- function() {
 
   cv_test_new_neg <- subset(cv_tests, new_tests_corrected < 0)
 
-  if (nrow(cv_tests[cv_tests$new_tests_corrected < 0,]) > 0) {
+  if (nrow(cv_tests[cv_tests$new_tests_corrected < 0, ]) > 0) {
     readr::write_csv(cv_test_new_neg, "coronavirus_tests_new_negative.csv")
     cli::cli_alert_danger("Found negative test values.")
     print(cv_test_new_neg)
@@ -189,16 +190,20 @@ process_test_data <- function() {
 }
 
 
-#' When manual countries have not been updated,
-#' `coronavirus_cases_new.csv` has NA for tests_cumulative and new_tests.
-#' When selenium process failed, `coronavirus_cases_new.csv` might have negative values or NA
-#' in new_tests and new_tests_corrected variables, and those values have not been corrected manually.
-#'
-
-
 #' Get tests from different sources (Selenium, fetch, and manual) and combine them.
 #' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
+#'
+#' #' When manual countries have not been updated,
+#' `coronavirus_cases_new.csv` has `NA` for tests_cumulative and new_tests.
+#' When selenium or fetch process failed and those values have not been corrected manually,
+#' `coronavirus_cases_new.csv` might have negative values or NA in new_tests and new_tests_corrected variables.
+#'
 #' Countries with negative values or `NA` are listed as well given the `days` input in the folder [`issues/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues).
+#'
+#' Parameter days allows to update past dates using manual files in [manual/processed/](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/processed); except for dates on "2021-02-18" or before.
+#' It allows to update from "2021-02-19" when the automatic workflow was implemented.
+#' To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder [automated/merged/](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged).
+#'
 #' @description
 #'   **Input:** Daily test data scraped via Selenium and "R fetch functions" from
 #'   [`automated/fetch`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
@@ -223,7 +228,30 @@ get_test_data <- function(days = 1, write = TRUE) {
   # it includes the day before to retrieve this date and calculate tests for day 1
   first_date <- as.Date(today) - days
 
-  window_update <- seq(first_date, as.Date(today), by = "days")
+  if (first_date <= as.Date("2021-02-18")) {
+    # Due to the implementation of automated workflow
+    warning("Changes on 2021-02-18 or before, should made directly in automated/merged")
+    first_date <- as.Date("2021-02-18")
+    window_update <- seq(first_date, as.Date(today), by = "days")
+    # Given the implementation of the automated workflow on "2021-02-19"
+    # The process should not take data from selenium or fetch on "2021-02-18"
+    data_2021_02_18 <- readr::read_csv(
+        "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/2021-02-18-automated-tests.csv", # nolint
+        cols(
+          country = col_character(),
+          tests_cumulative = col_double(),
+          new_tests = col_double(),
+          tests_cumulative_corrected = col_double(),
+          new_tests_corrected = col_double(),
+          date = col_date(format = ""),
+          source = col_character()
+        ),
+        col_names = TRUE, quoted_na = FALSE
+      ) %>%
+      dplyr::mutate(source = "manually")
+  } else {
+    window_update <- seq(first_date, as.Date(today), by = "days")
+  }
 
   # read list of all countries
   countries_all <- readr::read_csv(
@@ -331,15 +359,28 @@ get_test_data <- function(days = 1, write = TRUE) {
     }
   )
 
-  test_combined <- dplyr::bind_rows(
-    selenium_tests_daily, fetch_tests_daily,
-    manual_tests_daily
-  ) %>%
-    # keeping only manual source when there is multiple
-    dplyr::arrange(country, date) %>%
-    dplyr::group_by(country, date) %>%
-    dplyr::filter(n() == 1 | source == "manually") %>%
-    dplyr::ungroup()
+  if (first_date == as.Date("2021-02-18")) {
+    test_combined <- dplyr::bind_rows(
+      selenium_tests_daily, fetch_tests_daily,
+      manual_tests_daily, data_2021_02_18
+    ) %>%
+      # keeping only manual source when there is multiple
+      dplyr::arrange(country, date) %>%
+      dplyr::group_by(country, date) %>%
+      dplyr::filter(n() == 1 | source == "manually") %>%
+      dplyr::ungroup()
+  } else {
+    test_combined <- dplyr::bind_rows(
+      selenium_tests_daily, fetch_tests_daily,
+      manual_tests_daily
+    ) %>%
+      # keeping only manual source when there is multiple
+      dplyr::arrange(country, date) %>%
+      dplyr::group_by(country, date) %>%
+      dplyr::filter(n() == 1 | source == "manually") %>%
+      dplyr::ungroup()
+  }
+
 
   test_combined_all_countries <- countries_all %>%
     left_join(test_combined) %>%
@@ -349,8 +390,9 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::group_by(country) %>%
     dplyr::mutate(tests_cumulative = if_else(
       dplyr::row_number() != 1 &
-      is.na(tests_cumulative) &
-      !is.na(new_tests),
+        is.na(tests_cumulative) &
+        !is.na(new_tests) &
+        !is.na(dplyr::lag(tests_cumulative)),
     dplyr::lag(tests_cumulative) + new_tests,
     tests_cumulative
     )) %>%
@@ -359,7 +401,10 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
     dplyr::mutate(new_tests = if_else(
-      dplyr::row_number() != 1,
+      dplyr::row_number() != 1 &
+        is.na(new_tests) &
+        !is.na(tests_cumulative) &
+        !is.na(dplyr::lag(tests_cumulative)),
       tests_cumulative - dplyr::lag(tests_cumulative),
       new_tests
     )) %>%
