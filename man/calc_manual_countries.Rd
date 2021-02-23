@@ -7,7 +7,11 @@
 calc_manual_countries()
 }
 \description{
-This functions reads the list of \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/manual/countries-urls.csv}{automated countries} via
-Selenium and R fetch functions and calculates which countries still need
-manual processing.
+This functions reads the file with errors for the current date in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues}{issues},
+and generates a template for the current day in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/need-processing}{manual/need-processing/}.
+
+This process updates the file \code{-need-manual-processing.csv} \emph{only} for the current day.
+To see if there are errors for past dates check the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues}{issues}
+
+For the automated countries with error \code{test_cumulative} is set to 0 in the templates \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/need-processing}{manual/need-processing/}.
 }
