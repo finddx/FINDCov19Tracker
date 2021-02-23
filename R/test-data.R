@@ -1,10 +1,17 @@
 #' Postprocess tests data for input into Shiny App
 #'
-#' During the process, `coronavirus_cases.csv` (case data) is read and used.
+#' Creates `coronavirus_cases.csv`, based on `coronavirus_cases_new.csv`.
+#' `coronavirus_cases_new.csv` combines different sources (Selenium, fetch, and manual),
+#' and might have NA or negative values for new_test_corrected.
+#'
 #' This file is created/updated by `process_jhu_data()` which needs to be run
 #' before.
+#'   **Input:** test data combined from different sources (Selenium, fetch, and manual)[`automated/coronavirus_tests_new.csv`](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/automated/coronavirus_tests_new.csv).
 #'
-#' @return Writes `coronavirus_tests.csv`
+#'#'   **Output:**
+#'   - `coronavirus_cases.csv`
+#'
+#'   which is then deployed by CI to the [`processed/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/processed) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
 #'
 #' @importFrom mailR send.mail
 #' @importFrom utils tail
@@ -60,7 +67,7 @@ process_test_data <- function() {
     jhu_ID
   )) %>%
   # joining source(url) only since automated Selenium workflow implemented
-  dplyr::mutate(source = if_else(date >= as.Date("2021-02-18"),
+  dplyr::mutate(source = if_else(date > as.Date("2021-02-18"),
     url,
     source)) %>%
   dplyr::select(-url)
@@ -76,15 +83,11 @@ process_test_data <- function() {
   # be sure no NA in tests_cumulative field
   cv_tests <- cv_tests %>%
     dplyr::arrange(jhu_ID, date) %>%
+    #  when tests_cumulative is NA filling with the last value
     dplyr::group_by(jhu_ID) %>%
-    dplyr::mutate(tests_cumulative = if_else(dplyr::row_number() != 1 &
-      is.na(tests_cumulative) &
-      !is.na(new_tests),
-    dplyr::lag(tests_cumulative) + new_tests,
-    tests_cumulative
-    )) %>%
-    # populating tests_cumulative_corrected and new_tests_corrected
+    tidyr::fill(tests_cumulative, .direction = "down") %>%
     dplyr::ungroup() %>%
+  # populating tests_cumulative_corrected and new_tests_corrected
     dplyr::mutate(
       new_tests_corrected = if_else(is.na(new_tests_corrected),
                                     new_tests,
@@ -94,14 +97,25 @@ process_test_data <- function() {
                                                        tests_cumulative,
                                                        tests_cumulative_corrected
     )) %>%
-    # When there's negative values, taking into account the last date
-    # and no negative values in tests_cumulative_corrected and new_tests_corrected
+    # recalculating new_tests after filling tests_cumulative and after implementation of wrokflow
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
+    dplyr::mutate(new_tests = if_else(
+      dplyr::row_number() != 1 & date > as.Date("2021-02-18"),
+      tests_cumulative - dplyr::lag(tests_cumulative),
+      new_tests
+    )) %>%
+    dplyr::mutate(new_tests_corrected = if_else(
+      dplyr::row_number() != 1 & date > as.Date("2021-02-18"),
+      tests_cumulative - dplyr::lag(tests_cumulative),
+      new_tests_corrected
+    )) %>%
     dplyr::ungroup() %>%
+    # When there's negative values, taking into account date when was negative
     dplyr::arrange(jhu_ID, date) %>%
     dplyr::group_by(jhu_ID) %>%
-    #date since started negative values after the implementation of selenium workflow
     dplyr::mutate(date_change = if_else(
-      new_tests_corrected < 0 & date >= as.Date("2021-02-15"),
+      new_tests_corrected < 0,
       date,
       max(date)
     )) %>%
@@ -111,6 +125,7 @@ process_test_data <- function() {
       0,
       new_tests_corrected
     )) %>%
+    dplyr::ungroup() %>%
     dplyr::group_by(jhu_ID) %>%
     dplyr::mutate(tests_cumulative_corrected = if_else(
       date >= date_negative,
@@ -172,6 +187,14 @@ process_test_data <- function() {
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 
 }
+
+
+#' When manual countries have not been updated,
+#' `coronavirus_cases_new.csv` has NA for tests_cumulative and new_tests.
+#' When selenium process failed, `coronavirus_cases_new.csv` might have negative values or NA
+#' in new_tests and new_tests_corrected variables, and those values have not been corrected manually.
+#'
+
 
 #' Get tests from different sources (Selenium, fetch, and manual) and combine them.
 #' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
