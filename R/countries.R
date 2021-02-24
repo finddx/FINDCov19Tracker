@@ -65,10 +65,10 @@ countries_manual_csv <- countries_error %>%
     tests_cumulative_corrected, new_tests_corrected,
     date, source, status, url
   ) %>%
-  dplyr::mutate(tests_cumulative = if_else(
-    status == "automated" & is.na(tests_cumulative),
+  dplyr::mutate(new_tests = if_else(
+    is.na(tests_cumulative) & is.na(new_tests),
     0,
-    tests_cumulative
+    new_tests
   ))
 
   # write csv
