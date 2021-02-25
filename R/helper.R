@@ -105,3 +105,24 @@ robust_rollmean <- function(x) {
 sum_basic <- function(x) {
   sum(x, na.rm = TRUE)
 }
+
+# Functions to calculate test_cumulative when new_test available
+calc_cumulative_t <- function(cumulative_t, new_t) {
+  for (i in 2:length(cumulative_t)) {
+    if (!is.na(new_t[i]) & is.na(cumulative_t[i])) {
+      cumulative_t[i] = cumulative_t[i-1] + new_t[i]
+    }
+  }
+  cumulative_t
+}
+
+# Functions to calculate new_test when test_cumulative available
+calc_new_t <- function(cumulative_t, new_t) {
+  for (i in 2:length(cumulative_t)) {
+    if (is.na(new_t[i]) & !is.na(cumulative_t[i])) {
+      new_t[i] = cumulative_t[i] - cumulative_t[i-1]
+    }
+  }
+  new_t
+}
+

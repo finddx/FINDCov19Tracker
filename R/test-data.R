@@ -383,29 +383,31 @@ get_test_data <- function(days = 1, write = TRUE) {
 
 
   test_combined_all_countries <- countries_all %>%
-    left_join(test_combined) %>%
-    arrange(country, date) %>%
-    # calculating tests_cumulative when new_tests is available
+    dplyr::left_join(test_combined) %>%
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
-    dplyr::mutate(tests_cumulative = if_else(
-      dplyr::row_number() != 1 &
-        is.na(tests_cumulative) &
-        !is.na(new_tests) &
-        !is.na(dplyr::lag(tests_cumulative)),
-    dplyr::lag(tests_cumulative) + new_tests,
-    tests_cumulative
-    )) %>%
+    # calculating tests_cumulative when new_tests is available
+    dplyr::mutate(tests_cumulative = calc_cumulative_t(
+      tests_cumulative,
+      new_tests)) %>%
+    # calculating new_tests when tests_cumulative is available
+    dplyr::mutate(new_tests = calc_new_t(tests_cumulative, new_tests)) %>%
     dplyr::ungroup() %>%
     # calculating new_tests
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
     dplyr::mutate(new_tests = if_else(
-      dplyr::row_number() != 1 &
-        !is.na(tests_cumulative) &
-        !is.na(dplyr::lag(tests_cumulative)),
+      dplyr::row_number() != 1 ,
       tests_cumulative - dplyr::lag(tests_cumulative),
       new_tests
+    )) %>%
+    # calculating test_cumulative
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
+    dplyr::mutate(tests_cumulative = if_else(
+      dplyr::row_number() != 1 ,
+      lag(tests_cumulative) + new_tests,
+      tests_cumulative
     )) %>%
     dplyr::ungroup() %>%
     # populating corrected columns
