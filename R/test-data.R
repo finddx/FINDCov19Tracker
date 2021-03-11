@@ -130,7 +130,7 @@ process_test_data <- function() {
     dplyr::group_by(jhu_ID) %>%
     dplyr::mutate(tests_cumulative_corrected = if_else(
       date >= date_negative,
-      max(tests_cumulative),
+      max(tests_cumulative_corrected, na.rm = FALSE),
       tests_cumulative_corrected
     )) %>%
     dplyr::ungroup() %>%
