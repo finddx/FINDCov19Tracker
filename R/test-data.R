@@ -284,7 +284,7 @@ get_test_data <- function(days = 1, write = TRUE) {
   selenium_tests <- rio::import_list(selenium_list, rbind = TRUE) %>%
     dplyr::mutate(source = "selenium") %>%
     dplyr::mutate(date = as.Date(date)) %>%
-    dplyr::select(-`_file`)
+    dplyr::select(-`_file`, -pcr_tests_cum, -rapid_test_cum)
   selenium_tests_clean <- clean_selenium(selenium_tests)
   selenium_tests_daily <- selenium_tests_clean %>%
     dplyr::mutate(new_tests = NA_real_) %>%
