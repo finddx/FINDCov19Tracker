@@ -17,6 +17,31 @@ clean_selenium <- function(data) {
   return(data_clean)
 }
 
+#' @importFrom stringr str_replace_all str_match
+clean_selenium_segregated <- function(data) {
+
+  data_clean <- data %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, ",", "")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\.", "")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, " ", "")) %>%
+    mutate(tests_cumulative = str_match(tests_cumulative, pattern = "\\d+")) %>%
+    mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, ",", "")) %>%
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, "\\.", "")) %>%
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, " ", "")) %>%
+    mutate(pcr_tests_cum = str_match(pcr_tests_cum, pattern = "\\d+")) %>%
+    mutate(pcr_tests_cum = as.numeric(pcr_tests_cum)) %>%
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, ",", "")) %>%
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, "\\.", "")) %>%
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, " ", "")) %>%
+    mutate(rapid_test_cum = str_match(rapid_test_cum, pattern = "\\d+")) %>%
+    mutate(rapid_test_cum = as.numeric(rapid_test_cum)) %>%
+    filter(!is.na(pcr_tests_cum) & !is.na(rapid_test_cum)) %>%
+    mutate(date = as.Date(date))
+
+  return(data_clean)
+}
+
 calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
   data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", lubridate::today() - 1), quoted_na = FALSE) %>% # nolint
     dplyr::filter(country == data$country)
