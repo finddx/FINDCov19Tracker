@@ -76,33 +76,35 @@ segregated_test_data <- function(days = 1, write = TRUE) {
   }
   selenium_tests_clean <- clean_selenium_segregated(selenium_tests)
   selenium_tests_daily <- selenium_tests_clean %>%
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
     dplyr::mutate(pcr_tests_new = if_else(
-      date == "2021-03-22",
+      row_number() == 1,
       pcr_tests_cum,
       NA_real_
     )) %>%
     dplyr::mutate(pcr_tests_cum_corrected = if_else(
-      date == "2021-03-22",
+      row_number() == 1,
       pcr_tests_cum,
       NA_real_
     )) %>%
     dplyr::mutate(pcr_tests_new_corrected = if_else(
-      date == "2021-03-22",
+      row_number() == 1,
       pcr_tests_cum,
       NA_real_
     )) %>%
     dplyr::mutate(rapid_test_new = if_else(
-      date == "2021-03-22",
+      row_number() == 1,
       rapid_test_cum,
       NA_real_
     )) %>%
     dplyr::mutate(rapid_test_cum_corrected = if_else(
-      date == "2021-03-22",
+      row_number() == 1,
       rapid_test_cum,
       NA_real_
     )) %>%
     dplyr::mutate(rapid_test_new_corrected = if_else(
-      date == "2021-03-22",
+      row_number() == 1,
       rapid_test_cum,
       NA_real_
     )) %>%
