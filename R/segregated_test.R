@@ -78,7 +78,7 @@ segregated_test_data <- function(days = 1, write = TRUE) {
   selenium_tests_daily <- selenium_tests_clean %>%
     dplyr::mutate(pcr_tests_new = if_else(
       date == "2021-03-22",
-      0,
+      pcr_tests_cum,
       NA_real_
     )) %>%
     dplyr::mutate(pcr_tests_cum_corrected = if_else(
@@ -88,12 +88,12 @@ segregated_test_data <- function(days = 1, write = TRUE) {
     )) %>%
     dplyr::mutate(pcr_tests_new_corrected = if_else(
       date == "2021-03-22",
-      0,
+      pcr_tests_cum,
       NA_real_
     )) %>%
     dplyr::mutate(rapid_test_new = if_else(
       date == "2021-03-22",
-      0,
+      rapid_test_cum,
       NA_real_
     )) %>%
     dplyr::mutate(rapid_test_cum_corrected = if_else(
@@ -103,7 +103,7 @@ segregated_test_data <- function(days = 1, write = TRUE) {
     )) %>%
     dplyr::mutate(rapid_test_new_corrected = if_else(
       date == "2021-03-22",
-      0,
+      rapid_test_cum,
       NA_real_
     )) %>%
     dplyr::relocate(
@@ -115,6 +115,8 @@ segregated_test_data <- function(days = 1, write = TRUE) {
 
 
   segregated_test <- selenium_tests_daily %>%
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
     # calculating tests_cumulative when new_tests is available
     dplyr::mutate(pcr_tests_cum = calc_cumulative_t(
       pcr_tests_cum,
