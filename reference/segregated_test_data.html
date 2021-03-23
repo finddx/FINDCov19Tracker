@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get tests from different sources (Selenium, fetch, and manual) and combine them.
-Using the parameter days, all files in automated/merged/ are updated for the last dates given the input number. — get_test_data • FINDCov19Tracker</title>
+<title>Get segregated tests from Selenium and combine them.
+Using the parameter days, all files in automated/merged/ are updated for the last dates given the input number. — segregated_test_data • FINDCov19Tracker</title>
 
 
 <!-- jquery -->
@@ -40,13 +40,12 @@ Using the parameter days, all files in automated/merged/ are updated for the las
 
 
 
-<meta property="og:title" content="Get tests from different sources (Selenium, fetch, and manual) and combine them.
-Using the parameter days, all files in automated/merged/ are updated for the last dates given the input number. — get_test_data" />
-<meta property="og:description" content="Input: Daily test data scraped via Selenium and &quot;R fetch functions&quot; from
+<meta property="og:title" content="Get segregated tests from Selenium and combine them.
+Using the parameter days, all files in automated/merged/ are updated for the last dates given the input number. — segregated_test_data" />
+<meta property="og:description" content="Input: Daily test data scraped via Selenium
 automated/fetch and automated/selenium directories.
 Output:
-automated-tests.json
-countries-error.csv
+segregated.csv
 
 
 which are then deployed by CI to the automated/merged/ directory in the dsbbfinddx/FINDCov19TrackerData repo." />
@@ -117,24 +116,23 @@ which are then deployed by CI to the automated/merged/ directory in the dsbbfind
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get tests from different sources (Selenium, fetch, and manual) and combine them.
+    <h1>Get segregated tests from Selenium and combine them.
 Using the parameter <code>days</code>, all files in <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged'><code>automated/merged/</code></a> are updated for the last dates given the input number.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/dsbbfinddx/FINDCov19Tracker/blob/master/R/test-data.R'><code>R/test-data.R</code></a></small>
-    <div class="hidden name"><code>get_test_data.Rd</code></div>
+    <small class="dont-index">Source: <a href='https://github.com/dsbbfinddx/FINDCov19Tracker/blob/master/R/segregated_test.R'><code>R/segregated_test.R</code></a></small>
+    <div class="hidden name"><code>segregated_test_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><strong>Input:</strong> Daily test data scraped via Selenium and "R fetch functions" from
+    <p><strong>Input:</strong> Daily test data scraped via Selenium
 <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch'><code>automated/fetch</code></a> and <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium'><code>automated/selenium</code></a> directories.</p>
 <p><strong>Output:</strong></p><ul>
-<li><p><code>automated-tests.json</code></p></li>
-<li><p><code>countries-error.csv</code></p></li>
+<li><p><code>segregated.csv</code></p></li>
 </ul>
 
 <p>which are then deployed by CI to the <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged'><code>automated/merged/</code></a> directory in the <code>dsbbfinddx/FINDCov19TrackerData</code> repo.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>get_test_data</span><span class='op'>(</span>days <span class='op'>=</span> <span class='fl'>1</span>, write <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>segregated_test_data</span><span class='op'>(</span>days <span class='op'>=</span> <span class='fl'>1</span>, write <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -149,19 +147,9 @@ Using the parameter <code>days</code>, all files in <a href='https://github.com/
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>#' When manual countries have not been updated,
-<code>coronavirus_cases_new.csv</code> has <code>NA</code> for tests_cumulative and new_tests.
-When selenium or fetch process failed and those values have not been corrected manually,
-<code>coronavirus_cases_new.csv</code> might have negative values or NA in new_tests and new_tests_corrected variables.</p>
-<p>Countries with negative values or <code>NA</code> are listed as well given the <code>days</code> input in the folder <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues'><code>issues/</code></a>.</p>
-<p>Parameter days allows to update past dates using manual files in <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/processed'>manual/processed/</a>; except for dates on "2021-02-18" or before.
-It allows to update from "2021-02-19" when the automatic workflow was implemented.
-To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder <a href='https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged'>automated/merged/</a>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>get_test_data</span><span class='op'>(</span>days <span class='op'>=</span> <span class='fl'>8</span>, write <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='get_test_data.html'>get_test_data</a></span><span class='op'>(</span>days <span class='op'>=</span> <span class='fl'>8</span>, write <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 </div><div class='output co'>#&gt; <span class='message'>Joining, by = c("country", "date")</span></div><div class='output co'>#&gt; $test_combined
 #&gt; <span style='color: #949494;'># A tibble: 1,464 x 7</span><span>
 #&gt;    country     date       tests_cumulative new_tests tests_cumulative_corrected
