@@ -81,7 +81,7 @@ process_test_data <- function() {
   cli::cli_alert("total count of new tests: {sum(cv_tests$new_tests)}.")
 
   # be sure no NA in tests_cumulative field
-  cv_tests <- cv_tests %>%
+  cv_tests_clean <- cv_tests %>%
     dplyr::arrange(jhu_ID, date) %>%
     #  when tests_cumulative is NA filling with the last value
     dplyr::group_by(jhu_ID) %>%
@@ -105,11 +105,6 @@ process_test_data <- function() {
       dplyr::row_number() != 1 & date > as.Date("2021-02-18"),
       tests_cumulative - dplyr::lag(tests_cumulative),
       new_tests
-    )) %>%
-    dplyr::mutate(new_tests_corrected = if_else(
-      dplyr::row_number() != 1 & date > as.Date("2021-02-18"),
-      tests_cumulative - dplyr::lag(tests_cumulative),
-      new_tests_corrected
     )) %>%
     dplyr::ungroup() %>%
     # When there's negative values, taking into account date when was negative
@@ -152,7 +147,7 @@ process_test_data <- function() {
 
   # check consistency of country names across datasets
   countries_without_coordinates <- setdiff(
-    unique(cv_tests$country),
+    unique(cv_tests_clean$country),
     unique(countries$country)
   )
 
@@ -164,9 +159,9 @@ process_test_data <- function() {
     )
   }
 
-  cv_test_new_neg <- subset(cv_tests, new_tests_corrected < 0)
+  cv_test_new_neg <- subset(cv_tests_clean, new_tests_corrected < 0)
 
-  if (nrow(cv_tests[cv_tests$new_tests_corrected < 0, ]) > 0) {
+  if (nrow(cv_tests_clean[cv_tests_clean$new_tests_corrected < 0, ]) > 0) {
     readr::write_csv(cv_test_new_neg, "coronavirus_tests_new_negative.csv")
     cli::cli_alert_danger("Found negative test values.")
     print(cv_test_new_neg)
@@ -183,7 +178,7 @@ process_test_data <- function() {
     #   send = TRUE
     # )
   } else {
-    readr::write_csv(cv_tests, "processed/coronavirus_tests.csv")
+    readr::write_csv(cv_tests_clean, "processed/coronavirus_tests.csv")
   }
   cli::cli_alert_success("{.file processed/coronavirus_tests.csv}: Up to date!")
 
