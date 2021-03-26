@@ -106,6 +106,11 @@ process_test_data <- function() {
       tests_cumulative - dplyr::lag(tests_cumulative),
       new_tests
     )) %>%
+    dplyr::mutate(new_tests_corrected = if_else(
+      dplyr::row_number() != 1 & date > as.Date("2021-02-18"),
+      tests_cumulative_corrected - dplyr::lag(tests_cumulative_corrected),
+      new_tests_corrected
+    )) %>%
     dplyr::ungroup() %>%
     # When there's negative values, taking into account date when was negative
     dplyr::arrange(jhu_ID, date) %>%
