@@ -10,6 +10,7 @@ clean_selenium <- function(data) {
     mutate(tests_cumulative = str_replace_all(tests_cumulative, ",", "")) %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\.", "")) %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, " ", "")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, "’", "")) %>%
     mutate(tests_cumulative = str_match(tests_cumulative, pattern = "\\d+")) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
     mutate(date = as.Date(date))
