@@ -454,6 +454,11 @@ get_test_data <- function(days = 1, write = TRUE) {
       countries_error_split,
       paste0(countries_error_date, "-countries-error.csv")
     )
+
+    readr::write_csv(
+      countries_error,
+      "all-countries-error.csv"
+    )
   }
 
   without_error <- dplyr::setdiff(as.character(window_update[-1]), as.character(countries_error_date))
