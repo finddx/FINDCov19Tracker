@@ -38,8 +38,9 @@ calc_manual_countries <- function() {
     dplyr::select(jhu_ID, status, source) %>%
     dplyr::rename(country = jhu_ID, url = source)
 
+  today <- format(Sys.time(), "%Y-%m-%d")
 
-  countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/%s-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
+  countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/all-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
     col_types = cols(
       country = col_character(),
       date = col_date(format = ""),
@@ -51,7 +52,8 @@ calc_manual_countries <- function() {
     ),
     quoted_na = FALSE
   ) %>% # nolint
-    dplyr::select(-source)
+    dplyr::select(-source) %>%
+    dplyr::filter(date == today)
 
   # only keep countries which need manual processing (including their
   # source URLS)

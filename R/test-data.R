@@ -406,7 +406,7 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::group_by(country) %>%
     dplyr::mutate(tests_cumulative = if_else(
       dplyr::row_number() != 1 ,
-      lag(tests_cumulative) + new_tests,
+      dplyr::lag(tests_cumulative) + new_tests,
       tests_cumulative
     )) %>%
     dplyr::ungroup() %>%
@@ -443,31 +443,11 @@ get_test_data <- function(days = 1, write = TRUE) {
     dplyr::filter(is.na(tests_cumulative_corrected) | new_tests_corrected < 0) %>%
     dplyr::arrange(country, date)
 
-  countries_error_split <- countries_error %>%
-    dplyr::group_split(date)
-  countries_error_date <- sort(as.Date(unique(countries_error$date)))
-  countries_error_date <- countries_error_date[which(as.Date(unique(countries_error$date)) != first_date)]
-
   if (write == TRUE) {
-    mapply(
-      readr::write_csv,
-      countries_error_split,
-      paste0(countries_error_date, "-countries-error.csv")
-    )
 
     readr::write_csv(
       countries_error,
       "all-countries-error.csv"
-    )
-  }
-
-  without_error <- dplyr::setdiff(as.character(window_update[-1]), as.character(countries_error_date))
-
-  if (write == TRUE & length(without_error) >= 1) {
-    mapply(
-      readr::write_csv,
-      list(data.frame(country = NA)),
-      paste0(without_error, "-countries-error.csv")
     )
   }
 
