@@ -150,9 +150,18 @@ Using the parameter <code>days</code>, all files in <a href='https://github.com/
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='get_test_data.html'>get_test_data</a></span><span class='op'>(</span>days <span class='op'>=</span> <span class='fl'>8</span>, write <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='warning'>Warning: Changes on 2021-02-18 or before, should made directly in automated/merged</span></div><div class='output co'>#&gt; <span class='warning'>Warning: NAs introduced by coercion</span></div><div class='output co'>#&gt; <span class='message'>Joining, by = c("country", "date")</span></div><div class='output co'>#&gt; <span class='warning'>Warning: ... is ignored in group_split(&lt;grouped_df&gt;), please use group_by(..., .add = TRUE) %&gt;% group_split()</span></div><div class='output co'>#&gt; $test_combined
-#&gt; <span style='color: #949494;'># A tibble: 13,542 x 7</span><span>
-#&gt; </span><span style='color: #949494;'># Groups:   country [183]</span><span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: Changes on 2021-02-18 or before, should made directly in automated/merged</span></div><div class='output co'>#&gt; <span class='warning'>Warning: NAs introduced by coercion</span></div><div class='output co'>#&gt; <span class='message'>Joining, by = c("country", "date")</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'><span style='color: #00BBBB;'>──</span><span> </span><span style='font-weight: bold;'>Column specification</span><span> </span><span style='color: #00BBBB;'>────────────────────────────────────────────────────────</span><span></span>
+#&gt; <span class='message'>cols(</span>
+#&gt; <span class='message'>  country = </span><span style='color: #BB0000;'>col_character()</span><span>,</span>
+#&gt; <span class='message'>  tests_cumulative = </span><span style='color: #00BB00;'>col_double()</span><span>,</span>
+#&gt; <span class='message'>  new_tests = </span><span style='color: #00BB00;'>col_double()</span><span>,</span>
+#&gt; <span class='message'>  tests_cumulative_corrected = </span><span style='color: #00BB00;'>col_double()</span><span>,</span>
+#&gt; <span class='message'>  new_tests_corrected = </span><span style='color: #00BB00;'>col_double()</span><span>,</span>
+#&gt; <span class='message'>  date = </span><span style='color: #0000BB;'>col_date(format = "")</span><span>,</span>
+#&gt; <span class='message'>  source = </span><span style='color: #BB0000;'>col_character()</span><span></span>
+#&gt; <span class='message'>)</span></div><div class='output co'>#&gt; $test_combined
+#&gt; </span><span style='color: #949494;'># A tibble: 13,542 x 7</span><span>
 #&gt;    country     date       tests_cumulative new_tests tests_cumulative_corrected
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Afghanistan 2021-02-19           </span><span style='text-decoration: underline;'>282</span><span>249     </span><span style='text-decoration: underline;'>24</span><span>238                     </span><span style='text-decoration: underline;'>282</span><span>249
@@ -169,7 +178,7 @@ Using the parameter <code>days</code>, all files in <a href='https://github.com/
 #&gt; </span><span style='color: #949494;'>#   source &lt;chr&gt;</span><span>
 #&gt; 
 #&gt; $countries_error
-#&gt; </span><span style='color: #949494;'># A tibble: 291 x 7</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 292 x 7</span><span>
 #&gt; </span><span style='color: #949494;'># Groups:   country [77]</span><span>
 #&gt;    country         date       tests_cumulative new_tests tests_cumulative_corre…
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -183,7 +192,7 @@ Using the parameter <code>days</code>, all files in <a href='https://github.com/
 #&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Bangladesh      2021-05-01               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                      </span><span style='color: #BB0000;'>NA</span><span>
 #&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Bangladesh      2021-05-02               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                      </span><span style='color: #BB0000;'>NA</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span> Bangladesh      2021-05-03               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                      </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #949494;'># … with 281 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'># … with 282 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span><span>
 #&gt; </span><span style='color: #949494;'>#   source &lt;chr&gt;</span><span>
 #&gt; </div><div class='input'>
 </div></span></pre>
