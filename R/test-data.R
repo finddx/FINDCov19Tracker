@@ -226,7 +226,7 @@ get_test_data <- function(days = 1, write = TRUE) {
   today <- format(Sys.time(), "%Y-%m-%d")
 
   # it includes the day before to retrieve this date and calculate tests for day 1
-  first_date <- as.Date(today) - days
+  first_date <- as.Date("2021-02-18")
 
   if (first_date <= as.Date("2021-02-18")) {
     # Due to the implementation of automated workflow
