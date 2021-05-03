@@ -428,13 +428,16 @@ get_test_data <- function(days = 1, write = TRUE) {
       tests_cumulative_corrected - dplyr::lag(tests_cumulative_corrected),
       new_tests_corrected
     )) %>%
+    dplyr::ungroup() %>%
     # First date is not updated is just used to calculate new_tests
     filter(date != first_date)
 
   # Splitting combined data frame in data frame per days
   # to write files in folder automated/merged
   test_combined_split <- test_combined_all_countries %>%
-    dplyr::group_split(date)
+    dplyr::arrange(country, date) %>%
+    dplyr::group_by(date, .add =TRUE) %>%
+    dplyr::group_split()
 
   if (write == TRUE) {
     mapply(
@@ -444,9 +447,34 @@ get_test_data <- function(days = 1, write = TRUE) {
     )
   }
 
+  # get countries with NA (before 2020-03-18)
+  old_errors <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv") %>%
+    dplyr::arrange(country,date) %>%
+    dplyr::group_by(country) %>%
+    mutate(new_tests_calc=if_else(
+      dplyr::row_number() != 1,
+      tests_cumulative_corrected - dplyr::lag(tests_cumulative_corrected),
+      new_tests)) %>%
+    dplyr::filter(new_tests_calc<0) %>%
+    dplyr::filter(date <= first_date) %>%
+    dplyr::select(-new_tests_corrected) %>%
+    dplyr::rename(new_tests_corrected = new_tests_calc) %>%
+    dplyr::relocate(
+      country, date, tests_cumulative, new_tests,
+      tests_cumulative_corrected, new_tests_corrected,
+      source
+    )
+
   # get countries with NA (these errored during scraping)
-  countries_error <- test_combined_all_countries %>%
+  new_errors <- test_combined_all_countries %>%
     dplyr::filter(is.na(tests_cumulative_corrected) | new_tests_corrected < 0) %>%
+    dplyr::arrange(country, date)
+
+  countries_error <- dplyr::bind_rows(
+    old_errors,
+    new_errors
+  ) %>%
     dplyr::arrange(country, date)
 
   if (write == TRUE) {
