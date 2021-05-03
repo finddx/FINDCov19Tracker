@@ -422,6 +422,12 @@ get_test_data <- function(days = 1, write = TRUE) {
       tests_cumulative_corrected
     )) %>%
     dplyr::arrange(country, date) %>%
+    dplyr::group_by(country) %>%
+    dplyr::mutate(new_tests_corrected = if_else(
+      dplyr::row_number() != 1 ,
+      tests_cumulative_corrected - dplyr::lag(tests_cumulative_corrected),
+      new_tests_corrected
+    )) %>%
     # First date is not updated is just used to calculate new_tests
     filter(date != first_date)
 

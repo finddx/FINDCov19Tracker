@@ -2,6 +2,8 @@ test_that("get_test_data() works as expected", {
   automated <- get_test_data(write = FALSE)
 
   today <- format(Sys.time(), "%Y-%m-%d")
+  first_date <- as.Date("2021-02-18")
+  window_update <- seq(first_date+1, as.Date(today), by = "days")
 
   expect_s3_class(automated[["countries_error"]], "data.frame")
 
@@ -12,7 +14,7 @@ test_that("get_test_data() works as expected", {
      "date", "source"
   ), ignore.order = TRUE)
 
-  expect_equal(unique(automated[["test_combined"]]$date), as.Date(today))
+  expect_equal(unique(automated[["test_combined"]]$date), window_update)
 
 })
 
