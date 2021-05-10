@@ -89,7 +89,8 @@ process_test_data <- function() {
     dplyr::ungroup() %>%
   # populating tests_cumulative_corrected and new_tests_corrected
     dplyr::mutate(
-      new_tests_corrected = if_else(is.na(new_tests_corrected),
+      new_tests_corrected = if_else(is.na(new_tests_corrected) &
+                                      is.na(tests_cumulative_corrected),
                                     new_tests,
                                     new_tests_corrected
       )) %>%
@@ -130,10 +131,14 @@ process_test_data <- function() {
     dplyr::group_by(jhu_ID) %>%
     dplyr::mutate(tests_cumulative_corrected = if_else(
       date >= date_negative,
-      max(tests_cumulative_corrected, na.rm = FALSE),
+      NA_real_,
       tests_cumulative_corrected
     )) %>%
     dplyr::ungroup() %>%
+    dplyr::arrange(jhu_ID, date) %>%
+    #  when tests_cumulative_corrected is NA filling with the last value
+    dplyr::group_by(jhu_ID) %>%
+    tidyr::fill(tests_cumulative_corrected, .direction = "down") %>%
     dplyr::arrange(jhu_ID, date) %>%
     dplyr::select(-date_change, -date_negative) %>%
     dplyr::relocate(country, date, new_tests, tests_cumulative,
