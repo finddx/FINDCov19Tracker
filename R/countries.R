@@ -79,3 +79,62 @@ countries_manual_csv <- countries_error %>%
     "need-manual-processing.csv"
   )
 }
+
+
+
+#' @description last_update
+#'
+#' @importFrom readr read_csv write_csv
+#' @importFrom dplyr pull filter rename
+#' @importFrom tibble add_column
+#' @import readr
+#' @import dplyr
+#' @export
+updates_dates_countries <- function() {
+
+  # read list of all countries
+  countries_all <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+    cols(
+      country = col_character(),
+      date = col_date(format = ""),
+      new_tests = col_double(),
+      tests_cumulative = col_double(),
+      jhu_ID = col_character(),
+      source = col_character(),
+      new_tests_corrected = col_double(),
+      tests_cumulative_corrected = col_double()
+    ),
+    col_names = TRUE, quoted_na = FALSE
+  ) %>% # nolint
+    dplyr::select(jhu_ID, date, new_tests_corrected) %>%
+    dplyr::rename(country = jhu_ID)
+
+  today <- format(Sys.time(), "%Y-%m-%d")
+
+  # only keep countries which need manual processing (including their
+  # source URLS)
+  countries_updates <- countries_all %>%
+    dplyr::group_by(country) %>%
+    dplyr::arrange(country, desc(date)) %>%
+    dplyr::mutate(date_change = if_else(
+      new_tests_corrected > 0,
+      date,
+      as.Date("2018-01-01")
+    )) %>%
+    dplyr::mutate(date_new_tests = max(date_change)) %>%
+    dplyr::mutate(dates_no_update = if_else(
+      date < date_new_tests,
+      0,
+      1
+    )) %>%
+    dplyr::summarise(last_update = max(date_new_tests),
+                     days_no_update = sum(dates_no_update) - 1) %>%
+    dplyr::arrange(desc(days_no_update))
+
+  # write csv
+  readr::write_csv(
+    data.frame(countries_updates),
+    "countries-last-update.csv"
+  )
+}
