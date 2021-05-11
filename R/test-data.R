@@ -122,17 +122,17 @@ process_test_data <- function() {
       max(date)
     )) %>%
     dplyr::mutate(date_negative = min(date_change)) %>%
-    dplyr::mutate(new_tests_corrected = if_else(
-      date >= date_negative,
-      0,
-      new_tests_corrected
-    )) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(jhu_ID) %>%
     dplyr::mutate(tests_cumulative_corrected = if_else(
-      date >= date_negative,
+      (date >= date_negative & new_tests_corrected < 0) | date > date_negative,
       NA_real_,
       tests_cumulative_corrected
+    )) %>%
+    dplyr::mutate(new_tests_corrected = if_else(
+      is.na(tests_cumulative_corrected),
+      0,
+      new_tests_corrected
     )) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(jhu_ID, date) %>%
