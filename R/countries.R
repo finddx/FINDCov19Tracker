@@ -82,7 +82,9 @@ countries_manual_csv <- countries_error %>%
 
 
 
-#' @description last_update
+#' last_update
+#' @description
+#' last_update
 #'
 #' @importFrom readr read_csv write_csv
 #' @importFrom dplyr pull filter rename
