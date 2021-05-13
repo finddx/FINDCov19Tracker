@@ -303,7 +303,7 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   fetch_list <- sprintf(
     "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", # nolint
-    seq(first_date, as.Date(today), by = "days")
+    seq(first_date, as.Date("2021-05-12"), by = "days")
   )
   fetch_tests_daily <- rio::import_list(fetch_list, rbind = TRUE) %>%
     dplyr::select(-`_file`) %>%
