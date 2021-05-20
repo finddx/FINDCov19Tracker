@@ -161,7 +161,7 @@ Using the parameter <code>days</code>, all files in <a href='https://github.com/
 #&gt; <span class='message'>  date = </span><span style='color: #0000BB;'>col_date(format = "")</span><span>,</span>
 #&gt; <span class='message'>  source = </span><span style='color: #BB0000;'>col_character()</span><span></span>
 #&gt; <span class='message'>)</span></div><div class='output co'>#&gt; $test_combined
-#&gt; </span><span style='color: #949494;'># A tibble: 16,470 x 7</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 16,653 x 7</span><span>
 #&gt;    country     date       tests_cumulative new_tests tests_cumulative_corrected
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Afghanistan 2021-02-19           </span><span style='text-decoration: underline;'>282</span><span>249     </span><span style='text-decoration: underline;'>24</span><span>238                     </span><span style='text-decoration: underline;'>282</span><span>249
@@ -174,25 +174,25 @@ Using the parameter <code>days</code>, all files in <a href='https://github.com/
 #&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Afghanistan 2021-02-26           </span><span style='text-decoration: underline;'>282</span><span>249         0                     </span><span style='text-decoration: underline;'>282</span><span>249
 #&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Afghanistan 2021-02-27           </span><span style='text-decoration: underline;'>282</span><span>249         0                     </span><span style='text-decoration: underline;'>282</span><span>249
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span> Afghanistan 2021-02-28           </span><span style='text-decoration: underline;'>282</span><span>249         0                     </span><span style='text-decoration: underline;'>282</span><span>249
-#&gt; </span><span style='color: #949494;'># … with 16,460 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #949494;'># … with 16,643 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span><span>
 #&gt; </span><span style='color: #949494;'>#   source &lt;chr&gt;</span><span>
 #&gt; 
 #&gt; $countries_error
-#&gt; </span><span style='color: #949494;'># A tibble: 237 x 7</span><span>
-#&gt; </span><span style='color: #949494;'># Groups:   country [81]</span><span>
+#&gt; </span><span style='color: #949494;'># A tibble: 80 x 7</span><span>
+#&gt; </span><span style='color: #949494;'># Groups:   country [76]</span><span>
 #&gt;    country     date       tests_cumulative new_tests tests_cumulative_corrected
 #&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;date&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                      </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Afghanistan 2021-05-17               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Afghanistan 2021-05-18               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Afghanistan 2021-05-19               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Andorra     2021-05-10               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Andorra     2021-05-11               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Andorra     2021-05-12               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Andorra     2021-05-13               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Austria     2021-05-17               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Austria     2021-05-18               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Austria     2021-05-19               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
-#&gt; </span><span style='color: #949494;'># … with 227 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Afghanistan 2021-05-20               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Andorra     2021-05-10               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Andorra     2021-05-11               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Andorra     2021-05-12               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Andorra     2021-05-13               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Austria     2021-05-20               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Bahrain     2021-05-20               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Bangladesh  2021-05-20               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Barbados    2021-05-20               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Bhutan      2021-05-20               </span><span style='color: #BB0000;'>NA</span><span>        </span><span style='color: #BB0000;'>NA</span><span>                         </span><span style='color: #BB0000;'>NA</span><span>
+#&gt; </span><span style='color: #949494;'># … with 70 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span><span>
 #&gt; </span><span style='color: #949494;'>#   source &lt;chr&gt;</span><span>
 #&gt; </div><div class='input'>
 </div></span></pre>
