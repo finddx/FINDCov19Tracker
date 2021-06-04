@@ -5,11 +5,9 @@
 \title{Get segregated tests from Selenium and combine them.
 Using the parameter \code{days}, all files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.}
 \usage{
-segregated_test_data(days = 1, write = TRUE)
+segregated_test_data(write = TRUE)
 }
 \arguments{
-\item{days}{days to combine. It should always be bigger than 0.}
-
 \item{write}{if csv files should be written. Default TRUE.}
 }
 \description{

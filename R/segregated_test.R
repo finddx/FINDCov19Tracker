@@ -10,7 +10,6 @@
 #'   - `segregated.csv`
 #'
 #'   which are then deployed by CI to the [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
-#' @param days days to combine. It should always be bigger than 0.
 #' @param write if csv files should be written. Default TRUE.
 #'
 #' @examples
@@ -18,12 +17,12 @@
 #'
 #' @importFrom dplyr left_join mutate rename relocate select
 #' @export
-segregated_test_data <- function(days = 1, write = TRUE) {
+segregated_test_data <- function(write = TRUE) {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
   # it includes the day before to retrieve this date and calculate tests for day 1
-  first_date <- as.Date(today) - days
+  first_date <- as.Date("2021-03-22")
 
   if (first_date <= as.Date("2021-03-22")) {
     # Due to the implementation of automated workflow
@@ -151,7 +150,8 @@ segregated_test_data <- function(days = 1, write = TRUE) {
       rapid_test_cum_corrected
     )) %>%
     dplyr::arrange(country, date) %>%
-    select(-source)
+    dplyr::select(-source) %>%
+    dplyr::filter(country != "Peru")
 
 
   if (write == TRUE) {
