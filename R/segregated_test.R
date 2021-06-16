@@ -151,11 +151,41 @@ segregated_test_data <- function(write = TRUE) {
     )) %>%
     dplyr::arrange(country, date) %>%
     dplyr::select(-source) %>%
+    # at the beginning Peru was included, but those were not cumulative values
     dplyr::filter(country != "Peru")
 
 
   if (write == TRUE) {
     readr::write_csv(segregated_test, "segregated_tests.csv")
+  }
+
+  segregated_errors <- segregated_test %>%
+    dplyr::mutate(sum_tests_comparison = tests_cumulative -
+                    (pcr_tests_cum_corrected + rapid_test_cum_corrected)) %>%
+    dplyr::filter(is.na(tests_cumulative) |
+                    pcr_tests_new_corrected < 0 |
+                    rapid_test_new_corrected < 0 |
+                    sum_tests_comparison !=0) %>%
+    dplyr::mutate( type_of_error = dplyr::case_when(
+      (pcr_tests_new_corrected < 0 |
+        rapid_test_new_corrected < 0 ) &
+        sum_tests_comparison == 0 ~ "negative values",
+       (pcr_tests_new_corrected < 0 |
+              rapid_test_new_corrected < 0 ) &
+        sum_tests_comparison != 0 ~ "segregated values don't sum up and negative values",
+      pcr_tests_new_corrected > 0 &
+         rapid_test_new_corrected > 0  &
+        sum_tests_comparison != 0 ~ "segregated values don't sum up",
+      TRUE ~ "other"
+    )) %>%
+    dplyr::arrange(country, date)
+
+  if (write == TRUE) {
+
+    readr::write_csv(
+      segregated_errors,
+      "segregated-data-error.csv"
+    )
   }
 
   return(segregated_test)
