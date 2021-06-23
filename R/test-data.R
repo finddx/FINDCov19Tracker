@@ -521,5 +521,13 @@ combine_all_tests <- function() {
     dplyr::select(country, tests_cumulative, new_tests,
      tests_cumulative_corrected, new_tests_corrected, date, source)
 
+  # checking if due to manual files there are duplicates
+  files_df_duplicated <- files_df %>%
+    dplyr::group_by(country, date) %>%
+    dplyr::tally() %>%
+    dplyr::filter(n > 1)
+
   readr::write_csv(files_df, "coronavirus_tests_new.csv")
+  readr::write_csv(files_df_duplicated, "duplicated_tests_new.csv")
+
 }
