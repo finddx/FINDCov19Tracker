@@ -528,6 +528,6 @@ combine_all_tests <- function() {
     dplyr::filter(n > 1)
 
   readr::write_csv(files_df, "coronavirus_tests_new.csv")
-  readr::write_csv(files_df_duplicated, "duplicated_tests_new.csv")
+  readr::write_csv(files_df_duplicated, "duplicated_tests.csv")
 
 }
