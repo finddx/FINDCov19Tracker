@@ -106,6 +106,10 @@ segregated_test_data <- function(write = TRUE) {
   combined_segregated <- dplyr::left_join(test_data, segregated_tests) %>%
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
+    tidyr::fill(pcr_tests_cum,
+                .direction = "down") %>%
+    tidyr::fill(rapid_test_cum,
+                .direction = "down") %>%
     #calculating new tests
     dplyr::mutate(pcr_test_new =
                     pcr_tests_cum - lag(pcr_tests_cum)) %>%
