@@ -14,6 +14,20 @@ clean_selenium <- function(data) {
     mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\u202f", "")) %>%
     mutate(tests_cumulative = str_match(tests_cumulative, pattern = "\\d+")) %>%
     mutate(tests_cumulative = as.numeric(tests_cumulative)) %>%
+
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, ",", "")) %>%
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, "\\.", "")) %>%
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, " ", "")) %>%
+    mutate(pcr_tests_cum = str_replace_all(pcr_tests_cum, "\\u202f", "")) %>%
+    mutate(pcr_tests_cum = str_match(pcr_tests_cum, pattern = "\\d+")) %>%
+    mutate(pcr_tests_cum = as.numeric(pcr_tests_cum)) %>%
+
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, ",", "")) %>%
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, "\\.", "")) %>%
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, " ", "")) %>%
+    mutate(rapid_test_cum = str_replace_all(rapid_test_cum, "\\u202f", "")) %>%
+    mutate(rapid_test_cum = str_match(rapid_test_cum, pattern = "\\d+")) %>%
+    mutate(rapid_test_cum = as.numeric(rapid_test_cum)) %>%
     mutate(date = as.Date(date))
 
   return(data_clean)
