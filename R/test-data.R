@@ -222,7 +222,7 @@ process_test_data <- function() {
 #' @param write if csv files should be written. Default TRUE.
 #'
 #' @examples
-#' get_test_data(days = 8, write = FALSE)
+#' get_test_data(write = FALSE)
 #'
 #' @importFrom dplyr left_join mutate rename relocate select
 #' @export
@@ -289,12 +289,13 @@ get_test_data <- function(days = 1, write = TRUE) {
   selenium_tests <- rio::import_list(selenium_list, rbind = TRUE) %>%
     dplyr::mutate(source = "selenium") %>%
     dplyr::mutate(date = as.Date(date)) %>%
-    dplyr::select(-`_file`, -pcr_tests_cum, -rapid_test_cum)
+    dplyr::select(-`_file`)
   selenium_tests_clean <- clean_selenium(selenium_tests)
   selenium_tests_daily <- selenium_tests_clean %>%
     dplyr::mutate(new_tests = NA_real_) %>%
     dplyr::mutate(tests_cumulative_corrected = NA_real_) %>%
     dplyr::mutate(new_tests_corrected = NA_real_) %>%
+    dplyr::select(-pcr_tests_cum, -rapid_test_cum) %>%
     dplyr::relocate(
       country, tests_cumulative, new_tests,
       tests_cumulative_corrected, new_tests_corrected,

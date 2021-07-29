@@ -19,6 +19,31 @@
 #' @export
 segregated_test_data <- function(write = TRUE) {
 
+  #countries with segregated tests
+  segregated_countries <- c(
+    "Austria",
+    #"Benin",
+    "Colombia",
+    "Czechia",
+    "Denmark",
+    #"Greece",
+    "Indonesia",
+    "Italy",
+    "Lithuania",
+    #"Romania",
+    "Slovakia",
+    "Slovenia",
+    "Spain",
+    "Switzerland"
+  )
+
+  # Tests cumulative corrected
+  test_data <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv") %>%
+    dplyr::select(country, date, tests_cumulative, tests_cumulative_corrected, new_tests_corrected, source) %>%
+    dplyr::filter(date >= "2021-03-22") %>%
+    dplyr::filter(country %in% segregated_countries)
+
   today <- format(Sys.time(), "%Y-%m-%d")
 
   # it includes the day before to retrieve this date and calculate tests for day 1
@@ -74,110 +99,101 @@ segregated_test_data <- function(write = TRUE) {
       dplyr::select(-`_file`)
   }
   selenium_tests_clean <- clean_selenium_segregated(selenium_tests)
-  selenium_tests_daily <- selenium_tests_clean %>%
+
+  segregated_tests <- selenium_tests_clean %>%
+    dplyr::select(-tests_cumulative, -source)
+
+  combined_segregated <- dplyr::left_join(test_data, segregated_tests) %>%
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
-    dplyr::mutate(pcr_tests_new = if_else(
+    #calculating new tests
+    dplyr::mutate(pcr_test_new =
+                    pcr_tests_cum - lag(pcr_tests_cum)) %>%
+    dplyr::mutate(rapid_test_new =
+                    rapid_test_cum - lag(rapid_test_cum)) %>%
+    dplyr::mutate(
+      percentage_rapid_daily = rapid_test_new/ (pcr_test_new + rapid_test_new)) %>%
+    #Setting NA negative values
+    dplyr::mutate(percentage_rapid_daily = if_else(
+      percentage_rapid_daily < 0 | percentage_rapid_daily > 1,
+      NA_real_,
+      percentage_rapid_daily
+    )) %>%
+    # changing NA for value of the previous day
+    tidyr::fill(percentage_rapid_daily,
+                .direction = "down") %>%
+    # excluding first days without segregated data
+    dplyr::filter(!is.na(percentage_rapid_daily)) %>%
+    #calculating new tests corrected based on percentage
+    dplyr::mutate(pcr_test_new_corrected =
+                    round((1-percentage_rapid_daily) * new_tests_corrected)) %>%
+    dplyr::mutate(rapid_test_new_corrected =
+                    round((percentage_rapid_daily) * new_tests_corrected)) %>%
+    #recalculate cumulative segregated data based on corrected daily data
+    dplyr::mutate(first_pcr_tests_cum_corrected = if_else(
       row_number() == 1,
       pcr_tests_cum,
       NA_real_
-    )) %>%
-    dplyr::mutate(pcr_tests_cum_corrected = if_else(
-      row_number() == 1,
-      pcr_tests_cum,
-      NA_real_
-    )) %>%
-    dplyr::mutate(pcr_tests_new_corrected = if_else(
-      row_number() == 1,
-      pcr_tests_cum,
-      NA_real_
-    )) %>%
-    dplyr::mutate(rapid_test_new = if_else(
+      )) %>%
+    dplyr::mutate(first_rapid_test_cum_corrected = if_else(
       row_number() == 1,
       rapid_test_cum,
       NA_real_
+    )) %>%
+    tidyr::fill(first_pcr_tests_cum_corrected,
+                .direction = "down") %>%
+    tidyr::fill(first_rapid_test_cum_corrected,
+                .direction = "down") %>%
+    dplyr::mutate(first_pcr_tests_new_corrected = if_else(
+      row_number() == 1,
+      pcr_test_new_corrected,
+      NA_real_
+    )) %>%
+    dplyr::mutate(first_rapid_test_new_corrected = if_else(
+      row_number() == 1,
+      rapid_test_new_corrected,
+      NA_real_
+    )) %>%
+    tidyr::fill(first_pcr_tests_new_corrected,
+                .direction = "down") %>%
+    tidyr::fill(first_rapid_test_new_corrected,
+                .direction = "down") %>%
+    dplyr::mutate(pcr_tests_cum_corrected = if_else(
+      row_number() == 1,
+      first_pcr_tests_cum_corrected,
+      first_pcr_tests_cum_corrected + cumsum(pcr_test_new_corrected) - first_pcr_tests_new_corrected
     )) %>%
     dplyr::mutate(rapid_test_cum_corrected = if_else(
       row_number() == 1,
-      rapid_test_cum,
-      NA_real_
+      first_rapid_test_cum_corrected,
+      first_rapid_test_cum_corrected + cumsum(rapid_test_new_corrected) - first_rapid_test_new_corrected
     )) %>%
-    dplyr::mutate(rapid_test_new_corrected = if_else(
-      row_number() == 1,
-      rapid_test_cum,
-      NA_real_
-    )) %>%
-    dplyr::relocate(
-      country, date, tests_cumulative, pcr_tests_cum, pcr_tests_new,
-      rapid_test_cum, rapid_test_new, pcr_tests_cum_corrected,
-      pcr_tests_new_corrected, rapid_test_cum_corrected,
-      rapid_test_new_corrected, source
-    )
+    dplyr::select(-first_pcr_tests_new_corrected, -first_rapid_test_new_corrected,
+                  -first_pcr_tests_cum_corrected, -first_rapid_test_cum_corrected)
 
-
-  segregated_test <- selenium_tests_daily %>%
+  shiny_segregated <- combined_segregated %>%
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
-    # calculating tests_cumulative when new_tests is available
-    dplyr::mutate(pcr_tests_cum = calc_cumulative_t(
-      pcr_tests_cum,
-      pcr_tests_new)) %>%
-    dplyr::mutate(rapid_test_cum = calc_cumulative_t(
-      rapid_test_cum,
-      rapid_test_new)) %>%
-    # calculating new_tests when tests_cumulative is available
-    dplyr::mutate(pcr_tests_new = calc_new_t(pcr_tests_cum, pcr_tests_new)) %>%
-    dplyr::mutate(rapid_test_new = calc_new_t(rapid_test_cum, rapid_test_new)) %>%
-    dplyr::ungroup() %>%
-    # populating corrected columns
-    dplyr::mutate(pcr_tests_new_corrected = if_else(
-      is.na(pcr_tests_new_corrected),
-      pcr_tests_new,
-      pcr_tests_new_corrected
-    )) %>%
-    dplyr::mutate(pcr_tests_cum_corrected = if_else(
-      is.na(pcr_tests_cum_corrected),
-      pcr_tests_cum,
-      pcr_tests_cum_corrected
-    )) %>%dplyr::mutate(rapid_test_new_corrected = if_else(
-      is.na(rapid_test_new_corrected),
-      rapid_test_new,
-      rapid_test_new_corrected
-    )) %>%
-    dplyr::mutate(rapid_test_cum_corrected = if_else(
-      is.na(rapid_test_cum_corrected),
-      rapid_test_cum,
-      rapid_test_cum_corrected
-    )) %>%
-    dplyr::arrange(country, date) %>%
-    dplyr::select(-source) %>%
-    # at the beginning Peru was included, but those were not cumulative values
-    dplyr::filter(country != "Peru")
+    mutate(all_pcr_test_cum = pcr_tests_cum_corrected) %>%
+    mutate(all_pcr_test_new = round(robust_rollmean(pcr_test_new_corrected))) %>%
+    mutate(all_rapid_test_cum = rapid_test_cum_corrected) %>%
+    mutate(all_rapid_test_new = round(robust_rollmean(rapid_test_new_corrected))) %>%
+    dplyr::relocate(country,date,tests_cumulative,tests_cumulative_corrected,
+                pcr_tests_cum,rapid_test_cum,pcr_test_new,rapid_test_new,
+                pcr_tests_cum_corrected,rapid_test_cum_corrected,
+                pcr_test_new_corrected,rapid_test_new_corrected,
+                all_pcr_test_cum,all_rapid_test_cum,
+                all_pcr_test_new,all_rapid_test_new,source)
 
 
   if (write == TRUE) {
-    readr::write_csv(segregated_test, "segregated_tests.csv")
+    readr::write_csv(combined_segregated, "segregated_tests.csv")
+    readr::write_csv(shiny_segregated, "segregated-data.csv")
   }
 
-  segregated_errors <- segregated_test %>%
-    dplyr::mutate(sum_tests_comparison = tests_cumulative -
-                    (pcr_tests_cum_corrected + rapid_test_cum_corrected)) %>%
-    dplyr::filter(is.na(tests_cumulative) |
-                    pcr_tests_new_corrected < 0 |
-                    rapid_test_new_corrected < 0 |
-                    sum_tests_comparison !=0) %>%
-    dplyr::mutate( type_of_error = dplyr::case_when(
-      (pcr_tests_new_corrected < 0 |
-        rapid_test_new_corrected < 0 ) &
-        sum_tests_comparison == 0 ~ "negative values",
-       (pcr_tests_new_corrected < 0 |
-              rapid_test_new_corrected < 0 ) &
-        sum_tests_comparison != 0 ~ "segregated values don't sum up and negative values",
-      pcr_tests_new_corrected > 0 &
-         rapid_test_new_corrected > 0  &
-        sum_tests_comparison != 0 ~ "segregated values don't sum up",
-      TRUE ~ "other"
-    )) %>%
+  segregated_errors <- combined_segregated %>%
+    dplyr::filter(pcr_test_new_corrected < 0 |
+      rapid_test_new_corrected < 0) %>%
     dplyr::arrange(country, date)
 
   if (write == TRUE) {
@@ -188,5 +204,5 @@ segregated_test_data <- function(write = TRUE) {
     )
   }
 
-  return(segregated_test)
+  return(combined_segregated)
 }

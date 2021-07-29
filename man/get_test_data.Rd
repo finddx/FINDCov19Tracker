@@ -37,6 +37,6 @@ It allows to update from "2021-02-19" when the automatic workflow was implemente
 To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged/}.
 }
 \examples{
-get_test_data(days = 8, write = FALSE)
+get_test_data(write = FALSE)
 
 }
