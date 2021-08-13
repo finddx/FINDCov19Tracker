@@ -233,7 +233,7 @@ create_shiny_data <- function() {
   data_region <-
     data_country %>%
     left_join(select(country_info,
-      unit = country_iso, region = continent,
+      unit = country_iso, region = continent, who_region,
       income
     ), by = "unit") %>%
     group_by(unit = region, time) %>%
@@ -253,10 +253,34 @@ create_shiny_data <- function() {
     ungroup() %>%
     tibble::add_column(set = "region", .before = 1)
 
+  data_who_region <-
+    data_country %>%
+    left_join(select(country_info,
+                     unit = country_iso, region = continent, who_region,
+                     income
+    ), by = "unit") %>%
+    group_by(unit = who_region, time) %>%
+    summarize(
+      .groups = "keep",
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        ~ sum_ratio(.x, pop_100k),
+        .names = "cap_{col}"
+      ),
+      across(
+        c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
+        ~ sum_basic(.x),
+        .names = "all_{col}"
+      ),
+      pos = sum_ratio(all_new_cases, all_new_tests)
+    ) %>%
+    ungroup() %>%
+    tibble::add_column(set = "who_region", .before = 1)
+
   data_income <-
     data_country %>%
     left_join(select(country_info,
-      unit = country_iso, region = continent,
+      unit = country_iso, region = continent, who_region,
       income
     ), by = "unit") %>%
     group_by(unit = income, time) %>%
@@ -277,7 +301,7 @@ create_shiny_data <- function() {
     tibble::add_column(set = "income", .before = 1)
 
   data_all <-
-    bind_rows(data_country, data_region, data_income) %>%
+    bind_rows(data_country, data_region, data_who_region, data_income) %>%
     filter(!is.na(unit)) %>%
     mutate(across(where(is.numeric), function(e) {
       e[is.na(e)] <- NA
