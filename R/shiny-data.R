@@ -23,7 +23,7 @@ create_shiny_data <- function() {
     countrycode::codelist %>%
     as_tibble() %>%
     select(
-      name = country.name.en, country = iso2c
+      name = country.name.en, country = iso3c
     ) %>%
     dplyr::mutate(country = dplyr::case_when(
       name == "Kosovo" ~ "XK",
@@ -41,7 +41,7 @@ create_shiny_data <- function() {
     countrycode::codelist %>%
     as_tibble() %>%
     select(
-      regex = country.name.en.regex, country = iso2c
+      regex = country.name.en.regex, country = iso3c
     )
 
   # cv_cases_raw <- readr::read_csv("processed/coronavirus_cases.csv",
@@ -59,9 +59,9 @@ create_shiny_data <- function() {
   pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
   country_info <-
-    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols(), quoted_na = FALSE) %>% # nolint
-    select(-name_not_used) %>%
-    filter(!is.na(country_iso))
+    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info_2.csv", col_types = readr::cols(), quoted_na = FALSE) %>% # nolint
+    select(-name) %>%
+    filter(!is.na(alpha3))
 
   # use clean identifier (iso2c) -----------------------------------------------
 
@@ -233,7 +233,7 @@ create_shiny_data <- function() {
   data_region <-
     data_country %>%
     left_join(select(country_info,
-      unit = country_iso, region = continent, who_region,
+      unit = alpha3, region = continent, who_region,
       income
     ), by = "unit") %>%
     group_by(unit = region, time) %>%
@@ -256,7 +256,7 @@ create_shiny_data <- function() {
   data_who_region <-
     data_country %>%
     left_join(select(country_info,
-                     unit = country_iso, region = continent, who_region,
+                     unit = alpha3, region = continent, who_region,
                      income
     ), by = "unit") %>%
     group_by(unit = who_region, time) %>%
@@ -280,7 +280,7 @@ create_shiny_data <- function() {
   data_income <-
     data_country %>%
     left_join(select(country_info,
-      unit = country_iso, region = continent, who_region,
+      unit = alpha3, region = continent, who_region,
       income
     ), by = "unit") %>%
     group_by(unit = income, time) %>%
@@ -343,7 +343,7 @@ create_shiny_data <- function() {
       pos = pos,
       tests = cap_new_tests
     ) %>%
-    left_join(country_info, by = c("unit" = "country_iso")) %>%
+    left_join(country_info, by = c("unit" = "alpha3")) %>%
     left_join(latest_test_date, by = "unit")
 
 
