@@ -71,14 +71,14 @@ create_shiny_data <- function() {
     fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"),
      ignore_case = TRUE) %>%
     mutate(country = case_when(
-      name == "Kosovo" ~ "XK",
-      name == "SouthAfrica" ~ "ZA",
-      name == "CentralAfricanRepublic" ~ "CF",
-      name == "DominicanRepublic" ~ "DO",
-      name == "SaintLucia" ~ "LC",
-      name == "WesternSahara" ~ "EH",
+      name == "Kosovo" ~ "XKX",
+      name == "SouthAfrica" ~ "ZAF",
+      name == "CentralAfricanRepublic" ~ "CAF",
+      name == "DominicanRepublic" ~ "DOM",
+      name == "SaintLucia" ~ "LCA",
+      name == "WesternSahara" ~ "ESH",
       # name == "UnitedRepublicofTanzania" ~ "TZ",
-      name == "RepublicofKorea" ~ "KR",
+      name == "RepublicofKorea" ~ "KOR",
       # name == "LaoPeople'sDemocraticRepublic" ~ "LA",
       TRUE ~ country
     )) %>%
