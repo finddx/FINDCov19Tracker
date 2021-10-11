@@ -109,8 +109,29 @@ updates_dates_countries <- function() {
     ),
     col_names = TRUE, quoted_na = FALSE
   ) %>% # nolint
-    dplyr::select(jhu_ID, date, new_tests_corrected) %>%
+    dplyr::select(jhu_ID, date, new_tests_corrected, source) %>%
     dplyr::rename(country = jhu_ID)
+
+  countries_url <- readr::read_csv(
+    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    cols(
+      country = col_character(),
+      jhu_ID = col_character(),
+      source = col_character(),
+      `alternative link` = col_character(),
+      type = col_character(),
+      data_url = col_character(),
+      date_format = col_character(),
+      xpath_cumul = col_character(),
+      xpath_new = col_character(),
+      backlog = col_character(),
+      comment = col_character(),
+      status = col_character()
+    ),
+    col_names = TRUE, quoted_na = FALSE
+  ) %>% # nolint
+    dplyr::select(jhu_ID, source) %>%
+    dplyr::rename(country = jhu_ID, url = source)
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
@@ -132,7 +153,8 @@ updates_dates_countries <- function() {
     )) %>%
     dplyr::summarise(last_update = max(date_new_tests),
                      days_no_update = sum(dates_no_update) - 1) %>%
-    dplyr::arrange(desc(days_no_update))
+    dplyr::arrange(desc(days_no_update)) %>%
+    dplyr::left_join(countries_url)
 
   # write csv
   readr::write_csv(
