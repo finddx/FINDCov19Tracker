@@ -2,6 +2,7 @@
 do_package_checks(error_on = "error")
 
 get_stage("install") %>%
+  add_step(step_install_github("ropensci/tabulizerjars")) %>%
   add_step(step_install_github("ropensci/tabulizer"))
 
 if (ci_on_ghactions() && ci_has_env("BUILD_PKGDOWN")) {
