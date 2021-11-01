@@ -50,7 +50,6 @@ Imports:
     shinythemes,
     shinyWidgets,
     stringr,
-    tabulizer,
     tibble,
     tidyr,
     tidyselect,
