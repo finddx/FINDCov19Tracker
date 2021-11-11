@@ -159,7 +159,7 @@ create_shiny_data <- function() {
     select(cv_cases, -name) %>%
     full_join(select(cv_tests, -name), by = c("country", "date")) %>%
     left_join(pop, by = "country") %>%
-    mutate(pop_100k = population / 100000) %>%
+    mutate(pop_100k = population / 1000) %>%
     select(
       country,
       date,
