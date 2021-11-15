@@ -13,7 +13,6 @@
 #'
 #'   which is then deployed by CI to the [`processed/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/processed) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
 #'
-#' @importFrom mailR send.mail
 #' @importFrom utils tail
 #' @export
 process_test_data <- function() {

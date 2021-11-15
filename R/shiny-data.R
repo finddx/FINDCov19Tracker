@@ -61,7 +61,9 @@ create_shiny_data <- function() {
   country_info <-
     readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols(), quoted_na = FALSE) %>% # nolint
     select(-name) %>%
-    filter(!is.na(alpha3))
+    filter(!is.na(alpha3)) %>%
+    mutate(pop = population / 1000)
+
 
   # use clean identifier (iso2c) -----------------------------------------------
 
@@ -160,6 +162,7 @@ create_shiny_data <- function() {
     full_join(select(cv_tests, -name), by = c("country", "date")) %>%
     left_join(pop, by = "country") %>%
     mutate(pop_100k = population / 100000) %>%
+    mutate(pop = population / 1000) %>%
     select(
       country,
       date,
@@ -171,7 +174,8 @@ create_shiny_data <- function() {
       new_tests_orig = new_tests,
       tests = tests_cumulative_corrected,
       new_tests = new_tests_corrected,
-      pop_100k
+      pop_100k,
+      pop
     )
 
   um <- unique(filter(cv_tests, is.na(country))$name)
@@ -206,7 +210,7 @@ create_shiny_data <- function() {
     mutate(
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        ~ .x / pop_100k,
+        ~ .x / pop,
         .names = "cap_{col}"
       ),
       across(
@@ -240,7 +244,7 @@ create_shiny_data <- function() {
     summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        ~ sum_ratio(.x, pop_100k),
+        ~ sum_ratio(.x, pop),
         .names = "cap_{col}"
       ),
       across(
@@ -264,7 +268,7 @@ create_shiny_data <- function() {
       .groups = "keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        ~ sum_ratio(.x, pop_100k),
+        ~ sum_ratio(.x, pop),
         .names = "cap_{col}"
       ),
       across(
@@ -287,7 +291,7 @@ create_shiny_data <- function() {
     summarize(.groups="keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        ~ sum_ratio(.x, pop_100k),
+        ~ sum_ratio(.x, pop),
         .names = "cap_{col}"
       ),
       across(
