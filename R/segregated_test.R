@@ -178,15 +178,34 @@ segregated_test_data <- function(write = TRUE) {
   shiny_segregated <- combined_segregated %>%
     dplyr::arrange(country, date) %>%
     dplyr::group_by(country) %>%
-    mutate(all_pcr_test_cum = pcr_tests_cum_corrected) %>%
-    mutate(all_pcr_test_new = round(robust_rollmean(pcr_test_new_corrected))) %>%
-    mutate(all_rapid_test_cum = rapid_test_cum_corrected) %>%
-    mutate(all_rapid_test_new = round(robust_rollmean(rapid_test_new_corrected))) %>%
+    # dplyr::mutate(all_pcr_test_new = if_else(
+    #   pcr_test_new_corrected == 0,
+    #   NA_real_,
+    #   pcr_test_new_corrected
+    # )) %>%
+    # dplyr::mutate(all_rapid_test_new = if_else(
+    #   rapid_test_new_corrected == 0,
+    #   NA_real_,
+    #   rapid_test_new_corrected
+    # )) %>%
+    dplyr::mutate(all_new_tests = smooth_new_tests(new_tests_corrected,
+                                                 tests_cumulative_corrected)) %>%
+    dplyr::mutate(all_new_tests = round(robust_rollmean(all_new_tests))) %>%
+    dplyr::mutate(all_pcr_test_cum = pcr_tests_cum_corrected) %>%
+    dplyr::mutate(all_pcr_test_new = smooth_new_tests(pcr_test_new_corrected,
+                                               pcr_tests_cum_corrected)) %>%
+    dplyr::mutate(all_pcr_test_new = round(robust_rollmean(all_pcr_test_new))) %>%
+    dplyr::mutate(all_rapid_test_cum = rapid_test_cum_corrected) %>%
+    dplyr::mutate(all_rapid_test_new = smooth_new_tests(rapid_test_new_corrected,
+                                                 rapid_test_cum_corrected)) %>%
+    dplyr::mutate(all_rapid_test_new = round(robust_rollmean(all_rapid_test_new))) %>%
     dplyr::relocate(country,date,tests_cumulative,tests_cumulative_corrected,
+                    new_tests_corrected,
                 pcr_tests_cum,rapid_test_cum,pcr_test_new,rapid_test_new,
                 pcr_tests_cum_corrected,rapid_test_cum_corrected,
                 pcr_test_new_corrected,rapid_test_new_corrected,
                 all_pcr_test_cum,all_rapid_test_cum,
+                all_new_tests,
                 all_pcr_test_new,all_rapid_test_new,source)
 
 
