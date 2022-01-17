@@ -1,11 +1,16 @@
 reference:
+  - title: package
+    contents:
+    - FINDCov19Tracker-package
   - title: Test data
     contents:
       - fetch_test_data
-      - get_daily_test_data
+      - get_test_data
       - combine_all_tests
       - calc_manual_countries
       - process_test_data
+      - segregated_test_data
+      - updates_dates_countries
   - title: Cases data
     contents:
       - download_jhu_data

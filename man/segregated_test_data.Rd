@@ -22,6 +22,6 @@ segregated_test_data(write = TRUE)
 which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
 }
 \examples{
-get_test_data(days = 8, write = FALSE)
+segregated_test_data()
 
 }

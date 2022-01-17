@@ -13,10 +13,11 @@
 #' @param write if csv files should be written. Default TRUE.
 #'
 #' @examples
-#' get_test_data(days = 8, write = FALSE)
+#' segregated_test_data()
 #'
 #' @importFrom dplyr left_join mutate rename relocate select
 #' @export
+#'
 segregated_test_data <- function(write = TRUE) {
 
   #countries with segregated tests
