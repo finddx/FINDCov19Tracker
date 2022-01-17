@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,25 +33,19 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">FINDCov19Tracker</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="reference/index.html">Reference</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/dsbbfinddx/FINDCov19Tracker/">
+  <a href="https://github.com/dsbbfinddx/FINDCov19Tracker/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -66,9 +62,9 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="findcov19tracker" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#findcov19tracker" class="anchor"></a>FINDCov19Tracker</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="findcov19tracker">FINDCov19Tracker<a class="anchor" aria-label="anchor" href="#findcov19tracker"></a>
+</h1></div>
 <ul>
 <li>
 <a href="#findcov19tracker">FINDCov19Tracker</a>
@@ -87,34 +83,34 @@
 </ul>
 <p>Several countries and entities including the World Bank are publishing aggregate estimates on the total number of tests performed. These reports are published across individual websites, statistical reports and press releases – often in multiple languages and updated with different periodicity. Although there is currently no centralized database and many countries do not publish official reports on volumes of tests performed, we are working to build a global picture of how many people are being tested for COVID-19.</p>
 <p>The FIND team publishes its results in a visual application which can be found at</p>
-<p><a href="https://www.finddx.org/covid-19/test-tracker" class="uri">https://www.finddx.org/covid-19/test-tracker</a></p>
-<div id="data-sources" class="section level2">
-<h2 class="hasAnchor">
-<a href="#data-sources" class="anchor"></a>Data Sources</h2>
+<p><a href="https://www.finddx.org/covid-19/test-tracker" class="external-link uri">https://www.finddx.org/covid-19/test-tracker</a></p>
+<div class="section level2">
+<h2 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
+</h2>
 <p><strong>Test data</strong> : Collated everyday by the FIND team, from information found online. A large portion is automated via Python and R (see below in section <a href="#tests">Tests</a>). A minor portion is gathered by manual visits to the respective country websites. <em>Usually the official government websites of each country are consulted.</em></p>
-<p><strong>Case data</strong> : Downloaded daily from the COVID19 <a href="https://github.com/CSSEGISandData/COVID-19">John Hopkins University (JHU) repository</a>.</p>
+<p><strong>Case data</strong> : Downloaded daily from the COVID19 <a href="https://github.com/CSSEGISandData/COVID-19" class="external-link">John Hopkins University (JHU) repository</a>.</p>
 </div>
-<div id="workflow-description" class="section level2">
-<h2 class="hasAnchor">
-<a href="#workflow-description" class="anchor"></a>Workflow Description</h2>
+<div class="section level2">
+<h2 id="workflow-description">Workflow Description<a class="anchor" aria-label="anchor" href="#workflow-description"></a>
+</h2>
 <p>The querying and processing of the cases and test data is done by R package {FINDCovTracker19} found in this repo.</p>
-<div id="covid-19-cases" class="section level3">
-<h3 class="hasAnchor">
-<a href="#covid-19-cases" class="anchor"></a>COVID-19 Cases</h3>
+<div class="section level3">
+<h3 id="covid-19-cases">COVID-19 Cases<a class="anchor" aria-label="anchor" href="#covid-19-cases"></a>
+</h3>
 <ul>
 <li>
-<a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html"><code>FINDCov19Tracker::process_jhu_data()</code></a>: main function which starts all John Hopkins University (JHU) data processing. The functions calls <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html"><code>FINDCov19Tracker::preprocess_jhu_data()</code></a> and <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html"><code>FINDCov19Tracker::check_jhu_data()</code></a> and writes <code>processed/coronavirus_cases.csv</code>.</li>
+<a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html" class="external-link"><code>FINDCov19Tracker::process_jhu_data()</code></a>: main function which starts all John Hopkins University (JHU) data processing. The functions calls <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html" class="external-link"><code>FINDCov19Tracker::preprocess_jhu_data()</code></a> and <a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html" class="external-link"><code>FINDCov19Tracker::check_jhu_data()</code></a> and writes <code>processed/coronavirus_cases.csv</code>.</li>
 </ul>
 </div>
-<div id="covid-19-tests" class="section level3">
-<h3 class="hasAnchor">
-<a href="#covid-19-tests" class="anchor"></a>COVID-19 Tests</h3>
-<p>Test data scraping is mainly automated and run in a GitHub Actions workflow in the <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData">dsbbfinddx/FINDCov19TrackerData</a> repository. See the repos <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData">README</a> for a high-level and detailed workflow description.</p>
+<div class="section level3">
+<h3 id="covid-19-tests">COVID-19 Tests<a class="anchor" aria-label="anchor" href="#covid-19-tests"></a>
+</h3>
+<p>Test data scraping is mainly automated and run in a GitHub Actions workflow in the <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData" class="external-link">dsbbfinddx/FINDCov19TrackerData</a> repository. See the repos <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData" class="external-link">README</a> for a high-level and detailed workflow description.</p>
 </div>
-<div id="shiny-app" class="section level3">
-<h3 class="hasAnchor">
-<a href="#shiny-app" class="anchor"></a>Shiny App</h3>
-<p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html"><code>FINDCov19Tracker::create_shiny_data()</code></a>: makes use of <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_cases.csv"><code>coronavirus_cases.csv</code></a> and <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_tests.csv"><code>coronavirus_tests.csv</code></a>. The function writes <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/data_all.csv"><code>processed/data_all.csv</code></a> which is being used as the input for the Shiny app.</p>
+<div class="section level3">
+<h3 id="shiny-app">Shiny App<a class="anchor" aria-label="anchor" href="#shiny-app"></a>
+</h3>
+<p><a href="https://dsbbfinddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html" class="external-link"><code>FINDCov19Tracker::create_shiny_data()</code></a>: makes use of <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_cases.csv" class="external-link"><code>coronavirus_cases.csv</code></a> and <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_tests.csv" class="external-link"><code>coronavirus_tests.csv</code></a>. The function writes <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/data_all.csv" class="external-link"><code>processed/data_all.csv</code></a> which is being used as the input for the Shiny app.</p>
 </div>
 </div>
 </div>
@@ -122,36 +118,49 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/dsbbfinddx/FINDCov19Tracker/">https://​github.com/​dsbbfinddx/​FINDCov19Tracker/​</a>
-</li>
+<li><a href="https://github.com/dsbbfinddx/FINDCov19Tracker/" class="external-link">Browse source code</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Patrick Schratz <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-0748-6624" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html#citation">Citing FINDCov19Tracker</a></li>
 </ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Patrick Schratz <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-0748-6624" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+</ul>
+</div>
+
+
 
   </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Patrick Schratz.</p>
+  <p></p>
+<p>Developed by Patrick Schratz.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -159,6 +168,8 @@
 
   
 
+
+  
 
   </body>
 </html>
