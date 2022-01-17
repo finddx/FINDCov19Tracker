@@ -7,7 +7,6 @@
 #' @importFrom gert git_status
 #' @importFrom tibble add_column
 create_shiny_data <- function() {
-
   process_jhu_data()
   process_test_data()
 
@@ -48,11 +47,11 @@ create_shiny_data <- function() {
   #   col_types = readr::cols()
   # )
 
-  #cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  # cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
   cv_cases_raw <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
 
-  #cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  # cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
   cv_tests_raw <- readr::read_csv("processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE)
 
@@ -60,7 +59,7 @@ create_shiny_data <- function() {
 
   country_info <-
     readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols(), quoted_na = FALSE) %>% # nolint
-    select(-name) %>%
+    # select(-name) %>%
     filter(!is.na(alpha3)) %>%
     mutate(pop = population / 1000)
 
@@ -70,8 +69,10 @@ create_shiny_data <- function() {
   cv_cases <-
     cv_cases_raw %>%
     rename(name = country) %>%
-    fuzzyjoin::regex_left_join(iso_country, by = c("name" = "regex"),
-     ignore_case = TRUE) %>%
+    fuzzyjoin::regex_left_join(iso_country,
+      by = c("name" = "regex"),
+      ignore_case = TRUE
+    ) %>%
     mutate(country = case_when(
       name == "Kosovo" ~ "XKX",
       name == "SouthAfrica" ~ "ZAF",
@@ -132,7 +133,7 @@ create_shiny_data <- function() {
       by = c("name" = "regex"), ignore_case = TRUE
     ) %>%
     mutate(country = case_when(
-      name == "Kosovo" ~ "XK",
+      name == "Kosovo" ~ "XKX",
       TRUE ~ country
     )) %>%
     # drop non countries
@@ -215,7 +216,7 @@ create_shiny_data <- function() {
       ),
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
-        ~ .x,
+        ~.x,
         .names = "all_{col}"
       )
     ) %>%
@@ -241,7 +242,8 @@ create_shiny_data <- function() {
       income
     ), by = "unit") %>%
     group_by(unit = region, time) %>%
-    summarize(.groups="keep",
+    summarize(
+      .groups = "keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         ~ sum_ratio(.x, pop),
@@ -260,8 +262,8 @@ create_shiny_data <- function() {
   data_who_region <-
     data_country %>%
     left_join(select(country_info,
-                     unit = alpha3, region = continent, who_region,
-                     income
+      unit = alpha3, region = continent, who_region,
+      income
     ), by = "unit") %>%
     group_by(unit = who_region, time) %>%
     summarize(
@@ -288,7 +290,8 @@ create_shiny_data <- function() {
       income
     ), by = "unit") %>%
     group_by(unit = income, time) %>%
-    summarize(.groups="keep",
+    summarize(
+      .groups = "keep",
       across(
         c(cum_cases, new_cases, cum_deaths, new_deaths, cum_tests, new_tests),
         ~ sum_ratio(.x, pop),
@@ -303,6 +306,18 @@ create_shiny_data <- function() {
     ) %>%
     ungroup() %>%
     tibble::add_column(set = "income", .before = 1)
+
+  country_name <-
+    country_name |>
+    rename(unit = country) |>
+    rename(country = name) |>
+    left_join(select(country_info, name, alpha3), by = c("unit" = "alpha3")) |>
+    mutate(country = coalesce(name, country)) |>
+    select(-name) |>
+    rename(
+      name = country,
+      country = unit
+    )
 
   data_all <-
     bind_rows(data_country, data_region, data_who_region, data_income) %>%
@@ -347,7 +362,7 @@ create_shiny_data <- function() {
       pos = pos,
       tests = cap_new_tests
     ) %>%
-    left_join(country_info, by = c("unit" = "alpha3")) %>%
+    left_join(select(country_info, -name), by = c("unit" = "alpha3")) %>%
     left_join(latest_test_date, by = "unit")
 
 
@@ -355,6 +370,4 @@ create_shiny_data <- function() {
 
   readr::write_csv(unit_info, "processed/unit_info.csv")
   readr::write_csv(data_all, "processed/data_all.csv")
-
 }
-
