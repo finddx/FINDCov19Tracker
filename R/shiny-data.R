@@ -133,7 +133,7 @@ create_shiny_data <- function() {
       by = c("name" = "regex"), ignore_case = TRUE
     ) %>%
     mutate(country = case_when(
-      name == "Kosovo" ~ "XK",
+      name == "Kosovo" ~ "XKX",
       TRUE ~ country
     )) %>%
     # drop non countries
