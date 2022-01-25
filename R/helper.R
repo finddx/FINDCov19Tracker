@@ -9,6 +9,7 @@ clean_selenium <- function(data) {
   data_clean <- data %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, ",", "")) %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\.", "")) %>%
+    mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\s", "")) %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, " ", "")) %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, "’", "")) %>%
     mutate(tests_cumulative = str_replace_all(tests_cumulative, "\\u202f", "")) %>%
