@@ -516,7 +516,7 @@ combine_all_tests <- function() {
     paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
 
   files_df <- rio::import_list(filelist, rbind = TRUE) %>%
-    dplyr::arrange(dplyr::desc(date, country)) %>%
+    dplyr::arrange(country,date) %>%
     dplyr::relocate(country, tests_cumulative, new_tests) %>%
     dplyr::select(country, tests_cumulative, new_tests,
      tests_cumulative_corrected, new_tests_corrected, date, source)
