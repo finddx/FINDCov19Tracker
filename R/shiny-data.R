@@ -225,6 +225,75 @@ create_shiny_data <- function() {
     tibble::add_column(set = "country", .before = 1) %>%
     rename(unit = country)
 
+
+
+
+  # new calculations -----------------------------------------------------------
+
+  data_all_no_groups <-
+    data_country %>%
+    mutate(pop = pop_100k * 100) |>  # pop in 1000
+    filter(!is.na(unit)) %>%
+    mutate(across(where(is.numeric), function(e) {
+      e[is.na(e)] <- NA
+      e
+    })) %>%
+    select(-c(
+      cum_cases, new_cases, cum_deaths, new_deaths, tests,
+      cum_tests, new_tests
+    )) %>%
+    arrange(time, set, unit) %>%
+    # left_join(country_name, by = c("unit" = "country"))|>
+    left_join(select(country_info,
+      unit = alpha3, name, country = alpha3, continent, who_region,
+      income
+    ), by = "unit") %>%
+    mutate(period = time) |>
+    shinyfind::summarize_over_time() |>
+    mutate(world = "world") # pseudo group, for worldwide summary measures
+
+  colnames_expected <- c(
+    "set", "name", "unit", "time", "cum_tests_orig", "new_tests_orig",
+    "pop_100k", "pop", "new_cases_orig", "new_deaths_orig", "cap_cum_cases",
+    "cap_new_cases", "cap_cum_deaths", "cap_new_deaths", "cap_cum_tests",
+    "cap_new_tests", "all_cum_cases", "all_new_cases", "all_cum_deaths",
+    "all_new_deaths", "all_cum_tests", "all_new_tests", "pos"
+  )
+
+
+  sets <- c("country", "income", "continent", "who_region", "world")
+
+  data_all_new <-
+    purrr::map(
+      set_names(sets, sets),
+      \(x) shinyfind::summarize_over_group(data_all_no_groups, group = x)
+    ) |>
+    bind_rows(.id = "set") |>
+    rename(time = period) |>
+    rename_with(\(x) gsub("^avg_", "", x)) |>
+    # add orig columns for country data
+    left_join(
+      select(data_country, set, unit, time, ends_with("orig")),
+      by = c("set", "unit", "time")
+    ) |>
+    select({{ colnames_expected }}) |>
+    # continent is called 'region' in the output
+    mutate(set = recode(set, "continent" = "region")) |>
+    arrange(time, set, unit) |>
+    # pop for aggregates is confusing, don't report
+    mutate(
+      pop = if_else(set == "country", pop, NA_real_),
+      pop_100k = if_else(set == "country", pop_100k, NA_real_)
+    ) |>
+    # no rame reported for non country sets
+    mutate(
+      name = if_else(set == "country", name, NA_character_)
+    )
+
+
+  # old calculations -----------------------------------------------------------
+
+
   # aggregate to regions, income groups
 
   # if ratios are aggregated, only use observations that have data for
@@ -333,6 +402,10 @@ create_shiny_data <- function() {
     arrange(time, set, unit) %>%
     left_join(country_name, by = c("unit" = "country")) %>%
     relocate(name, .before = unit)
+
+
+  # FIXME, remove old calculations from above
+  data_all <- data_all_new
 
 
   # summary table --------------------------------------------------------------
