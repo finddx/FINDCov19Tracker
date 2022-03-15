@@ -34,7 +34,7 @@ process_test_data <- function() {
       comment = col_character(),
       status = col_character()
     ),
-    col_names = TRUE, quoted_na = FALSE
+    col_names = TRUE
   ) %>% # nolint
     dplyr::select(country, jhu_ID, source) %>%
     dplyr::rename(url = source)
@@ -51,7 +51,7 @@ process_test_data <- function() {
     date = col_date(format = ""),
     source = col_character()
   ),
-  col_names = TRUE, quoted_na = FALSE
+  col_names = TRUE
 ) %>% # nolint
   dplyr::arrange(country, date) %>%
   dplyr::rename(jhu_ID = country) %>%
@@ -149,9 +149,9 @@ process_test_data <- function() {
   ) {
     process_jhu_data()
   }
-  cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
+  cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols())
   countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
-    col_types = readr::cols(), quoted_na = FALSE
+    col_types = readr::cols()
   ))
 
   # check consistency of country names across datasets
@@ -238,7 +238,7 @@ get_test_data <- function(days = 1, write = TRUE) {
           date = col_date(format = ""),
           source = col_character()
         ),
-        col_names = TRUE, quoted_na = FALSE
+        col_names = TRUE
       ) %>%
       dplyr::mutate(source = "manually")
   } else {
@@ -262,7 +262,7 @@ get_test_data <- function(days = 1, write = TRUE) {
       comment = col_character(),
       status = col_character()
     ),
-    col_names = TRUE, quoted_na = FALSE
+    col_names = TRUE
   ) %>% # nolint
     dplyr::select(jhu_ID) %>%
     dplyr::rename(country = jhu_ID) %>%
