@@ -187,6 +187,9 @@ create_shiny_data <- function() {
 
   # calculations ---------------------------------------------------------------
 
+  . <- shinyfind::get_data_all()
+  country_last_update_info <- .$country_last_update_info
+
   data_country <-
     data_combined |>
     # prefix cummulative vars
@@ -227,7 +230,6 @@ create_shiny_data <- function() {
 
 
 
-
   # new calculations -----------------------------------------------------------
 
   data_all_no_groups <-
@@ -244,10 +246,12 @@ create_shiny_data <- function() {
     )) |>
     arrange(time, set, unit) |>
     # left_join(country_name, by = c("unit" = "country"))|>
-    left_join(select(country_info,
-      unit = alpha3, name, country = alpha3, continent, who_region,
-      income
-    ), by = "unit") |>
+    # left_join(select(country_info,
+    #   unit = alpha3, name, country = alpha3, continent, who_region,
+    #   income
+    # ), by = "unit") |>
+    left_join(country_last_update_info, by = "unit") |>
+    filter(!is.na(last_update)) |>
     mutate(period = time) |>
     shinyfind::summarize_over_time() |>
     mutate(world = "world") # pseudo group, for worldwide summary measures
@@ -270,7 +274,8 @@ create_shiny_data <- function() {
     ) |>
     bind_rows(.id = "set") |>
     rename(time = period) |>
-    rename_with(\(x) gsub("^avg_", "", x)) |>
+    rename(pos = avg_pos) |>
+    rename_with(\(x) gsub("^sum_", "", x)) |>
     # add orig columns for country data
     left_join(
       select(data_country, set, unit, time, ends_with("orig")),
