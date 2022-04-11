@@ -1,12 +1,12 @@
 #' Find and write countries which need manual processing
 #' @description
-#'  This functions reads the file with errors for the current date in the folder [issues](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues),
-#'  and generates a template for the current day in [manual/need-processing/](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/need-processing).
+#'  This functions reads the file with errors for the current date in the folder [issues](https://github.com/finddx/FINDCov19TrackerData/tree/master/issues),
+#'  and generates a template for the current day in [manual/need-processing/](https://github.com/finddx/FINDCov19TrackerData/tree/master/manual/need-processing).
 #'
 #' This process updates the file `-need-manual-processing.csv` *only* for the current day.
-#' To see if there are errors for past dates check the folder [issues](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues)
+#' To see if there are errors for past dates check the folder [issues](https://github.com/finddx/FINDCov19TrackerData/tree/master/issues)
 #'
-#' For the automated countries with error `test_cumulative` is set to 0 in the templates [manual/need-processing/](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/need-processing).
+#' For the automated countries with error `test_cumulative` is set to 0 in the templates [manual/need-processing/](https://github.com/finddx/FINDCov19TrackerData/tree/master/manual/need-processing).
 #'
 #'
 #' @importFrom readr read_csv write_csv
@@ -18,7 +18,7 @@ calc_manual_countries <- function() {
 
   # read list of all countries
   countries_all <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
     cols(
       country = col_character(),
       jhu_ID = col_character(),
@@ -40,7 +40,7 @@ calc_manual_countries <- function() {
 
   today <- format(Sys.time(), "%Y-%m-%d")
 
-  countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/issues/all-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
+  countries_error <- readr::read_csv(sprintf("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/issues/all-countries-error.csv", as.character(Sys.Date(), format = "%Y-%m-%d")), # nolint
     col_types = cols(
       country = col_character(),
       date = col_date(format = ""),
@@ -96,7 +96,7 @@ updates_dates_countries <- function() {
 
   # read list of all countries
   countries_all <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv",
     cols(
       country = col_character(),
       date = col_date(format = ""),
@@ -113,7 +113,7 @@ updates_dates_countries <- function() {
     dplyr::rename(country = jhu_ID)
 
   countries_url <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
     cols(
       country = col_character(),
       jhu_ID = col_character(),

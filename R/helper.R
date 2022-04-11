@@ -60,7 +60,7 @@ clean_selenium_segregated <- function(data) {
 }
 
 calculate_daily_tests_r_fetch <- function(data, tests_cumulative) {
-  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", lubridate::today() - 1), quoted_na = FALSE) %>% # nolint
+  data_yesterday <- readr::read_csv(sprintf("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", lubridate::today() - 1), quoted_na = FALSE) %>% # nolint
     dplyr::filter(country == data$country)
 
   # if no yesterday data exists yet, we return NA

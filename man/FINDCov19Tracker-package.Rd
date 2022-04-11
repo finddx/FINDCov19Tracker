@@ -11,7 +11,7 @@ What the package does (one paragraph).
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/dsbbfinddx/FINDCov19Tracker}
+  \item \url{https://github.com/finddx/FINDCov19Tracker}
 }
 
 }

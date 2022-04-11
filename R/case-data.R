@@ -40,7 +40,7 @@ process_jhu_data <- function() {
 
   # load country data
   # suppress warning for the first column being unnamed
-  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/data/master/raw/countries_codes_and_coordinates.csv",
+  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
     col_types = readr::cols(), quoted_na = FALSE
   ))
 

@@ -3,7 +3,7 @@
 \name{segregated_test_data}
 \alias{segregated_test_data}
 \title{Get segregated tests from Selenium and combine them.
-Using the parameter \code{days}, all files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.}
+Using the parameter \code{days}, all files in \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.}
 \usage{
 segregated_test_data(write = TRUE)
 }
@@ -12,14 +12,14 @@ segregated_test_data(write = TRUE)
 }
 \description{
 \strong{Input:} Daily test data scraped via Selenium
-\href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch}{\code{automated/fetch}} and \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium}{\code{automated/selenium}} directories.
+\href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/fetch}{\code{automated/fetch}} and \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/selenium}{\code{automated/selenium}} directories.
 
 \strong{Output:}
 \itemize{
 \item \code{segregated.csv}
 }
 
-which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
+which are then deployed by CI to the \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{finddx/FINDCov19TrackerData} repo.
 }
 \examples{
 segregated_test_data()

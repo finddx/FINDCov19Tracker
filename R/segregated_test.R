@@ -1,15 +1,15 @@
 #' Get segregated tests from Selenium and combine them.
-#' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
+#' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
 #'
 #
 #' @description
 #'   **Input:** Daily test data scraped via Selenium
-#'   [`automated/fetch`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
+#'   [`automated/fetch`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
 #'
 #'   **Output:**
 #'   - `segregated.csv`
 #'
-#'   which are then deployed by CI to the [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
+#'   which are then deployed by CI to the [`automated/merged/`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `finddx/FINDCov19TrackerData` repo.
 #' @param write if csv files should be written. Default TRUE.
 #'
 #' @examples
@@ -40,7 +40,7 @@ segregated_test_data <- function(write = TRUE) {
 
   # Tests cumulative corrected
   test_data <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv") %>%
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv") %>%
     dplyr::select(country, date, tests_cumulative, tests_cumulative_corrected, new_tests_corrected, source) %>%
     dplyr::filter(date >= "2021-03-22") %>%
     dplyr::filter(country %in% segregated_countries)
@@ -62,7 +62,7 @@ segregated_test_data <- function(write = TRUE) {
 
   # read list of all countries
   countries_all <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
     cols(
       country = col_character(),
       jhu_ID = col_character(),
@@ -85,7 +85,7 @@ segregated_test_data <- function(write = TRUE) {
     rename(date = y)
 
   selenium_list <- sprintf(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", # nolint
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", # nolint
     window_update
   )
   # When only one day is updated rio::import_list() won't have file column

@@ -7,6 +7,6 @@
 combine_all_tests()
 }
 \description{
-This function reads all clean input files from the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged} directory and row-binds them. The output is written to a file called
+This function reads all clean input files from the \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged} directory and row-binds them. The output is written to a file called
 \code{coronavirus_tests_new.csv} and uploaded to \code{automated/coronavirus_tests_new.csv}.
 }

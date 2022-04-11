@@ -3,7 +3,7 @@
 \name{get_test_data}
 \alias{get_test_data}
 \title{Get tests from different sources (Selenium, fetch, and manual) and combine them.
-Using the parameter \code{days}, all files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.}
+Using the parameter \code{days}, all files in \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} are updated for the last dates given the input number.}
 \usage{
 get_test_data(days = 1, write = TRUE)
 }
@@ -14,7 +14,7 @@ get_test_data(days = 1, write = TRUE)
 }
 \description{
 \strong{Input:} Daily test data scraped via Selenium and "R fetch functions" from
-\href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch}{\code{automated/fetch}} and \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium}{\code{automated/selenium}} directories.
+\href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/fetch}{\code{automated/fetch}} and \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/selenium}{\code{automated/selenium}} directories.
 
 \strong{Output:}
 \itemize{
@@ -22,7 +22,7 @@ get_test_data(days = 1, write = TRUE)
 \item \code{countries-error.csv}
 }
 
-which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
+which are then deployed by CI to the \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged}{\verb{automated/merged/}} directory in the \code{finddx/FINDCov19TrackerData} repo.
 }
 \details{
 #' When manual countries have not been updated,
@@ -30,11 +30,11 @@ which are then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov
 When selenium or fetch process failed and those values have not been corrected manually,
 \code{coronavirus_cases_new.csv} might have negative values or NA in new_tests and new_tests_corrected variables.
 
-Countries with negative values or \code{NA} are listed as well given the \code{days} input in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues}{\verb{issues/}}.
+Countries with negative values or \code{NA} are listed as well given the \code{days} input in the folder \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/issues}{\verb{issues/}}.
 
-Parameter days allows to update past dates using manual files in \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/processed}{manual/processed/}; except for dates on "2021-02-18" or before.
+Parameter days allows to update past dates using manual files in \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/manual/processed}{manual/processed/}; except for dates on "2021-02-18" or before.
 It allows to update from "2021-02-19" when the automatic workflow was implemented.
-To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged/}.
+To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged}{automated/merged/}.
 }
 \examples{
 get_test_data(write = FALSE)

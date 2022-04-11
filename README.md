@@ -30,15 +30,15 @@ The querying and processing of the cases and test data is done by R package {FIN
 
 ### COVID-19 Cases
 
-- [`FINDCov19Tracker::process_jhu_data()`](https://dsbbfinddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html): main function which starts all John Hopkins University (JHU) data processing.
-  The functions calls [`FINDCov19Tracker::preprocess_jhu_data()`](https://dsbbfinddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html) and [`FINDCov19Tracker::check_jhu_data()`](https://dsbbfinddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html) and writes `processed/coronavirus_cases.csv`.
+- [`FINDCov19Tracker::process_jhu_data()`](https://finddx.github.io/FINDCov19Tracker/reference/process_jhu_data.html): main function which starts all John Hopkins University (JHU) data processing.
+  The functions calls [`FINDCov19Tracker::preprocess_jhu_data()`](https://finddx.github.io/FINDCov19Tracker/reference/preprocess_jhu_data.html) and [`FINDCov19Tracker::check_jhu_data()`](https://finddx.github.io/FINDCov19Tracker/reference/check_jhu_data.html) and writes `processed/coronavirus_cases.csv`.
 
 ### COVID-19 Tests
 
-Test data scraping is mainly automated and run in a GitHub Actions workflow in the [dsbbfinddx/FINDCov19TrackerData](https://github.com/dsbbfinddx/FINDCov19TrackerData) repository.
-See the repos [README](https://github.com/dsbbfinddx/FINDCov19TrackerData) for a high-level and detailed workflow description.
+Test data scraping is mainly automated and run in a GitHub Actions workflow in the [finddx/FINDCov19TrackerData](https://github.com/finddx/FINDCov19TrackerData) repository.
+See the repos [README](https://github.com/finddx/FINDCov19TrackerData) for a high-level and detailed workflow description.
 
 ### Shiny App
 
-[`FINDCov19Tracker::create_shiny_data()`](https://dsbbfinddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html): makes use of [`coronavirus_cases.csv`](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_cases.csv) and [`coronavirus_tests.csv`](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/coronavirus_tests.csv).
-The function writes [`processed/data_all.csv`](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/data_all.csv) which is being used as the input for the Shiny app.
+[`FINDCov19Tracker::create_shiny_data()`](https://finddx.github.io/FINDCov19Tracker/reference/create_shiny_data.html): makes use of [`coronavirus_cases.csv`](https://github.com/finddx/FINDCov19TrackerData/blob/master/processed/coronavirus_cases.csv) and [`coronavirus_tests.csv`](https://github.com/finddx/FINDCov19TrackerData/blob/master/processed/coronavirus_tests.csv).
+The function writes [`processed/data_all.csv`](https://github.com/finddx/FINDCov19TrackerData/blob/master/processed/data_all.csv) which is being used as the input for the Shiny app.

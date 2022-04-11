@@ -47,18 +47,18 @@ create_shiny_data <- function() {
   #   col_types = readr::cols()
   # )
 
-  # cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  # cv_cases_raw <- readr::read_csv("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
   cv_cases_raw <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols(), quoted_na = FALSE)
 
-  # cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  # cv_tests_raw <- readr::read_csv("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
   cv_tests_raw <- readr::read_csv("processed/coronavirus_tests.csv", col_types = readr::cols(), quoted_na = FALSE)
 
-  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
+  pop_raw <- readr::read_csv("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/raw/UN_populations_2020.csv", col_types = readr::cols(), quoted_na = FALSE) # nolint
 
   country_info <-
-    readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols(), quoted_na = FALSE) |> # nolint
+    readr::read_csv("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/raw/country_info.csv", col_types = readr::cols(), quoted_na = FALSE) |> # nolint
     # select(-name) |>
     filter(!is.na(alpha3)) |>
     mutate(pop = population / 1000)

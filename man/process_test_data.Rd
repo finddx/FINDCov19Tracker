@@ -14,12 +14,12 @@ and might have \code{NA} or negative values for new_test_corrected.
 \details{
 This file is created/updated by \code{process_jhu_data()} which needs to be run
 before.
-\strong{Input:} test data combined from different sources (Selenium, fetch, and manual)\href{https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/automated/coronavirus_tests_new.csv}{\code{automated/coronavirus_tests_new.csv}}.
+\strong{Input:} test data combined from different sources (Selenium, fetch, and manual)\href{https://github.com/finddx/FINDCov19TrackerData/blob/master/automated/coronavirus_tests_new.csv}{\code{automated/coronavirus_tests_new.csv}}.
 
 #'   \strong{Output:}
 \itemize{
 \item \code{coronavirus_cases.csv}
 }
 
-which is then deployed by CI to the \href{https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/processed}{\verb{processed/}} directory in the \code{dsbbfinddx/FINDCov19TrackerData} repo.
+which is then deployed by CI to the \href{https://github.com/finddx/FINDCov19TrackerData/tree/master/processed}{\verb{processed/}} directory in the \code{finddx/FINDCov19TrackerData} repo.
 }

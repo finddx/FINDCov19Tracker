@@ -6,12 +6,12 @@
 #'
 #' This file is created/updated by `process_jhu_data()` which needs to be run
 #' before.
-#'   **Input:** test data combined from different sources (Selenium, fetch, and manual)[`automated/coronavirus_tests_new.csv`](https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/automated/coronavirus_tests_new.csv).
+#'   **Input:** test data combined from different sources (Selenium, fetch, and manual)[`automated/coronavirus_tests_new.csv`](https://github.com/finddx/FINDCov19TrackerData/blob/master/automated/coronavirus_tests_new.csv).
 #'
 #'#'   **Output:**
 #'   - `coronavirus_cases.csv`
 #'
-#'   which is then deployed by CI to the [`processed/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/processed) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
+#'   which is then deployed by CI to the [`processed/`](https://github.com/finddx/FINDCov19TrackerData/tree/master/processed) directory in the `finddx/FINDCov19TrackerData` repo.
 #'
 #' @importFrom utils tail
 #' @export
@@ -19,7 +19,7 @@ process_test_data <- function() {
 
   # read list of all countries
   countries_all <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
     cols(
       country = col_character(),
       jhu_ID = col_character(),
@@ -41,7 +41,7 @@ process_test_data <- function() {
 
   # read test data combining Scrape, fetch, and manual data
   cv_tests <- readr::read_csv(
-  "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv",
+  "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv",
   cols(
     country = col_character(),
     tests_cumulative = col_double(),
@@ -150,7 +150,7 @@ process_test_data <- function() {
     process_jhu_data()
   }
   cv_cases <- readr::read_csv("processed/coronavirus_cases.csv", col_types = readr::cols())
-  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
+  countries <- suppressWarnings(readr::read_csv("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/raw/countries_codes_and_coordinates.csv",
     col_types = readr::cols()
   ))
 
@@ -183,28 +183,28 @@ process_test_data <- function() {
 
 
 #' Get tests from different sources (Selenium, fetch, and manual) and combine them.
-#' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
+#' Using the parameter `days`, all files in [`automated/merged/`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged) are updated for the last dates given the input number.
 #'
 #' #' When manual countries have not been updated,
 #' `coronavirus_cases_new.csv` has `NA` for tests_cumulative and new_tests.
 #' When selenium or fetch process failed and those values have not been corrected manually,
 #' `coronavirus_cases_new.csv` might have negative values or NA in new_tests and new_tests_corrected variables.
 #'
-#' Countries with negative values or `NA` are listed as well given the `days` input in the folder [`issues/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues).
+#' Countries with negative values or `NA` are listed as well given the `days` input in the folder [`issues/`](https://github.com/finddx/FINDCov19TrackerData/tree/master/issues).
 #'
-#' Parameter days allows to update past dates using manual files in [manual/processed/](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/processed); except for dates on "2021-02-18" or before.
+#' Parameter days allows to update past dates using manual files in [manual/processed/](https://github.com/finddx/FINDCov19TrackerData/tree/master/manual/processed); except for dates on "2021-02-18" or before.
 #' It allows to update from "2021-02-19" when the automatic workflow was implemented.
-#' To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder [automated/merged/](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged).
+#' To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder [automated/merged/](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged).
 #'
 #' @description
 #'   **Input:** Daily test data scraped via Selenium and "R fetch functions" from
-#'   [`automated/fetch`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
+#'   [`automated/fetch`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/fetch) and [`automated/selenium`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/selenium) directories.
 #'
 #'   **Output:**
 #'   - `automated-tests.json`
 #'   - `countries-error.csv`
 #'
-#'   which are then deployed by CI to the [`automated/merged/`](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `dsbbfinddx/FINDCov19TrackerData` repo.
+#'   which are then deployed by CI to the [`automated/merged/`](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged) directory in the `finddx/FINDCov19TrackerData` repo.
 #' @param days days to combine. It should always be bigger than 0.
 #' @param write if csv files should be written. Default TRUE.
 #'
@@ -228,7 +228,7 @@ get_test_data <- function(days = 1, write = TRUE) {
     # Given the implementation of the automated workflow on "2021-02-19"
     # The process should not take data from selenium or fetch on "2021-02-18"
     data_2021_02_18 <- readr::read_csv(
-        "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/merged/2021-02-18-automated-tests.csv", # nolint
+        "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/merged/2021-02-18-automated-tests.csv", # nolint
         cols(
           country = col_character(),
           tests_cumulative = col_double(),
@@ -247,7 +247,7 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   # read list of all countries
   countries_all <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/resources/countries-urls.csv",
     cols(
       country = col_character(),
       jhu_ID = col_character(),
@@ -270,7 +270,7 @@ get_test_data <- function(days = 1, write = TRUE) {
     rename(date = y)
 
   selenium_list <- sprintf(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", # nolint
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/selenium/%s-tests-selenium.csv", # nolint
     window_update
   )
   selenium_tests <- rio::import_list(selenium_list, rbind = TRUE) %>%
@@ -290,7 +290,7 @@ get_test_data <- function(days = 1, write = TRUE) {
     )
 
   fetch_list <- sprintf(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", # nolint
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/fetch/%s-tests-R.csv", # nolint
     seq(first_date, as.Date("2021-05-12"), by = "days")
   )
   fetch_tests_daily <- rio::import_list(fetch_list, rbind = TRUE) %>%
@@ -308,14 +308,14 @@ get_test_data <- function(days = 1, write = TRUE) {
     )
 
   manual_list <- sprintf(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", # nolint
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/manual/processed/%s-processed-manually.csv", # nolint
     window_update
   )
 
   manual_tests_daily <- tryCatch(
     {
       fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
-                      owner = "dsbbfinddx",
+                      owner = "finddx",
                       repo = "FINDCov19TrackerData",
                       branch = "selenium"
       )
@@ -324,7 +324,7 @@ get_test_data <- function(days = 1, write = TRUE) {
       # the time frame to update (first_date and today)
       filelist_manual <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
         stringr::str_subset(., "manual/processed/.*processed-manually.csv$") %>%
-        paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
+        paste0("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/", .)
 
       manual_files <- manual_list[which(manual_list %in% filelist_manual)]
 
@@ -442,7 +442,7 @@ get_test_data <- function(days = 1, write = TRUE) {
 
   # get countries with NA (before 2020-03-18)
   old_errors <- readr::read_csv(
-    "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv") %>%
+    "https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/automated/coronavirus_tests_new.csv") %>%
     dplyr::arrange(country,date) %>%
     dplyr::group_by(country) %>%
     mutate(new_tests_calc=if_else(
@@ -482,7 +482,7 @@ get_test_data <- function(days = 1, write = TRUE) {
 }
 
 #' Combine test daily data from all countries across all dates
-#' @description This function reads all clean input files from the [automated/merged](https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged) directory and row-binds them. The output is written to a file called
+#' @description This function reads all clean input files from the [automated/merged](https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged) directory and row-binds them. The output is written to a file called
 #' `coronavirus_tests_new.csv` and uploaded to `automated/coronavirus_tests_new.csv`.
 #' @importFrom stringr str_subset
 #' @importFrom gh gh
@@ -494,14 +494,14 @@ get_test_data <- function(days = 1, write = TRUE) {
 combine_all_tests <- function() {
 
   fl_gh <- gh::gh("GET /repos/:owner/:repo/git/trees/master?recursive=1",
-    owner = "dsbbfinddx",
+    owner = "finddx",
     repo = "FINDCov19TrackerData",
     branch = "selenium"
   )
 
   filelist <- unlist(lapply(fl_gh$tree, "[", "path"), use.names = FALSE) %>%
     stringr::str_subset(., "automated/merged/.*tests.csv$") %>%
-    paste0("https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/", .)
+    paste0("https://raw.githubusercontent.com/finddx/FINDCov19TrackerData/master/", .)
 
   files_df <- rio::import_list(filelist, rbind = TRUE) %>%
     dplyr::arrange(country,date) %>%
