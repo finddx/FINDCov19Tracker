@@ -8,7 +8,7 @@ automated-tests.json
 countries-error.csv
 
 
-which are then deployed by CI to the automated/merged/ directory in the dsbbfinddx/FINDCov19TrackerData repo.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
+which are then deployed by CI to the automated/merged/ directory in the finddx/FINDCov19TrackerData repo.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
@@ -35,7 +35,7 @@ which are then deployed by CI to the automated/merged/ directory in the dsbbfind
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/dsbbfinddx/FINDCov19Tracker/" class="external-link">
+  <a href="https://github.com/finddx/FINDCov19Tracker/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -50,17 +50,17 @@ which are then deployed by CI to the automated/merged/ directory in the dsbbfind
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get tests from different sources (Selenium, fetch, and manual) and combine them.
-Using the parameter <code>days</code>, all files in <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged" class="external-link"><code>automated/merged/</code></a> are updated for the last dates given the input number.</h1>
-    <small class="dont-index">Source: <a href="https://github.com/dsbbfinddx/FINDCov19Tracker/blob/HEAD/R/test-data.R" class="external-link"><code>R/test-data.R</code></a></small>
+Using the parameter <code>days</code>, all files in <a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged" class="external-link"><code>automated/merged/</code></a> are updated for the last dates given the input number.</h1>
+    <small class="dont-index">Source: <a href="https://github.com/finddx/FINDCov19Tracker/blob/HEAD/R/test-data.R" class="external-link"><code>R/test-data.R</code></a></small>
     <div class="hidden name"><code>get_test_data.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p><strong>Input:</strong> Daily test data scraped via Selenium and "R fetch functions" from
-<a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/fetch" class="external-link"><code>automated/fetch</code></a> and <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/selenium" class="external-link"><code>automated/selenium</code></a> directories.</p>
+<a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/fetch" class="external-link"><code>automated/fetch</code></a> and <a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/selenium" class="external-link"><code>automated/selenium</code></a> directories.</p>
 <p><strong>Output:</strong></p><ul><li><p><code>automated-tests.json</code></p></li>
 <li><p><code>countries-error.csv</code></p></li>
-</ul><p>which are then deployed by CI to the <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged" class="external-link"><code>automated/merged/</code></a> directory in the <code>dsbbfinddx/FINDCov19TrackerData</code> repo.</p>
+</ul><p>which are then deployed by CI to the <a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged" class="external-link"><code>automated/merged/</code></a> directory in the <code>finddx/FINDCov19TrackerData</code> repo.</p>
     </div>
 
     <div id="ref-usage">
@@ -80,10 +80,10 @@ Using the parameter <code>days</code>, all files in <a href="https://github.com/
 <code>coronavirus_cases_new.csv</code> has <code>NA</code> for tests_cumulative and new_tests.
 When selenium or fetch process failed and those values have not been corrected manually,
 <code>coronavirus_cases_new.csv</code> might have negative values or NA in new_tests and new_tests_corrected variables.</p>
-<p>Countries with negative values or <code>NA</code> are listed as well given the <code>days</code> input in the folder <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/issues" class="external-link"><code>issues/</code></a>.</p>
-<p>Parameter days allows to update past dates using manual files in <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/manual/processed" class="external-link">manual/processed/</a>; except for dates on "2021-02-18" or before.
+<p>Countries with negative values or <code>NA</code> are listed as well given the <code>days</code> input in the folder <a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/issues" class="external-link"><code>issues/</code></a>.</p>
+<p>Parameter days allows to update past dates using manual files in <a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/manual/processed" class="external-link">manual/processed/</a>; except for dates on "2021-02-18" or before.
 It allows to update from "2021-02-19" when the automatic workflow was implemented.
-To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder <a href="https://github.com/dsbbfinddx/FINDCov19TrackerData/tree/master/automated/merged" class="external-link">automated/merged/</a>.</p>
+To update data on 2021-02-18 or previous days, changes should be made using the specific date in the folder <a href="https://github.com/finddx/FINDCov19TrackerData/tree/master/automated/merged" class="external-link">automated/merged/</a>.</p>
     </div>
 
     <div id="ref-examples">
@@ -121,21 +121,21 @@ To update data on 2021-02-18 or previous days, changes should be made using the 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   source &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $countries_error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 262 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   country [70]</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 67 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   country [64]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    country     date       tests_cumulative new_tests tests_cumulative_corrected</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Afghanistan 2022-04-08               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Afghanistan 2022-04-09               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Afghanistan 2022-04-10               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Afghanistan 2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Andorra     2022-04-08               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Andorra     2022-04-09               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Andorra     2022-04-10               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Andorra     2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Barbados    2022-04-08           <span style="text-decoration: underline;">619</span>228     -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">401</span>                     <span style="text-decoration: underline;">619</span>228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Barbados    2022-04-11           <span style="text-decoration: underline;">620</span>629     -<span style="color: #BB0000; text-decoration: underline;">2</span><span style="color: #BB0000;">565</span>                     <span style="text-decoration: underline;">620</span>629</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 252 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Afghanistan 2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Andorra     2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Bhutan      2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Bolivia     2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Brunei      2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Cambodia    2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> China       2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> CostaRica   2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Croatia     2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Cyprus      2022-04-11               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 57 more rows, and 2 more variables: new_tests_corrected &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   source &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"></span>
