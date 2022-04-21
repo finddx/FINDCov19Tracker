@@ -274,13 +274,14 @@ create_shiny_data <- function() {
     ) |>
     bind_rows(.id = "set") |>
     rename(time = period) |>
-    rename(pos = avg_pos) |>
-    rename_with(\(x) gsub("^sum_", "", x)) |>
+    # rename(pos = avg_pos) |>
+    # rename_with(\(x) gsub("^sum_", "", x)) |>
     # add orig columns for country data
     left_join(
       select(data_country, set, unit, time, ends_with("orig")),
       by = c("set", "unit", "time")
     ) |>
+    # drops e.g., sum_
     select({{ colnames_expected }}) |>
     # continent is called 'region' in the output
     mutate(set = recode(set, "continent" = "region")) |>
