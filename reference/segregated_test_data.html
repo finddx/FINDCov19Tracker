@@ -75,7 +75,7 @@ Using the parameter <code>days</code>, all files in <a href="https://github.com/
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">segregated_test_data</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">167003</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">167186</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">8</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Delimiter:</span> ","</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">chr</span>  (3): country, jhu_ID, source</span>
@@ -87,7 +87,7 @@ Using the parameter <code>days</code>, all files in <a href="https://github.com/
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Segregated data is scraped since 2021-03-22.</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span>             Data before that date is not available</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = c("country", "date")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5,312 × 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5,322 × 15</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   country [10]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    country date       tests_cum…¹ tests…² new_t…³ source pcr_t…⁴ rapid…⁵ pcr_t…⁶</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -101,7 +101,7 @@ Using the parameter <code>days</code>, all files in <a href="https://github.com/
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Austria 2021-03-30    23<span style="text-decoration: underline;">093</span>306  2.31<span style="color: #949494;">e</span>7  <span style="text-decoration: underline;">483</span>046 https… 6<span style="text-decoration: underline;">474</span>269  1.66<span style="color: #949494;">e</span>7   <span style="text-decoration: underline;">52</span>504</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Austria 2021-03-31    23<span style="text-decoration: underline;">451</span>521  2.35<span style="color: #949494;">e</span>7  <span style="text-decoration: underline;">358</span>215 https… 6<span style="text-decoration: underline;">543</span>059  1.69<span style="color: #949494;">e</span>7   <span style="text-decoration: underline;">68</span>790</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Austria 2021-04-01    23<span style="text-decoration: underline;">805</span>240  2.38<span style="color: #949494;">e</span>7  <span style="text-decoration: underline;">353</span>719 https… 6<span style="text-decoration: underline;">616</span>140  1.72<span style="color: #949494;">e</span>7   <span style="text-decoration: underline;">73</span>081</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 5,302 more rows, 6 more variables: rapid_test_new &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 5,312 more rows, 6 more variables: rapid_test_new &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   percentage_rapid_daily &lt;dbl&gt;, pcr_test_new_corrected &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   rapid_test_new_corrected &lt;dbl&gt;, pcr_tests_cum_corrected &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   rapid_test_cum_corrected &lt;dbl&gt;, and abbreviated variable names</span></span>
