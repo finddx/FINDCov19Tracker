@@ -107,7 +107,7 @@ To update data on 2021-02-18 or previous days, changes should be made using the 
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning:</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> NAs introduced by coercion</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(country, date)`</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">198479</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">198662</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">7</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Delimiter:</span> ","</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">chr</span>  (2): country, source</span>
@@ -117,7 +117,7 @@ To update data on 2021-02-18 or previous days, changes should be made using the 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $test_combined</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 139,995 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 140,178 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    country     date       tests_cumulative new_tests tests_cumulative_corrected</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Afghanistan 2021-02-19           <span style="text-decoration: underline;">282</span>249     <span style="text-decoration: underline;">24</span>238                     <span style="text-decoration: underline;">282</span>249</span>
@@ -130,11 +130,11 @@ To update data on 2021-02-18 or previous days, changes should be made using the 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Afghanistan 2021-02-26           <span style="text-decoration: underline;">282</span>249         0                     <span style="text-decoration: underline;">282</span>249</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Afghanistan 2021-02-27           <span style="text-decoration: underline;">282</span>249         0                     <span style="text-decoration: underline;">282</span>249</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Afghanistan 2021-02-28           <span style="text-decoration: underline;">282</span>249         0                     <span style="text-decoration: underline;">282</span>249</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 139,985 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 140,168 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: new_tests_corrected &lt;dbl&gt;, source &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $countries_error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,073 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,162 × 7</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># Groups:   country [104]</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    country     date       tests_cumulative new_tests tests_cumulative_corrected</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -147,8 +147,8 @@ To update data on 2021-02-18 or previous days, changes should be made using the 
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Afghanistan 2023-03-23               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Afghanistan 2023-03-24               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Afghanistan 2023-03-25               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Andorra     2023-03-17               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1,063 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Afghanistan 2023-03-26               <span style="color: #BB0000;">NA</span>        <span style="color: #BB0000;">NA</span>                         <span style="color: #BB0000;">NA</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1,152 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 2 more variables: new_tests_corrected &lt;dbl&gt;, source &lt;chr&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
